@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QTabWidget" name="WebBrowsing">
@@ -427,8 +427,8 @@ font-size: 35px;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>1211</width>
-          <height>661</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -470,7 +470,7 @@ font-size: 35px;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_6">
       <attribute name="title">
@@ -493,8 +493,8 @@ font-size: 35px;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>1211</width>
+          <height>661</height>
          </rect>
         </property>
         <attribute name="label">
@@ -722,8 +722,8 @@ font-size: 35px;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>98</width>
-          <height>28</height>
+          <width>1211</width>
+          <height>661</height>
          </rect>
         </property>
         <attribute name="label">

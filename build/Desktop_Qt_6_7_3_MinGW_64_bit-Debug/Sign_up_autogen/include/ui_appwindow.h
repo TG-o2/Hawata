@@ -226,7 +226,7 @@ public:
         ToolBox_pages->addItem(page_3, QString::fromUtf8("Page 1"));
         page_4 = new QWidget();
         page_4->setObjectName("page_4");
-        page_4->setGeometry(QRect(0, 0, 1211, 661));
+        page_4->setGeometry(QRect(0, 0, 98, 28));
         ToolBox_pages->addItem(page_4, QString::fromUtf8("Page 2"));
         WebBrowsing->addTab(tab, QString());
         tab_3 = new QWidget();
@@ -254,7 +254,7 @@ public:
         page1->setGeometry(QRect(20, 10, 1211, 731));
         page_5 = new QWidget();
         page_5->setObjectName("page_5");
-        page_5->setGeometry(QRect(0, 0, 98, 28));
+        page_5->setGeometry(QRect(0, 0, 1211, 661));
         pushButton_3 = new QPushButton(page_5);
         pushButton_3->setObjectName("pushButton_3");
         pushButton_3->setGeometry(QRect(860, 420, 181, 51));
@@ -315,7 +315,7 @@ public:
         page1->addItem(page_5, QString::fromUtf8("Page 1"));
         page_6 = new QWidget();
         page_6->setObjectName("page_6");
-        page_6->setGeometry(QRect(0, 0, 98, 28));
+        page_6->setGeometry(QRect(0, 0, 1211, 661));
         page1->addItem(page_6, QString::fromUtf8("Page 2"));
         WebBrowsing_2->addTab(tab_6, QString());
         tab_8 = new QWidget();
@@ -430,10 +430,10 @@ public:
 
         retranslateUi(appwindow);
 
-        stackedWidget->setCurrentIndex(0);
+        stackedWidget->setCurrentIndex(1);
         WebBrowsing->setCurrentIndex(0);
         ToolBox_pages->setCurrentIndex(0);
-        WebBrowsing_2->setCurrentIndex(1);
+        WebBrowsing_2->setCurrentIndex(0);
         page1->setCurrentIndex(0);
 
 

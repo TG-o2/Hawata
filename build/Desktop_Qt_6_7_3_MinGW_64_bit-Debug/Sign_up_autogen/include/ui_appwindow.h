@@ -96,6 +96,7 @@ public:
     QWidget *page_7;
     QLabel *label_34;
     QPushButton *pushButton_7;
+    QPushButton *Filterbutton_2;
     QWidget *page_5;
     QLineEdit *lineEdit_2;
     QLabel *label;
@@ -237,7 +238,7 @@ public:
         tab_3->setObjectName("tab_3");
         toolBox = new QToolBox(tab_3);
         toolBox->setObjectName("toolBox");
-        toolBox->setGeometry(QRect(0, 0, 1231, 501));
+        toolBox->setGeometry(QRect(0, 10, 1231, 501));
         page_3 = new QWidget();
         page_3->setObjectName("page_3");
         page_3->setGeometry(QRect(0, 0, 1231, 429));
@@ -271,10 +272,10 @@ public:
         verticalScrollBar->setOrientation(Qt::Orientation::Vertical);
         toolBox_2 = new QToolBox(page_3);
         toolBox_2->setObjectName("toolBox_2");
-        toolBox_2->setGeometry(QRect(660, 40, 571, 361));
+        toolBox_2->setGeometry(QRect(660, 40, 571, 341));
         page_6 = new QWidget();
         page_6->setObjectName("page_6");
-        page_6->setGeometry(QRect(0, 0, 571, 289));
+        page_6->setGeometry(QRect(0, 0, 571, 269));
         label_22 = new QLabel(page_6);
         label_22->setObjectName("label_22");
         label_22->setGeometry(QRect(40, 120, 101, 21));
@@ -329,6 +330,7 @@ public:
         toolBox_2->addItem(page_6, QString::fromUtf8("View Details"));
         page_8 = new QWidget();
         page_8->setObjectName("page_8");
+        page_8->setGeometry(QRect(0, 0, 100, 30));
         graphicsView_3 = new QGraphicsView(page_8);
         graphicsView_3->setObjectName("graphicsView_3");
         graphicsView_3->setGeometry(QRect(80, 30, 401, 201));
@@ -346,9 +348,13 @@ public:
         pushButton_7->setObjectName("pushButton_7");
         pushButton_7->setGeometry(QRect(255, 80, 91, 31));
         toolBox_2->addItem(page_7, QString::fromUtf8("Delete"));
+        Filterbutton_2 = new QPushButton(page_3);
+        Filterbutton_2->setObjectName("Filterbutton_2");
+        Filterbutton_2->setGeometry(QRect(370, 10, 91, 21));
         toolBox->addItem(page_3, QString::fromUtf8("View"));
         page_5 = new QWidget();
         page_5->setObjectName("page_5");
+        page_5->setGeometry(QRect(0, 0, 1231, 429));
         lineEdit_2 = new QLineEdit(page_5);
         lineEdit_2->setObjectName("lineEdit_2");
         lineEdit_2->setGeometry(QRect(210, 50, 113, 20));
@@ -397,7 +403,7 @@ public:
         label_20->setGeometry(QRect(80, 20, 131, 16));
         label_21 = new QLabel(page_4);
         label_21->setObjectName("label_21");
-        label_21->setGeometry(QRect(350, 20, 71, 16));
+        label_21->setGeometry(QRect(350, 15, 111, 21));
         graphicsView = new QGraphicsView(page_4);
         graphicsView->setObjectName("graphicsView");
         graphicsView->setGeometry(QRect(30, 50, 256, 192));
@@ -424,7 +430,7 @@ public:
         WebBrowsing->setCurrentIndex(1);
         ToolBox_pages->setCurrentIndex(0);
         toolBox->setCurrentIndex(0);
-        toolBox_2->setCurrentIndex(2);
+        toolBox_2->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(appwindow);
@@ -475,7 +481,7 @@ public:
         ___qtablewidgetitem3->setText(QCoreApplication::translate("appwindow", "Status", nullptr));
         QTableWidgetItem *___qtablewidgetitem4 = tableWidget->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QCoreApplication::translate("appwindow", "Details", nullptr));
-        Filterbutton->setText(QCoreApplication::translate("appwindow", "Filter", nullptr));
+        Filterbutton->setText(QCoreApplication::translate("appwindow", "By Status", nullptr));
         lineEdit->setText(QString());
         lineEdit->setPlaceholderText(QString());
         pushButton_4->setText(QCoreApplication::translate("appwindow", "Search", nullptr));
@@ -497,6 +503,7 @@ public:
         label_34->setText(QCoreApplication::translate("appwindow", "Are you sure you want to delete this ship?", nullptr));
         pushButton_7->setText(QCoreApplication::translate("appwindow", "Delete", nullptr));
         toolBox_2->setItemText(toolBox_2->indexOf(page_7), QCoreApplication::translate("appwindow", "Delete", nullptr));
+        Filterbutton_2->setText(QCoreApplication::translate("appwindow", "By Type", nullptr));
         toolBox->setItemText(toolBox->indexOf(page_3), QCoreApplication::translate("appwindow", "View", nullptr));
         label->setText(QCoreApplication::translate("appwindow", "Owner name", nullptr));
         label_14->setText(QCoreApplication::translate("appwindow", "Add Boat", nullptr));
@@ -509,7 +516,7 @@ public:
         label_20->setText(QCoreApplication::translate("appwindow", "Boat trips", nullptr));
         label_21->setText(QCoreApplication::translate("appwindow", "Fish caught", nullptr));
         toolBox->setItemText(toolBox->indexOf(page_4), QCoreApplication::translate("appwindow", "Statistics", nullptr));
-        WebBrowsing->setTabText(WebBrowsing->indexOf(tab_3), QCoreApplication::translate("appwindow", "Page", nullptr));
+        WebBrowsing->setTabText(WebBrowsing->indexOf(tab_3), QCoreApplication::translate("appwindow", "Boats", nullptr));
         WebBrowsing->setTabText(WebBrowsing->indexOf(tab_4), QCoreApplication::translate("appwindow", "Page", nullptr));
         WebBrowsing->setTabText(WebBrowsing->indexOf(tab_5), QCoreApplication::translate("appwindow", "Page", nullptr));
         WebBrowsing->setTabText(WebBrowsing->indexOf(tab_2), QCoreApplication::translate("appwindow", "Tab 2", nullptr));

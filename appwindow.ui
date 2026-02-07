@@ -432,14 +432,13 @@ font-size: 35px;
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>10</y>
        <width>1231</width>
        <height>501</height>
       </rect>
      </property>
      <property name="toolTip">
-      <string>
-</string>
+      <string/>
      </property>
      <property name="whatsThis">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -467,6 +466,12 @@ font-size: 35px;
          <width>611</width>
          <height>421</height>
         </rect>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
        </property>
        <column>
         <property name="text">
@@ -504,7 +509,7 @@ font-size: 35px;
         </rect>
        </property>
        <property name="text">
-        <string>Filter</string>
+        <string>By Status</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="lineEdit">
@@ -555,11 +560,11 @@ font-size: 35px;
          <x>660</x>
          <y>40</y>
          <width>571</width>
-         <height>361</height>
+         <height>341</height>
         </rect>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_6">
         <property name="geometry">
@@ -567,7 +572,7 @@ font-size: 35px;
           <x>0</x>
           <y>0</y>
           <width>571</width>
-          <height>289</height>
+          <height>269</height>
          </rect>
         </property>
         <attribute name="label">
@@ -784,6 +789,14 @@ font-size: 35px;
         </widget>
        </widget>
        <widget class="QWidget" name="page_8">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>100</width>
+          <height>30</height>
+         </rect>
+        </property>
         <attribute name="label">
          <string>live location</string>
         </attribute>
@@ -843,8 +856,29 @@ font-size: 35px;
         </widget>
        </widget>
       </widget>
+      <widget class="QPushButton" name="Filterbutton_2">
+       <property name="geometry">
+        <rect>
+         <x>370</x>
+         <y>10</y>
+         <width>91</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>By Type</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="page_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1231</width>
+        <height>429</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>Add</string>
       </attribute>
@@ -1024,9 +1058,9 @@ font-size: 35px;
        <property name="geometry">
         <rect>
          <x>350</x>
-         <y>20</y>
-         <width>71</width>
-         <height>16</height>
+         <y>15</y>
+         <width>111</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="text">

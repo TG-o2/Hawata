@@ -15,6 +15,7 @@ public:
     explicit appwindow(QWidget *parent = nullptr);
     ~appwindow();
 
+
 private:
     Ui::appwindow *ui;
 };

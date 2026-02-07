@@ -48,6 +48,19 @@ void MainWindow::on_logo_linkActivated(const QString &link)
 {
 
 }
+void MainWindow::openSignupPage()
+{
+    // Tu peux ouvrir la fenêtre signup ici plus tard
+    qDebug() << "openSignupPage called";
+}
+
+void MainWindow::on_Create_clicked()
+{
+    qDebug() << "Create button clicked";
+
+    CreateAcc create_account(this);
+    create_account.exec();
+}
 
 
 void MainWindow::on_Exit_clicked()
@@ -76,7 +89,7 @@ void MainWindow::on_Sign_in_clicked()
         return;
     }
 
-    QFile file("C:/Users/USER/Downloads/Project (1)/Sign_up/users.txt");
+    QFile file("users.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Error", "Cannot open users file!");
         return;

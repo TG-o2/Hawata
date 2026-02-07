@@ -178,6 +178,502 @@ QPushButton#danger:hover, QPushButton[style="danger"]:hover {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #f44336, stop:1 #ef5350);
 }
+/* =========================
+   AHMED SECTION
+========================= */
+/* ================================================
+   COMPANIES SECTION STYLING
+   ================================================ */
+
+/* Main Table Styling */
+QTableWidget#tableWidget {
+    background-color: #ffffff;
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    gridline-color: #d0d0d0;
+    font-size: 14px;
+}
+
+QTableWidget#tableWidget::item {
+    padding: 5px;
+}
+
+QHeaderView::section {
+    background-color: #0a4c73;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    border: 1px solid #ffffff;
+    height: 30px;
+}
+
+/* Alternating row colors */
+QTableWidget#tableWidget {
+    alternate-background-color: #f5f5f5;
+}
+
+/* Selected row style */
+QTableWidget#tableWidget::item:selected {
+    background-color: #42a5f5;
+    color: white;
+}
+
+/* Search bar */
+QLineEdit#searchbar {
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+/* Clear button */
+QPushButton#clear {
+    background-color: #f44336;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+QPushButton#clear:hover {
+    background-color: #e57373;
+}
+
+/* Add/Edit/Delete/Export buttons */
+QPushButton#add_company,
+QPushButton#edit_company,
+QPushButton#delete_company
+ {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #2196F3);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+}
+QPushButton#export_pdf {
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #42a5f5, stop:1 #e57373);
+color: white;
+font-weight: bold;
+border-radius: 8px;
+padding: 8px 12px;
+font-size: 14px;
+border: none;
+}
+QPushButton#add_company:hover,
+QPushButton#edit_company:hover,
+QPushButton#delete_company:hover
+{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #64b5f6, stop:1 #42a5f5);
+}
+
+QPushButton#export_pdf:hover
+{
+background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #e57373, stop:1 #42a5f5);
+}
+
+QPushButton#add_company:pressed,
+QPushButton#edit_company:pressed,
+QPushButton#delete_company:pressed,
+QPushButton#export_pdf:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Result label below table */
+QLabel#labelResults {
+    font-weight: bold;
+    color: #0a4c73;
+    font-size: 14px;
+}
+
+/* Layout styling */
+QWidget#layoutWidget {
+    background-color: transparent;
+}
+
+/* Scrollbars inside table */
+QTableWidget#tableWidget QScrollBar {
+    background: #e0e0e0;
+    border-radius: 5px;
+}
+QTableWidget#tableWidget QScrollBar::handle {
+    background: #0a4c73;
+    border-radius: 5px;
+}
+
+/* ================================================
+   AUTOMATED EMAIL BUTTONS STYLING
+   ================================================ */
+
+QPushButton#btn_preview_2 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #2196F3);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_preview_2:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #64b5f6, stop:1 #42a5f5);
+}
+
+QPushButton#btn_preview_2:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Send Now Button - Success Green */
+QPushButton#btn_send_now_2 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #66bb6a, stop:1 #4CAF50);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_send_now_2:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #81c784, stop:1 #66bb6a);
+}
+
+QPushButton#btn_send_now_2:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #388e3c, stop:1 #2e7d32);
+}
+
+/* Schedule Button - Danger Red */
+QPushButton#btn_schedule_2 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #ef5350, stop:1 #e53935);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_schedule_2:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f44336, stop:1 #ef5350);
+}
+
+QPushButton#btn_schedule_2:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #d32f2f, stop:1 #c62828);
+}
+
+/* Template Buttons - Secondary Blue */
+QPushButton#btn_template_inactive_2,
+QPushButton#btn_template_promo_2 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #2196F3);
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 5px 10px;
+    border: none;
+}
+
+QPushButton#btn_template_inactive_2:hover,
+QPushButton#btn_template_promo_2:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #64b5f6, stop:1 #42a5f5);
+}
+
+QPushButton#btn_template_inactive_2:pressed,
+QPushButton#btn_template_promo_2:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Clear Template Button - Gray */
+QPushButton#btn_template_clear_2 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #bdbdbd, stop:1 #9E9E9E);
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 5px 10px;
+    border: none;
+}
+
+QPushButton#btn_template_clear_2:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #e0e0e0, stop:1 #bdbdbd);
+}
+
+QPushButton#btn_template_clear_2:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #757575, stop:1 #616161);
+}
+/* ================================================
+   STATISTICS SECTION STYLING
+   ================================================ */
+
+/* Main Chart Container */
+QChartView#chartView {
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    padding: 10px;
+}
+
+/* Section Title */
+QLabel#labelStatsTitle {
+    font-family: "Arteks";
+    font-size: 28px;
+    font-weight: bold;
+    color: #0a4c73;
+}
+
+/* ComboBox Filters */
+QComboBox {
+    border: 1px solid #0a4c73;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: white;
+    min-width: 150px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #0a4c73;
+}
+
+QComboBox QAbstractItemView {
+    selection-background-color: #42a5f5;
+    background-color: white;
+}
+
+/* Generate Button */
+QPushButton#pushButton_5 {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #2196F3);
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#pushButton_5:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #64b5f6, stop:1 #42a5f5);
+}
+
+QPushButton#pushButton_5:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Labels for Stats Filters & Count */
+QLabel#label_target_count_2,
+QLabel#label_filter_fish_2,
+QLabel#label_filter_location_2 {
+    font-weight: bold;
+    font-size: 14px;
+    color: #0a4c73;
+}
+
+/* DateTimeEdits (if used for date filters) */
+QDateTimeEdit {
+    border: 1px solid #0a4c73;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: white;
+    font-size: 14px;
+}
+
+/* Scrollable Chart (if needed) */
+QChartView QScrollBar {
+    background: #e0e0e0;
+    border-radius: 5px;
+}
+QChartView QScrollBar::handle {
+    background: #0a4c73;
+    border-radius: 5px;
+}
+/* ================================================
+   TRENDS & INSIGHTS SECTION STYLING
+   ================================================ */
+
+/* Refresh Button - Primary Blue */
+QPushButton#btn_refresh_trends {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #2196F3);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_refresh_trends:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #64b5f6, stop:1 #42a5f5);
+}
+
+QPushButton#btn_refresh_trends:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Export PDF Button - Gradient Blue to Red */
+QPushButton#btn_export_trends_pdf {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #42a5f5, stop:1 #e57373);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_export_trends_pdf:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #e57373, stop:1 #42a5f5);
+}
+
+QPushButton#btn_export_trends_pdf:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #1976d2, stop:1 #1565c0);
+}
+
+/* Export CSV Button - Success Green */
+QPushButton#btn_export_trends_csv {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #66bb6a, stop:1 #4CAF50);
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+}
+
+QPushButton#btn_export_trends_csv:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #81c784, stop:1 #66bb6a);
+}
+
+QPushButton#btn_export_trends_csv:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #388e3c, stop:1 #2e7d32);
+}
+
+/* Top Companies Table */
+QTableWidget#table_top_companies {
+    background-color: #ffffff;
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    gridline-color: #d0d0d0;
+    font-size: 14px;
+}
+
+QTableWidget#table_top_companies::item {
+    padding: 5px;
+}
+
+QTableWidget#table_top_companies::item:selected {
+    background-color: #42a5f5;
+    color: white;
+}
+
+/* Main Chart View */
+QChartView#chartView_main {
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    padding: 10px;
+}
+
+/* Time Range ComboBox */
+QComboBox#combo_time_range,
+QComboBox#combo_chart_type {
+    border: 1px solid #0a4c73;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 14px;
+    background-color: white;
+}
+
+QComboBox#combo_time_range::drop-down,
+QComboBox#combo_chart_type::drop-down {
+    border-left: 1px solid #0a4c73;
+}
+
+QComboBox#combo_time_range QAbstractItemView,
+QComboBox#combo_chart_type QAbstractItemView {
+    selection-background-color: #42a5f5;
+    background-color: white;
+}
+
+/* Labels */
+QLabel#label_time_range,
+QLabel#label_chart_type,
+QLabel#label_top_companies,
+QLabel#label_key_insights,
+QLabel#label_summary_title,
+QLabel#label_export {
+    font-weight: bold;
+    font-size: 14px;
+    color: #0a4c73;
+}
+
+QLabel#label_total_purchases,
+QLabel#label_active_companies,
+QLabel#label_avg_purchase {
+    font-size: 13px;
+    color: #333333;
+}
+
+/* Insights Text Edit */
+QTextEdit#text_insights {
+    border: 1px solid #0a4c73;
+    border-radius: 5px;
+    background-color: #ffffff;
+    font-size: 13px;
+    padding: 5px;
+}
+
+/* GroupBox */
+QGroupBox#groupBox_trends {
+    border: 2px solid #0a4c73;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #0a4c73;
+}
+
+QGroupBox#groupBox_trends::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 5px 10px;
+    background-color: white;
+}
+
+
+/* =========================
+   AHMMED END SECTION
+========================= */
 
 
 /* =========================

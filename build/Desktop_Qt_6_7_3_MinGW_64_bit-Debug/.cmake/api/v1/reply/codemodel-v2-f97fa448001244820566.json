@@ -6,8 +6,7 @@
 			[
 				{
 					"build" : ".",
-					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-79019c5810eb19871132.json",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.16"
@@ -44,7 +43,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Sign_up::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Sign_up-Debug-0143f38487e424a88411.json",
+					"jsonFile" : "target-Sign_up-Debug-5b7cd46ae5d9284041e9.json",
 					"name" : "Sign_up",
 					"projectIndex" : 0
 				},
@@ -68,8 +67,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
-		"source" : "C:/Users/USER/Downloads/Project (1)/Sign_up"
+		"build" : "C:/Users/BenKh/OneDrive/Desktop/PROJET C++ QT/Project_qt/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/BenKh/OneDrive/Desktop/PROJET C++ QT/Project_qt/Sign_up"
 	},
 	"version" : 
 	{

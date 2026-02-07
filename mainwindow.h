@@ -25,13 +25,13 @@ public:
 
 public slots:
     //opens a new window :
-   // void openSignupPage();
+    void openSignupPage();
 private slots:
     void on_logo_linkActivated(const QString &link);
 
     void on_Exit_clicked();
     void on_create_acc_linkActivated(const QString &link);
-   // void on_Create_clicked();
+    void on_Create_clicked();
 
     void on_Sign_in_clicked();
 

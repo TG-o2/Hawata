@@ -414,8 +414,8 @@ font-size: 35px;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>100</width>
-        <height>30</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -502,10 +502,10 @@ font-size: 35px;
       <widget class="QPushButton" name="Filterbutton">
        <property name="geometry">
         <rect>
-         <x>490</x>
+         <x>470</x>
          <y>10</y>
-         <width>91</width>
-         <height>21</height>
+         <width>111</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
@@ -793,8 +793,8 @@ font-size: 35px;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>100</width>
-          <height>30</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -816,8 +816,8 @@ font-size: 35px;
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>571</width>
-          <height>289</height>
+          <width>98</width>
+          <height>28</height>
          </rect>
         </property>
         <attribute name="label">
@@ -859,10 +859,10 @@ font-size: 35px;
       <widget class="QPushButton" name="Filterbutton_2">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>350</x>
          <y>10</y>
-         <width>91</width>
-         <height>21</height>
+         <width>111</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
@@ -875,8 +875,8 @@ font-size: 35px;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1231</width>
-        <height>429</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1034,8 +1034,8 @@ font-size: 35px;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1231</width>
-        <height>429</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">

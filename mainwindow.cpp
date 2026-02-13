@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     //logo
-    QPixmap pix("logoQt.png");
+    QPixmap pix("try2.png");
     ui->logo->setPixmap(pix);
     ui->logo->setScaledContents(true);
 
@@ -28,6 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->create_acc->setText(
         "<a href=\"signup\">forgot password?</a>"
+        );
+    ui->BackFrame->lower();
+    ui->BackFrame->setStyleSheet(
+        "background: rgba(255, 255, 255, 0.3);"
+        "border: 2px solid #0369a1;"
+        "border-radius: 16px;"
         );
 
     ui->create_acc->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -47,19 +53,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_logo_linkActivated(const QString &link)
 {
 
-}
-void MainWindow::openSignupPage()
-{
-    // Tu peux ouvrir la fenêtre signup ici plus tard
-    qDebug() << "openSignupPage called";
-}
-
-void MainWindow::on_Create_clicked()
-{
-    qDebug() << "Create button clicked";
-
-    CreateAcc create_account(this);
-    create_account.exec();
 }
 
 

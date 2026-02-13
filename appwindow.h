@@ -2,6 +2,13 @@
 #define APPWINDOW_H
 
 #include <QDialog>
+#include <QFile>
+#include <QFontDatabase>
+#include <QDebug>
+#include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 namespace Ui {
 class appwindow;
@@ -14,7 +21,6 @@ class appwindow : public QDialog
 public:
     explicit appwindow(QWidget *parent = nullptr);
     ~appwindow();
-
 
 private:
     Ui::appwindow *ui;

@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
 
     //loading the fonts
 
-    int fontId = QFontDatabase::addApplicationFont(":/fonts/Bion-Bold.otf");
-    int fontId3 = QFontDatabase::addApplicationFont(":/fonts/Arteks-Bold.otf");
+    int fontId = QFontDatabase::addApplicationFont(":/fonts/Hey Comic.otf");
+    int fontId3 = QFontDatabase::addApplicationFont(":/fonts/Bion-BoldCond.otf");
 
     int fontId2 = QFontDatabase::addApplicationFont(":/fonts/Behove.ttf");
     if (fontId == -1) {

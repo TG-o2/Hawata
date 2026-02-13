@@ -51,6 +51,14 @@ QLabel#description {
     line-height: 1.4;
 }
 
+QLabel#homeImage,
+QLabel#welcomeTitle,
+QLabel#welcomeText,
+QLabel#getStarted,
+QLabel#waveDecoration {
+    background: transparent;
+    border: none;
+}
 
 /* =========================
    INPUT FIELDS

@@ -1,0 +1,19 @@
+# ninja log v6
+15	60	7927906684608786	CMakeFiles/clean.additional	baedbe210acaa455
+60	78	7927906685058782	clean	577b940aee94fbd7
+41	1800	7927906702985085	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+41	1800	7927906702985085	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+41	1800	7927906702985085	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+41	1800	7927906702985085	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+1841	2570	7927906712223832	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+1841	2570	7927906712223832	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+2639	5962	7927906713104014	CMakeFiles/Sign_up.dir/connection.cpp.obj	a0094b91198ab1e7
+2646	6036	7927906713174013	CMakeFiles/Sign_up.dir/Docking.cpp.obj	11872d51f0f6be28
+2619	6080	7927906712903970	CMakeFiles/Sign_up.dir/user.cpp.obj	4dc9f22091038350
+2606	6839	7927906712773994	CMakeFiles/Sign_up.dir/main.cpp.obj	e23720ae6eafbd6b
+2600	6983	7927906712713974	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
+2612	7110	7927906712834023	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+2626	7345	7927906712974002	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+2632	9490	7927906713034007	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+2653	9558	7927906713244003	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	25662290229cf2d7
+9559	10165	7927906782302983	Sign_up.exe	e0cfe93fda7bde69

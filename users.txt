@@ -1,0 +1,4 @@
+Jihene;Jeridi;Admin;jihene@gmail.com;1234
+Ali;BenAli;User;ali@gmail.com;password
+Sarra;Trabelsi;User;sarra@gmail.com;abcd1234
+test;TestUser;User;test@example.com;test123

@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>marine_theme.qss</file>
+        <file>fonts/Arteks Black.otf</file>
+        <file>fonts/Arteks Compact.otf</file>
+        <file>fonts/Arteks Contour.otf</file>
+        <file>fonts/Arteks Creative.otf</file>
+        <file>fonts/Arteks Italic.otf</file>
+        <file>fonts/Arteks Light Italic.otf</file>
+        <file>fonts/Arteks Light.otf</file>
+        <file>fonts/Arteks Medium Italic.otf</file>
+        <file>fonts/Arteks Medium.otf</file>
+        <file>fonts/Arteks Regular.otf</file>
+        <file>fonts/Arteks Shadow.otf</file>
+        <file>fonts/Arteks Version Italic.otf</file>
+        <file>fonts/Arteks Version Regular.otf</file>
+        <file>fonts/Arteks-Bold-Italic.otf</file>
+        <file>fonts/Arteks-Bold.otf</file>
+        <file>fonts/Behove.otf</file>
+        <file>fonts/Behove.ttf</file>
+        <file>fonts/Bion-Bold.otf</file>
+        <file>fonts/Bion-Bold.ttf</file>
+        <file>fonts/Bion-BoldCond.otf</file>
+        <file>fonts/Bion-BoldCond.ttf</file>
+        <file>fonts/Bion-Book.otf</file>
+        <file>fonts/Bion-Book.ttf</file>
+        <file>fonts/Bion-BookCond.otf</file>
+        <file>fonts/Bion-BookCond.ttf</file>
+    </qresource>
+</RCC>

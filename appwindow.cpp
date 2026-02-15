@@ -2,6 +2,7 @@
 #include "ui_appwindow.h"
 #include "mainwindow.h"
 
+
 #include <QPixmap>
 #include <QMessageBox>
 #include <QFile>
@@ -36,7 +37,7 @@ appwindow::appwindow(QWidget *parent)
 
     //pictures for product--------
     QPixmap fish("icons/fishicon.png");
-    QPixmap pic_2("logoQT.png");
+    QPixmap pic_2("icons/logoQT.png");
     QPixmap homepage("icons/Ports1.jpg");
     QPixmap waves("icons/wave.jpg");
     //product picture set up
@@ -650,7 +651,90 @@ appwindow::appwindow(QWidget *parent)
     });
 }
 
+//Add docking
+void appwindow::on_CreateDocking_clicked()
+{
+    // Get values from UI widgets
+    QString location = ui->location->text();
+    QString length = ui->length->text();
+    QString height = ui->height->text();
+    QString status = ui->status->currentText();  // Assuming it's a QComboBox
+    QString capacity = ui->capacity->text();
+    QString startDate = ui->startDate->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+    QString endDate = ui->endDate->dateTime().toString("yyyy-MM-dd hh:mm:ss");
+
+    // Validate inputs
+    if (location.isEmpty() || length.isEmpty() || height.isEmpty() ||
+        capacity.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
+        return;
+    }
+
+    // Call the create function
+    if (dockingManager.createDocking(location, length, height, status, capacity, startDate, endDate)) {
+        QMessageBox::information(this, "Success", "Docking created successfully!");
+        // Clear the form
+        ui->location->clear();
+        ui->length->clear();
+        ui->height->clear();
+        ui->capacity->clear();
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to create docking. Please check the database connection.");
+    }
+}
+
+//add user
+void appwindow::on_CreateUser_clicked()
+{
+    // Get values from UI widgets
+    QString email = ui->email->text();
+    QString firstName = ui->Fname->text();
+    QString lastName = ui->Lname->text();
+    QString password = ui->password->text();
+    QString role = ui->role->currentText();
+    QString gender = ui->gender->currentText().left(1).toUpper(); // M/F
+
+    bool ok;
+    double salary = ui->salary->text().toDouble(&ok);
+    if (!ok) {
+        QMessageBox::warning(this, "Error", "Salary must be a number!");
+        return;
+    }
+
+    QString shiftStart = ui->startShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString shiftEnd = ui->endShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    // Validate required fields
+    if (email.isEmpty() || password.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
+        return;
+    }
+
+    // Call the create function ONCE
+    if (userManager.createUser(email, firstName, lastName, password, role, gender, salary, shiftStart, shiftEnd)) {
+        QMessageBox::information(this, "Success", "User created successfully!");
+
+        // Clear the form
+        ui->email->clear();
+        ui->Fname->clear();
+        ui->Lname->clear();
+        ui->password->clear();
+        ui->role->setCurrentIndex(0);
+        ui->gender->setCurrentIndex(0);
+        ui->salary->clear();
+        ui->startShift->setDateTime(QDateTime::currentDateTime());
+        ui->endShift->setDateTime(QDateTime::currentDateTime());
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to create user. Please check the database connection.");
+    }
+}
+
+
 appwindow::~appwindow()
 {
     delete ui;
 }
+
+
+
+

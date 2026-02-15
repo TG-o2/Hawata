@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QStandardItemModel>
+#include <QSqlDatabase>
 #include "product.h"
 #include <QList>
 
@@ -29,10 +30,14 @@ private:
     Ui::appwindow *ui;
     QList<Product> m_products;
     QStandardItemModel *m_productModel;
+    QSqlDatabase m_database;
+    
+    // Database helper methods
+    bool connectToDatabase();
+    void createProductTable();
     
     // Product helper methods
-    void loadProducts();
-    void saveProducts();
+    void loadProductsFromDB();
     void displayProducts();
     void clearProductForm();
     int getNextProductId();

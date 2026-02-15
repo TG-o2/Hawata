@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -4445,7 +4445,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -4486,8 +4486,8 @@ border: none;
        <widget class="QLabel" name="pic">
         <property name="geometry">
          <rect>
-          <x>490</x>
-          <y>250</y>
+          <x>550</x>
+          <y>260</y>
           <width>350</width>
           <height>350</height>
          </rect>
@@ -4502,8 +4502,8 @@ border: none;
        <widget class="QPushButton" name="checkProductButton_2">
         <property name="geometry">
          <rect>
-          <x>300</x>
-          <y>250</y>
+          <x>330</x>
+          <y>360</y>
           <width>161</width>
           <height>51</height>
          </rect>
@@ -4702,6 +4702,29 @@ font-size: 35px;
          <rect>
           <x>20</x>
           <y>580</y>
+          <width>251</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_6">
+        <property name="geometry">
+         <rect>
+          <x>300</x>
+          <y>230</y>
+          <width>101</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>loction:</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="locationEdit">
+        <property name="geometry">
+         <rect>
+          <x>290</x>
+          <y>270</y>
           <width>251</width>
           <height>31</height>
          </rect>
@@ -7479,7 +7502,7 @@ border: none;
            <x>10</x>
            <y>60</y>
            <width>1020</width>
-           <height>63</height>
+           <height>65</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_subject_2">

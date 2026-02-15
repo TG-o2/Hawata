@@ -4,7 +4,7 @@ Connection::Connection()
 {
     // Use the member db, not a local variable
     db = QSqlDatabase::addDatabase("QODBC");  // or "QOCI" for Oracle client
-    db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=tasnim;Pwd=286919;");
+    db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=qtuser;Pwd=mypassword123;");
 
     if (!db.open()) {
         qDebug() << "Database connection failed:" << db.lastError().text();

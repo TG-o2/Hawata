@@ -1,0 +1,10 @@
+build/
+build-*/
+*.user
+CMakeCache.txt
+CMakeFiles/
+Makefile
+*.o
+*.exe
+Debug/
+Release/

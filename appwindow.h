@@ -2,6 +2,7 @@
 #define APPWINDOW_H
 #include "Docking.h"
 #include "user.h"
+#include "product.h"
 #include <QDialog>
 #include <QFile>
 #include <QFontDatabase>
@@ -27,11 +28,13 @@ private slots:
     void on_CreateDocking_clicked();
 
     void on_CreateUser_clicked();
+    void on_checkProductButton_2_clicked();
 
 private:
     Ui::appwindow *ui;
     Docking dockingManager;
     User userManager;
+     Product productManager;
 
 };
 

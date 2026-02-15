@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         appwindow.h appwindow.cpp appwindow.ui
         connection.h connection.cpp
         Docking.h Docking.cpp
+        product.h product.cpp
     )
 
     # ────────────────────────────────────────────────
@@ -62,6 +63,7 @@ else()
             appwindow.h appwindow.cpp appwindow.ui
             connection.h connection.cpp
             Docking.h Docking.cpp
+            product.h product.cpp
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
@@ -74,6 +76,7 @@ else()
             appwindow.h appwindow.cpp appwindow.ui
             connection.h connection.cpp
             Docking.h Docking.cpp
+            product.h product.cpp
         )
     endif()
 endif()

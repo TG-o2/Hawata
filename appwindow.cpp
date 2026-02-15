@@ -729,6 +729,61 @@ void appwindow::on_CreateUser_clicked()
     }
 }
 
+// Add product
+void appwindow::on_checkProductButton_2_clicked()
+{
+    // Get values from UI widgets (object names based on appwindow.ui)
+    QString id = ui->firstNameEdit_3->text();               // Product Code
+    QString type = ui->firstNameEdit_4->text();             // Type of Fish
+    QString status = ui->role_option_4->currentText();      // Status combo
+    QString quantity = ui->firstNameEdit_5->text();          // Quantity
+    QString price = ui->firstNameEdit_6->text();             // Price
+    QString location = ui->locationEdit->text();             // location
+
+    QString fishCaughtTime = ui->dateTimeEdit_6->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString dateOfPurchase = ui->dateTimeEdit_5->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+
+
+
+    // Validate required fields
+    if (id.isEmpty() || type.isEmpty() || quantity.isEmpty() || price.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
+        return;
+    }
+
+    // Optionally validate numeric fields
+    bool ok;
+    int qty = quantity.toInt(&ok);
+    if (!ok) {
+        QMessageBox::warning(this, "Error", "Quantity must be a number!");
+        return;
+    }
+    double pr = price.toDouble(&ok);
+    if (!ok) {
+        QMessageBox::warning(this, "Error", "Price must be a number!");
+        return;
+    }
+
+    // Call the create function
+    if (productManager.createProduct(id, type, status, quantity, price,
+                                     fishCaughtTime, dateOfPurchase, location)) {
+        QMessageBox::information(this, "Success", "Product added successfully!");
+
+        // Clear the form
+        ui->firstNameEdit_3->clear();
+        ui->firstNameEdit_4->clear();
+        ui->role_option_4->setCurrentIndex(0);
+        ui->firstNameEdit_5->clear();
+        ui->firstNameEdit_6->clear();
+        ui->dateTimeEdit_5->setDateTime(QDateTime::currentDateTime());
+        ui->dateTimeEdit_6->setDateTime(QDateTime::currentDateTime());
+        // If location field exists, clear it too
+        // ui->locationEdit->clear();
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to add product. Please check the database connection.");
+    }
+}
 
 appwindow::~appwindow()
 {

@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "createacc.h"
 #include "appwindow.h"
+//#include "connection.h"
 
 
 //libraries
@@ -17,8 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
     //logo
-    QPixmap pix("try2.png");
+    QPixmap pix("icons/try2.png");
     ui->logo->setPixmap(pix);
     ui->logo->setScaledContents(true);
 

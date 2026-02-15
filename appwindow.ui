@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -339,7 +339,7 @@ font-size: 35px;
          <string>Email</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lastNameEdit_6">
+       <widget class="QLineEdit" name="salary">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -388,7 +388,7 @@ font-size: 35px;
          <string>Last Name:</string>
         </property>
        </widget>
-       <widget class="QComboBox" name="role_option_6">
+       <widget class="QComboBox" name="gender">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -421,7 +421,7 @@ font-size: 35px;
          <string>Choose Role</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="emailEdit_3">
+       <widget class="QLineEdit" name="email">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -431,7 +431,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="role_option_5">
+       <widget class="QComboBox" name="role">
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -456,7 +456,7 @@ font-size: 35px;
          </property>
         </item>
        </widget>
-       <widget class="QLineEdit" name="lastNameEdit_5">
+       <widget class="QLineEdit" name="Lname">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -466,7 +466,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="firstNameEdit_7">
+       <widget class="QLineEdit" name="Fname">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -489,7 +489,7 @@ font-size: 35px;
          <string>First Name:</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="passwordEdit_2">
+       <widget class="QLineEdit" name="password">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -538,7 +538,7 @@ font-size: 35px;
          <string>Start of Shift</string>
         </property>
        </widget>
-       <widget class="QDateTimeEdit" name="dateTimeEdit_7">
+       <widget class="QDateTimeEdit" name="startShift">
         <property name="geometry">
          <rect>
           <x>620</x>
@@ -548,7 +548,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QDateTimeEdit" name="dateTimeEdit_8">
+       <widget class="QDateTimeEdit" name="endShift">
         <property name="geometry">
          <rect>
           <x>620</x>
@@ -558,7 +558,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QPushButton" name="CreateUser_2">
+       <widget class="QPushButton" name="CreateUser">
         <property name="geometry">
          <rect>
           <x>640</x>
@@ -1453,7 +1453,7 @@ border: none;
        <property name="styleSheet">
         <string notr="true"/>
        </property>
-       <widget class="QDateTimeEdit" name="dateTimeEdit_11">
+       <widget class="QDateTimeEdit" name="startDate">
         <property name="geometry">
          <rect>
           <x>530</x>
@@ -1463,7 +1463,7 @@ border: none;
          </rect>
         </property>
        </widget>
-       <widget class="QComboBox" name="role_option_9">
+       <widget class="QComboBox" name="status">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -1515,7 +1515,7 @@ font-size: 35px;
          <string>Create Docking:</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_20">
+       <widget class="QPushButton" name="CreateDocking">
         <property name="geometry">
          <rect>
           <x>540</x>
@@ -1528,7 +1528,7 @@ font-size: 35px;
          <string>Create Docking</string>
         </property>
        </widget>
-       <widget class="QDateTimeEdit" name="dateTimeEdit_12">
+       <widget class="QDateTimeEdit" name="endDate">
         <property name="geometry">
          <rect>
           <x>530</x>
@@ -1551,7 +1551,7 @@ font-size: 35px;
          <string>Height:</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="firstNameEdit_9">
+       <widget class="QLineEdit" name="location">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -1613,7 +1613,7 @@ font-size: 35px;
          <string>Status:</string>
         </property>
        </widget>
-       <widget class="QLineEdit" name="emailEdit_6">
+       <widget class="QLineEdit" name="capacity">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -1623,7 +1623,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="lastNameEdit_9">
+       <widget class="QLineEdit" name="length">
         <property name="geometry">
          <rect>
           <x>180</x>
@@ -1633,7 +1633,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QLineEdit" name="emailEdit_7">
+       <widget class="QLineEdit" name="height">
         <property name="geometry">
          <rect>
           <x>180</x>

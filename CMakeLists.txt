@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
     mainwindow.ui
     user.h
     user.cpp
+    product.h
+    product.cpp
     createacc.h
     createacc.cpp
     createacc.ui

@@ -6,15 +6,35 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
-#include <QMessageBox>
+#include <QTableWidgetItem>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlRecord>
 
 
 appwindow::appwindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::appwindow)
+    , m_productModel(new QStandardItemModel(this))
 {
     ui->setupUi(this);
 
+    // Initialize product table model
+    m_productModel->setHorizontalHeaderLabels(
+        QStringList() << "ID" << "Code" << "Fish Type" << "Catch Date" 
+                      << "Quantity" << "Status" << "Price" << "Created At"
+    );
+    ui->tableView_5->setModel(m_productModel);
+    ui->tableView_5->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView_5->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    // Connect to database and create table if needed
+    if (connectToDatabase()) {
+        createProductTable();
+    } else {
+        QMessageBox::warning(this, "Database Error", "Failed to connect to database. Product features may not work.");
+    }
 
     //photo logo set up
 
@@ -481,5 +501,303 @@ appwindow::appwindow(QWidget *parent)
 
 appwindow::~appwindow()
 {
+    if (m_database.isOpen()) {
+        m_database.close();
+    }
     delete ui;
+}
+
+// ===============================================
+// DATABASE CONNECTION METHODS
+// ===============================================
+
+bool appwindow::connectToDatabase()
+{
+    m_database = QSqlDatabase::addDatabase("QOCI");  // Oracle database driver
+    
+    // Database connection parameters
+    // Update these based on your SQL Developer configuration
+    m_database.setHostName("localhost");  // or your Oracle host
+    m_database.setDatabaseName("hwata");  // or your service name/SID
+    m_database.setUserName("system");     // Update with your username
+    m_database.setPassword("password");   // Update with your password
+    
+    if (!m_database.open()) {
+        QMessageBox::critical(this, "Database Error", 
+            "Failed to connect to database:\n" + m_database.lastError().text());
+        return false;
+    }
+    
+    return true;
+}
+
+void appwindow::createProductTable()
+{
+    QSqlQuery query(m_database);
+    
+    // Create products table if it doesn't exist
+    QString createTableQuery = R"(
+        CREATE TABLE IF NOT EXISTS products (
+            product_id NUMBER PRIMARY KEY,
+            product_code VARCHAR2(100) NOT NULL,
+            fish_type VARCHAR2(100) NOT NULL,
+            catch_date TIMESTAMP,
+            catch_time TIMESTAMP,
+            quantity NUMBER NOT NULL,
+            status NUMBER NOT NULL,
+            price NUMBER(10,2) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    )";
+    
+    if (!query.exec(createTableQuery)) {
+        qDebug() << "Failed to create table:" << query.lastError().text();
+        // Table might already exist, which is fine
+    }
+    
+    // Create sequence for auto-incrementing product_id
+    QString createSequenceQuery = "CREATE SEQUENCE product_seq START WITH 1 INCREMENT BY 1";
+    query.exec(createSequenceQuery);  // Ignore error if sequence already exists
+}
+
+// ===============================================
+// PRODUCT CRUD IMPLEMENTATION
+// ===============================================
+
+// Load products from database
+void appwindow::loadProductsFromDB()
+{
+    m_products.clear();
+    
+    QSqlQuery query(m_database);
+    query.prepare("SELECT product_id, product_code, fish_type, catch_date, catch_time, "
+                  "quantity, status, price, created_at FROM products ORDER BY product_id");
+    
+    if (!query.exec()) {
+        QMessageBox::warning(this, "Database Error", 
+            "Failed to load products:\n" + query.lastError().text());
+        return;
+    }
+    
+    while (query.next()) {
+        Product product(
+            query.value(0).toInt(),                           // productId
+            query.value(1).toString(),                        // productCode
+            query.value(2).toString(),                        // fishType
+            query.value(3).toDateTime(),                      // catchDate
+            query.value(4).toDateTime(),                      // catchTime
+            query.value(5).toInt(),                           // quantity
+            static_cast<Product::ProductStatus>(query.value(6).toInt()), // status
+            query.value(7).toDouble(),                        // price
+            query.value(8).toDateTime()                       // createdAt
+        );
+        m_products.append(product);
+    }
+}
+
+// Display products in table
+void appwindow::displayProducts()
+{
+    // Clear existing rows
+    m_productModel->removeRows(0, m_productModel->rowCount());
+    
+    // Populate table with products
+    for (const Product &p : m_products) {
+        QList<QStandardItem*> row;
+        
+        row.append(new QStandardItem(QString::number(p.getProductId())));
+        row.append(new QStandardItem(p.getProductCode()));
+        row.append(new QStandardItem(p.getFishType()));
+        row.append(new QStandardItem(p.getCatchDate().toString("yyyy-MM-dd")));
+        row.append(new QStandardItem(QString::number(p.getQuantity())));
+        row.append(new QStandardItem(Product::statusToString(p.getStatus())));
+        row.append(new QStandardItem(QString::number(p.getPrice(), 'f', 2)));
+        row.append(new QStandardItem(p.getCreatedAt().toString("yyyy-MM-dd HH:mm")));
+        
+        m_productModel->appendRow(row);
+    }
+    
+    ui->tableView_5->resizeColumnsToContents();
+}
+
+// Clear product form inputs
+void appwindow::clearProductForm()
+{
+    ui->firstNameEdit_5->clear();  // Product Code
+    ui->firstNameEdit_3->clear();  // Fish Type
+    ui->dateTimeEdit_5->setDateTime(QDateTime::currentDateTime()); // Catch Date
+    ui->dateTimeEdit_6->setDateTime(QDateTime::currentDateTime()); // Catch Time
+    ui->firstNameEdit_4->clear();  // Quantity
+    ui->role_option_4->setCurrentIndex(0); // Status
+    ui->firstNameEdit_6->clear();  // Price
+}
+
+// Get next product ID
+int appwindow::getNextProductId()
+{
+    int maxId = 0;
+    for (const Product &p : m_products) {
+        if (p.getProductId() > maxId) {
+            maxId = p.getProductId();
+        }
+    }
+    return maxId + 1;
+}
+
+// Add Product button handler
+void appwindow::on_checkProductButton_2_clicked()
+{
+    // Get values from form
+    QString productCode = ui->firstNameEdit_5->text().trimmed();  // Product Code
+    QString fishType = ui->firstNameEdit_3->text().trimmed();      // Fish Type
+    QDateTime catchDate = ui->dateTimeEdit_5->dateTime();
+    QDateTime catchTime = ui->dateTimeEdit_6->dateTime();
+    QString quantityStr = ui->firstNameEdit_4->text().trimmed();
+    QString statusStr = ui->role_option_4->currentText();
+    QString priceStr = ui->firstNameEdit_6->text().trimmed();
+    
+    // Validation
+    if (productCode.isEmpty() || fishType.isEmpty() || quantityStr.isEmpty() || priceStr.isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Please fill in all required fields.");
+        return;
+    }
+    
+    bool ok1, ok2;
+    int quantity = quantityStr.toInt(&ok1);
+    double price = priceStr.toDouble(&ok2);
+    
+    if (!ok1 || quantity <= 0) {
+        QMessageBox::warning(this, "Validation Error", "Please enter a valid quantity (positive number).");
+        return;
+    }
+    
+    if (!ok2 || price < 0) {
+        QMessageBox::warning(this, "Validation Error", "Please enter a valid price.");
+        return;
+    }
+    
+    // Convert status string to enum
+    Product::ProductStatus status = Product::stringToStatus(statusStr);
+    
+    // Insert into database
+    QSqlQuery query(m_database);
+    query.prepare("INSERT INTO products (product_id, product_code, fish_type, catch_date, "
+                  "catch_time, quantity, status, price, created_at) "
+                  "VALUES (product_seq.NEXTVAL, :code, :fish_type, :catch_date, "
+                  ":catch_time, :quantity, :status, :price, CURRENT_TIMESTAMP)");
+    
+    query.bindValue(":code", productCode);
+    query.bindValue(":fish_type", fishType);
+    query.bindValue(":catch_date", catchDate);
+    query.bindValue(":catch_time", catchTime);
+    query.bindValue(":quantity", quantity);
+    query.bindValue(":status", static_cast<int>(status));
+    query.bindValue(":price", price);
+    
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", 
+            "Failed to add product:\n" + query.lastError().text());
+        return;
+    }
+    
+    QMessageBox::information(this, "Success", "Product added successfully!");
+    clearProductForm();
+}
+
+// Check/Display Products button handler
+void appwindow::on_checkProductButton_clicked()
+{
+    loadProductsFromDB();
+    displayProducts();
+    
+    // Switch to display page (page 2 of the stacked widget)
+    ui->stackedWidget_4->setCurrentIndex(1);
+}
+
+// Update Product button handler
+void appwindow::on_pushButton_24_clicked()
+{
+    // Get selected row
+    QModelIndexList selection = ui->tableView_5->selectionModel()->selectedRows();
+    
+    if (selection.isEmpty()) {
+        QMessageBox::warning(this, "Selection Error", "Please select a product to update.");
+        return;
+    }
+    
+    int currentRow = selection.first().row();
+    
+    // Get product ID from table
+    int productId = m_productModel->item(currentRow, 0)->text().toInt();
+    
+    // Get updated values from table (allowing inline editing)
+    QString newCode = m_productModel->item(currentRow, 1)->text();
+    QString newFishType = m_productModel->item(currentRow, 2)->text();
+    int newQuantity = m_productModel->item(currentRow, 4)->text().toInt();
+    double newPrice = m_productModel->item(currentRow, 6)->text().toDouble();
+    
+    // Update in database
+    QSqlQuery query(m_database);
+    query.prepare("UPDATE products SET product_code = :code, fish_type = :fish_type, "
+                  "quantity = :quantity, price = :price WHERE product_id = :id");
+    
+    query.bindValue(":code", newCode);
+    query.bindValue(":fish_type", newFishType);
+    query.bindValue(":quantity", newQuantity);
+    query.bindValue(":price", newPrice);
+    query.bindValue(":id", productId);
+    
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", 
+            "Failed to update product:\n" + query.lastError().text());
+        return;
+    }
+    
+    QMessageBox::information(this, "Success", "Product updated successfully!");
+    loadProductsFromDB();
+    displayProducts();
+}
+
+// Delete Product button handler (if pushButton_25 exists)
+void appwindow::on_pushButton_25_clicked()
+{
+    // Get selected row
+    QModelIndexList selection = ui->tableView_5->selectionModel()->selectedRows();
+    
+    if (selection.isEmpty()) {
+        QMessageBox::warning(this, "Selection Error", "Please select a product to delete.");
+        return;
+    }
+    
+    // Confirm deletion
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, 
+        "Confirm Delete", 
+        "Are you sure you want to delete this product?",
+        QMessageBox::Yes | QMessageBox::No
+    );
+    
+    if (reply == QMessageBox::No) {
+        return;
+    }
+    
+    int currentRow = selection.first().row();
+    
+    // Get product ID from table
+    int productId = m_productModel->item(currentRow, 0)->text().toInt();
+    
+    // Delete from database
+    QSqlQuery query(m_database);
+    query.prepare("DELETE FROM products WHERE product_id = :id");
+    query.bindValue(":id", productId);
+    
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Database Error", 
+            "Failed to delete product:\n" + query.lastError().text());
+        return;
+    }
+    
+    QMessageBox::information(this, "Success", "Product deleted successfully!");
+    loadProductsFromDB();
+    displayProducts();
 }

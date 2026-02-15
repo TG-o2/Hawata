@@ -2,6 +2,10 @@
 #define APPWINDOW_H
 
 #include <QDialog>
+#include <QStandardItemModel>
+#include <QSqlDatabase>
+#include "product.h"
+#include <QList>
 
 namespace Ui {
 class appwindow;
@@ -15,9 +19,28 @@ public:
     explicit appwindow(QWidget *parent = nullptr);
     ~appwindow();
 
-
+private slots:
+    // Product CRUD operations
+    void on_checkProductButton_2_clicked();  // Add Product button
+    void on_checkProductButton_clicked();    // Check/Display Products button
+    void on_pushButton_24_clicked();         // Update Product button
+    void on_pushButton_25_clicked();         // Delete Product button (if exists)
+    
 private:
     Ui::appwindow *ui;
+    QList<Product> m_products;
+    QStandardItemModel *m_productModel;
+    QSqlDatabase m_database;
+    
+    // Database helper methods
+    bool connectToDatabase();
+    void createProductTable();
+    
+    // Product helper methods
+    void loadProductsFromDB();
+    void displayProducts();
+    void clearProductForm();
+    int getNextProductId();
 };
 
 #endif // APPWINDOW_H

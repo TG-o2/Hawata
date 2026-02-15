@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # -------------------------
 # FIND QT MODULES BEFORE CREATING TARGET
 # -------------------------
-find_package(Qt6 REQUIRED COMPONENTS Widgets Charts)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Charts Sql)
 
 # -------------------------
 # SOURCES
@@ -24,6 +24,8 @@ set(PROJECT_SOURCES
     mainwindow.ui
     user.h
     user.cpp
+    product.h
+    product.cpp
     createacc.h
     createacc.cpp
     createacc.ui
@@ -50,6 +52,7 @@ if(Qt6_FOUND)
     target_link_libraries(Sign_up PRIVATE
         Qt6::Widgets
         Qt6::Charts
+        Qt6::Sql
     )
 
     qt_finalize_executable(Sign_up)

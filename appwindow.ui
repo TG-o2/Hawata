@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -279,7 +279,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_2">
       <widget class="QWidget" name="user_page1" native="true">
@@ -926,7 +926,69 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QTableView" name="usersTable"/>
+         <widget class="QTableWidget" name="tableWidget_7">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <column>
+           <property name="text">
+            <string>ID</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Email</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>First Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Last Name</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Role</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Gender</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Status</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Salary</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Shift Start</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Shift End</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Manage</string>
+           </property>
+          </column>
+         </widget>
         </item>
         <item>
          <widget class="QLabel" name="labelResults_3">
@@ -957,7 +1019,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QPushButton" name="editUSERBtn">
+         <widget class="QPushButton" name="edit_company_3">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -985,7 +1047,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="deleteUSERBtn">
+         <widget class="QPushButton" name="delete_company_3">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #FF0000;
@@ -1011,7 +1073,7 @@ QPushButton:hover {
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="export_pdf_user">
+         <widget class="QPushButton" name="export_pdf_3">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -4383,7 +4445,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -4424,8 +4486,8 @@ border: none;
        <widget class="QLabel" name="pic">
         <property name="geometry">
          <rect>
-          <x>550</x>
-          <y>260</y>
+          <x>490</x>
+          <y>250</y>
           <width>350</width>
           <height>350</height>
          </rect>
@@ -4440,8 +4502,8 @@ border: none;
        <widget class="QPushButton" name="checkProductButton_2">
         <property name="geometry">
          <rect>
-          <x>330</x>
-          <y>360</y>
+          <x>300</x>
+          <y>250</y>
           <width>161</width>
           <height>51</height>
          </rect>
@@ -4640,29 +4702,6 @@ font-size: 35px;
          <rect>
           <x>20</x>
           <y>580</y>
-          <width>251</width>
-          <height>31</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_6">
-        <property name="geometry">
-         <rect>
-          <x>300</x>
-          <y>230</y>
-          <width>101</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>loction:</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="locationEdit">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>270</y>
           <width>251</width>
           <height>31</height>
          </rect>
@@ -6008,14 +6047,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
+       <x>-30</x>
+       <y>30</y>
        <width>1271</width>
        <height>791</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -6241,7 +6280,7 @@ QPushButton:pressed {
         <string>Preferred Fish</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="emailEdit_4">
+      <widget class="QLineEdit" name="companyEmail">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6264,16 +6303,6 @@ QPushButton:pressed {
         <string>Email</string>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="dateTimeEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>340</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_51">
        <property name="geometry">
         <rect>
@@ -6287,7 +6316,7 @@ QPushButton:pressed {
         <string>Status</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="role_option_7">
+      <widget class="QComboBox" name="companyStatus">
        <property name="geometry">
         <rect>
          <x>650</x>
@@ -6298,21 +6327,16 @@ QPushButton:pressed {
        </property>
        <item>
         <property name="text">
-         <string>Admin</string>
+         <string>active</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Manager</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Employee</string>
+         <string>inactive</string>
         </property>
        </item>
       </widget>
-      <widget class="QLineEdit" name="lastNameEdit_7">
+      <widget class="QLineEdit" name="companyLocation">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6322,7 +6346,7 @@ QPushButton:pressed {
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="passwordEdit_3">
+      <widget class="QLineEdit" name="companyPhone">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6332,7 +6356,7 @@ QPushButton:pressed {
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lastNameEdit_8">
+      <widget class="QLineEdit" name="preferredFish">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6374,19 +6398,6 @@ font-size: 35px;
         <string>Name of Company</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_52">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>300</y>
-         <width>241</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Company Availability</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
@@ -6400,11 +6411,11 @@ font-size: 35px;
         <string>Phone</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="CreateUser_3">
+      <widget class="QPushButton" name="CreateCompany">
        <property name="geometry">
         <rect>
          <x>650</x>
-         <y>420</y>
+         <y>320</y>
          <width>191</width>
          <height>51</height>
         </rect>
@@ -6447,7 +6458,7 @@ QPushButton:pressed {
         <string>Location</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="firstNameEdit_8">
+      <widget class="QLineEdit" name="companyName">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -7440,7 +7451,7 @@ border: none;
            <x>10</x>
            <y>60</y>
            <width>1020</width>
-           <height>65</height>
+           <height>63</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_subject_2">

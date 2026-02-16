@@ -4,14 +4,9 @@
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlError>
-#include <QSqlQueryModel>
 
 class User
 {
-private:
-    QSqlQueryModel* usersModel;
-
-
 public:
     User();
 
@@ -28,10 +23,6 @@ public:
 
     // Get last database error
     QString getLastError();
-    QSqlQueryModel* getUsersModel();
-    bool deleteUser(int userId);
-    bool updateUser(int userId, const QString &email, const QString &firstName,const QString &lastName, const QString &role, const QString &gender, double salary);
-
 
 };
 

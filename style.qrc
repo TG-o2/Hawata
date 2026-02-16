@@ -37,5 +37,32 @@
         <file>fonts/Hey Comic.otf</file>
         <file>fonts/Hey Comic.ttf</file>
         <file>fonts/Wigglye.ttf</file>
+        <file>icons/add-user1.png</file>
+        <file>icons/add-user2.png</file>
+        <file>icons/boat.png</file>
+        <file>icons/chart.png</file>
+        <file>icons/companies.png</file>
+        <file>icons/dashboard.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/display.png</file>
+        <file>icons/dock.png</file>
+        <file>icons/Email.png</file>
+        <file>icons/fishicon.png</file>
+        <file>icons/FullLogoQT.png</file>
+        <file>icons/HOW_TO_SETTUP.txt</file>
+        <file>icons/live.png</file>
+        <file>icons/loading-arrow.png</file>
+        <file>icons/logoQT.jpg</file>
+        <file>icons/logoQT.png</file>
+        <file>icons/Ports.jpg</file>
+        <file>icons/Ports1.jpg</file>
+        <file>icons/prod.png</file>
+        <file>icons/stats.png</file>
+        <file>icons/trash.png</file>
+        <file>icons/try1.png</file>
+        <file>icons/try2.png</file>
+        <file>icons/update.png</file>
+        <file>icons/user.png</file>
+        <file>icons/wave.jpg</file>
     </qresource>
 </RCC>

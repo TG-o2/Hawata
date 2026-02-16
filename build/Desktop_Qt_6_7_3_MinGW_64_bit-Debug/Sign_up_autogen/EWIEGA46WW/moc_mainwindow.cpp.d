@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/Shaima/Downloads/Project/Sign_up/mainwindow.h \
   C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
+=======
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/xampp/htdocs/git/Hawata/mainwindow.h \
+  C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
+>>>>>>> Stashed changes
   C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QFile \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \

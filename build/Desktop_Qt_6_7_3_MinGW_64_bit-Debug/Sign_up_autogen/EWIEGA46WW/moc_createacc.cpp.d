@@ -1,5 +1,10 @@
+<<<<<<< Updated upstream
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_createacc.cpp: C:/Users/Shaima/Downloads/Project/Sign_up/createacc.h \
   C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
+=======
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_createacc.cpp: C:/xampp/htdocs/git/Hawata/createacc.h \
+  C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
+>>>>>>> Stashed changes
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/q20type_traits.h \

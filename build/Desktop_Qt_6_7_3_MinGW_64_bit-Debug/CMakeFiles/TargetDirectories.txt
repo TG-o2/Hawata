@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up.dir
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
@@ -7,3 +8,14 @@ C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-De
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen_timestamp_deps.dir
 C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir
+=======
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen_timestamp_deps.dir
+C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir
+>>>>>>> Stashed changes

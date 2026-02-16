@@ -29,11 +29,17 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         user.h user.cpp
         createacc.h createacc.cpp createacc.ui
         appwindow.h appwindow.cpp appwindow.ui
+<<<<<<< Updated upstream
 
 
 
 
 
+=======
+        connection.h connection.cpp
+        Docking.h Docking.cpp
+        boat.h boat.cpp
+>>>>>>> Stashed changes
     )
 
     # ────────────────────────────────────────────────

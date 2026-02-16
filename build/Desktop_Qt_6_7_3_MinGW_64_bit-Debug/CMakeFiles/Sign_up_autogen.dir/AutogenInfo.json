@@ -1,5 +1,6 @@
 {
 	"AUTOGEN_COMMAND_LINE_LENGTH_MAX" : 32000,
+<<<<<<< Updated upstream
 	"BUILD_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
 	"CMAKE_BINARY_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
 	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
@@ -67,6 +68,22 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/GNU-FindBinUtils.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompiler.cmake.in",
 		"C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
+=======
+	"BUILD_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
+	"CMAKE_BINARY_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/xampp/htdocs/git/Hawata",
+	"CMAKE_EXECUTABLE" : "C:/Qt/Tools/CMake_64/bin/cmake.exe",
+	"CMAKE_LIST_FILES" : 
+	[
+		"C:/xampp/htdocs/git/Hawata/CMakeLists.txt",
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/auto-setup.cmake",
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake",
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/maintenance_tool_provider.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-Initialize.cmake",
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
+>>>>>>> Stashed changes
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeGenericSystem.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake",
@@ -79,6 +96,7 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU.cmake",
+<<<<<<< Updated upstream
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeDetermineRCCompiler.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCCompiler.cmake.in",
 		"C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
@@ -100,6 +118,13 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompiler.cmake.in",
 		"C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
+=======
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCInformation.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-windres.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake",
+>>>>>>> Stashed changes
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
@@ -346,6 +371,84 @@
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6QModernWindowsStylePluginTargets.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6QModernWindowsStylePluginTargets-relwithdebinfo.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6QModernWindowsStylePluginAdditionalTargetInfo.cmake",
+<<<<<<< Updated upstream
+=======
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlPlugins.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPluginAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QODBCDriverPluginConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QODBCDriverPluginTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QODBCDriverPluginTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QODBCDriverPluginAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QPSQLDriverPluginConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QPSQLDriverPluginTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QPSQLDriverPluginTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QPSQLDriverPluginAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsVersionlessTargets.cmake",
+>>>>>>> Stashed changes
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
@@ -371,40 +474,83 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake",
+<<<<<<< Updated upstream
 		"C:/Users/Shaima/Downloads/Project/Sign_up/style.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up",
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/deps",
+=======
+		"C:/xampp/htdocs/git/Hawata/style.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "C:/xampp/htdocs/git/Hawata",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/deps",
+>>>>>>> Stashed changes
 	"DEP_FILE_RULE_NAME" : "Sign_up_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
+<<<<<<< Updated upstream
 			"C:/Users/Shaima/Downloads/Project/Sign_up/appwindow.h",
+=======
+			"C:/xampp/htdocs/git/Hawata/Docking.h",
+			"MU",
+			"EWIEGA46WW/moc_Docking.cpp",
+			null
+		],
+		[
+			"C:/xampp/htdocs/git/Hawata/appwindow.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_appwindow.cpp",
 			null
 		],
 		[
+<<<<<<< Updated upstream
 			"C:/Users/Shaima/Downloads/Project/Sign_up/createacc.h",
+=======
+			"C:/xampp/htdocs/git/Hawata/boat.h",
+			"MU",
+			"EWIEGA46WW/moc_boat.cpp",
+			null
+		],
+		[
+			"C:/xampp/htdocs/git/Hawata/connection.h",
+			"MU",
+			"EWIEGA46WW/moc_connection.cpp",
+			null
+		],
+		[
+			"C:/xampp/htdocs/git/Hawata/createacc.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_createacc.cpp",
 			null
 		],
 		[
+<<<<<<< Updated upstream
 			"C:/Users/Shaima/Downloads/Project/Sign_up/mainwindow.h",
+=======
+			"C:/xampp/htdocs/git/Hawata/mainwindow.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
 			null
 		],
 		[
+<<<<<<< Updated upstream
 			"C:/Users/Shaima/Downloads/Project/Sign_up/user.h",
+=======
+			"C:/xampp/htdocs/git/Hawata/user.h",
+>>>>>>> Stashed changes
 			"MU",
 			"EWIEGA46WW/moc_user.cpp",
 			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+<<<<<<< Updated upstream
 	"INCLUDE_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
 	"MOC_COMPILATION_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
@@ -413,6 +559,20 @@
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
 		"QT_NEEDS_QMAIN",
+=======
+	"INCLUDE_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+	"MOC_COMPILATION_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"MINGW_HAS_SECURE_API=1",
+		"QT_CHARTS_LIB",
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NEEDS_QMAIN",
+		"QT_OPENGLWIDGETS_LIB",
+		"QT_OPENGL_LIB",
+		"QT_SQL_LIB",
+>>>>>>> Stashed changes
 		"QT_WIDGETS_LIB",
 		"UNICODE",
 		"WIN32",
@@ -430,12 +590,23 @@
 	],
 	"MOC_INCLUDES" : 
 	[
+<<<<<<< Updated upstream
 		"C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+=======
+		"C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+>>>>>>> Stashed changes
 		"C:/Qt/6.7.3/mingw_64/include/QtCore",
 		"C:/Qt/6.7.3/mingw_64/include",
 		"C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++",
 		"C:/Qt/6.7.3/mingw_64/include/QtWidgets",
 		"C:/Qt/6.7.3/mingw_64/include/QtGui",
+<<<<<<< Updated upstream
+=======
+		"C:/Qt/6.7.3/mingw_64/include/QtSql",
+		"C:/Qt/6.7.3/mingw_64/include/QtCharts",
+		"C:/Qt/6.7.3/mingw_64/include/QtOpenGL",
+		"C:/Qt/6.7.3/mingw_64/include/QtOpenGLWidgets",
+>>>>>>> Stashed changes
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/backward",
@@ -463,16 +634,25 @@
 		"-c",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp"
 	],
+<<<<<<< Updated upstream
 	"MOC_PREDEFS_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h",
+=======
+	"MOC_PREDEFS_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h",
+>>>>>>> Stashed changes
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 4,
+<<<<<<< Updated upstream
 	"PARSE_CACHE_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/ParseCache.txt",
+=======
+	"PARSE_CACHE_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/ParseCache.txt",
+>>>>>>> Stashed changes
 	"QT_MOC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/moc.exe",
 	"QT_UIC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/uic.exe",
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 7,
+<<<<<<< Updated upstream
 	"SETTINGS_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
@@ -485,6 +665,19 @@
 			null
 		],
 		[ "C:/Users/Shaima/Downloads/Project/Sign_up/user.cpp", "MU", null ]
+=======
+	"SETTINGS_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[ "C:/xampp/htdocs/git/Hawata/Docking.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/appwindow.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/boat.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/connection.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/createacc.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/main.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/mainwindow.cpp", "MU", null ],
+		[ "C:/xampp/htdocs/git/Hawata/user.cpp", "MU", null ]
+>>>>>>> Stashed changes
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

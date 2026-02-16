@@ -37,6 +37,10 @@ public:
     QLabel *logo;
     QLabel *label_7;
     QPushButton *Exit;
+<<<<<<< Updated upstream
+=======
+    QWidget *BackFrame;
+>>>>>>> Stashed changes
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -49,6 +53,7 @@ public:
         centralwidget->setObjectName("centralwidget");
         label = new QLabel(centralwidget);
         label->setObjectName("label");
+<<<<<<< Updated upstream
         label->setGeometry(QRect(240, 20, 281, 41));
         label->setStyleSheet(QString::fromUtf8("font-family: \"Behove\";\n"
 "font-size: 35px;\n"
@@ -66,10 +71,30 @@ public:
         create_acc = new QLabel(centralwidget);
         create_acc->setObjectName("create_acc");
         create_acc->setGeometry(QRect(470, 440, 291, 21));
+=======
+        label->setGeometry(QRect(220, 10, 281, 41));
+        label->setStyleSheet(QString::fromUtf8("font-family: \"Behove\";\n"
+"font-size: 45px;\n"
+"    font-weight: bold;\n"
+"    color: #3f5bab;"));
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName("label_4");
+        label_4->setGeometry(QRect(490, 200, 161, 21));
+        label_5 = new QLabel(centralwidget);
+        label_5->setObjectName("label_5");
+        label_5->setGeometry(QRect(490, 310, 161, 21));
+        Sign_in = new QPushButton(centralwidget);
+        Sign_in->setObjectName("Sign_in");
+        Sign_in->setGeometry(QRect(490, 360, 121, 41));
+        create_acc = new QLabel(centralwidget);
+        create_acc->setObjectName("create_acc");
+        create_acc->setGeometry(QRect(490, 430, 181, 21));
+>>>>>>> Stashed changes
         create_acc->setTextFormat(Qt::TextFormat::RichText);
         create_acc->setOpenExternalLinks(false);
         password_input = new QLineEdit(centralwidget);
         password_input->setObjectName("password_input");
+<<<<<<< Updated upstream
         password_input->setGeometry(QRect(470, 250, 271, 41));
         firstName_input = new QLineEdit(centralwidget);
         firstName_input->setObjectName("firstName_input");
@@ -88,6 +113,29 @@ public:
         Exit->setObjectName("Exit");
         Exit->setGeometry(QRect(610, 370, 121, 41));
         Exit->setStyleSheet(QString::fromUtf8(""));
+=======
+        password_input->setGeometry(QRect(490, 240, 271, 41));
+        firstName_input = new QLineEdit(centralwidget);
+        firstName_input->setObjectName("firstName_input");
+        firstName_input->setGeometry(QRect(490, 150, 271, 41));
+        Remember_me = new QCheckBox(centralwidget);
+        Remember_me->setObjectName("Remember_me");
+        Remember_me->setGeometry(QRect(490, 300, 161, 24));
+        logo = new QLabel(centralwidget);
+        logo->setObjectName("logo");
+        logo->setGeometry(QRect(10, 90, 400, 400));
+        logo->setStyleSheet(QString::fromUtf8(""));
+        label_7 = new QLabel(centralwidget);
+        label_7->setObjectName("label_7");
+        label_7->setGeometry(QRect(490, 110, 161, 21));
+        Exit = new QPushButton(centralwidget);
+        Exit->setObjectName("Exit");
+        Exit->setGeometry(QRect(630, 360, 121, 41));
+        Exit->setStyleSheet(QString::fromUtf8(""));
+        BackFrame = new QWidget(centralwidget);
+        BackFrame->setObjectName("BackFrame");
+        BackFrame->setGeometry(QRect(470, 90, 311, 431));
+>>>>>>> Stashed changes
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -105,11 +153,19 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+<<<<<<< Updated upstream
         label->setText(QCoreApplication::translate("MainWindow", "User Sign up", nullptr));
         label_4->setText(QCoreApplication::translate("MainWindow", "Password", nullptr));
         label_5->setText(QString());
         Sign_in->setText(QCoreApplication::translate("MainWindow", "Sign In", nullptr));
         Sign_in->setProperty("style", QVariant(QString()));
+=======
+        label->setText(QCoreApplication::translate("MainWindow", "Welcome !", nullptr));
+        label_4->setText(QCoreApplication::translate("MainWindow", "Password", nullptr));
+        label_5->setText(QString());
+        Sign_in->setText(QCoreApplication::translate("MainWindow", "Sign In", nullptr));
+        Sign_in->setProperty("style", QVariant(QCoreApplication::translate("MainWindow", "secondary", nullptr)));
+>>>>>>> Stashed changes
         create_acc->setText(QCoreApplication::translate("MainWindow", "<html><head/><body><p><span style=\" text-decoration: underline;\">forgot password?</span></p></body></html>", nullptr));
         Remember_me->setText(QCoreApplication::translate("MainWindow", "Remember Me", nullptr));
         logo->setText(QCoreApplication::translate("MainWindow", "Picture", nullptr));

@@ -50,7 +50,11 @@ public:
         label_2->setGeometry(QRect(200, 130, 111, 20));
         signup = new QPushButton(CreateAcc);
         signup->setObjectName("signup");
+<<<<<<< Updated upstream
         signup->setGeometry(QRect(220, 690, 93, 29));
+=======
+        signup->setGeometry(QRect(200, 520, 93, 29));
+>>>>>>> Stashed changes
         label_5 = new QLabel(CreateAcc);
         label_5->setObjectName("label_5");
         label_5->setGeometry(QRect(200, 340, 111, 20));
@@ -62,7 +66,11 @@ public:
         passwordEdit->setGeometry(QRect(200, 370, 251, 31));
         logo = new QLabel(CreateAcc);
         logo->setObjectName("logo");
+<<<<<<< Updated upstream
         logo->setGeometry(QRect(170, 460, 321, 211));
+=======
+        logo->setGeometry(QRect(390, 420, 61, 51));
+>>>>>>> Stashed changes
         logo->setStyleSheet(QString::fromUtf8(""));
         emailEdit = new QLineEdit(CreateAcc);
         emailEdit->setObjectName("emailEdit");
@@ -75,7 +83,11 @@ public:
         label_3->setGeometry(QRect(200, 200, 111, 20));
         cancel = new QPushButton(CreateAcc);
         cancel->setObjectName("cancel");
+<<<<<<< Updated upstream
         cancel->setGeometry(QRect(330, 690, 93, 29));
+=======
+        cancel->setGeometry(QRect(350, 520, 93, 29));
+>>>>>>> Stashed changes
         label_4 = new QLabel(CreateAcc);
         label_4->setObjectName("label_4");
         label_4->setGeometry(QRect(200, 270, 111, 20));

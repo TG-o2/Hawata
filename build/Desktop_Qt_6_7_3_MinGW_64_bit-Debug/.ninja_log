@@ -1,4 +1,5 @@
 # ninja log v6
+<<<<<<< Updated upstream
 26	187	7921916289782785	Sign_up_autogen/timestamp	884cbcfa9135c3b3
 932	1332	7921835642211419	C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	7885f7907196dba8
 188	2304	7921916291423350	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	39df6a2746e892fc
@@ -37,3 +38,46 @@
 225	2518	7922584771089766	CMakeFiles/Sign_up.dir/createacc.cpp.obj	210697293d2ce83f
 228	2864	7922584771120099	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	d783f169fdb10ff2
 2864	3172	7922584797477528	Sign_up.exe	c8f9805a34df9aaa
+=======
+27	191	7929506421270786	Sign_up_autogen/timestamp	ebb1fc109ce133f3
+27	191	7929506421270786	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+27	191	7929506421270786	Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+192	2232	7929506422928037	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	4deab59dd386666c
+1411	2266	7929504412240998	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	c024efa847430f6c
+27	191	7929506421270786	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	ebb1fc109ce133f3
+2299	7204	7929504412727325	CMakeFiles/Sign_up.dir/Docking.cpp.obj	eb66c16e377a32b8
+1411	2266	7929504412240998	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	c024efa847430f6c
+2281	7170	7929504412537309	CMakeFiles/Sign_up.dir/user.cpp.obj	ec2010b29d717051
+2267	8229	7929504412404740	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c469e6083b8d9326
+195	2455	7929506422958270	CMakeFiles/Sign_up.dir/createacc.cpp.obj	67d9431a5f10e7ec
+2295	10189	7929504412677324	CMakeFiles/Sign_up.dir/connection.cpp.obj	3db085330d17a558
+2272	10232	7929504412447356	CMakeFiles/Sign_up.dir/main.cpp.obj	40728c30243502e7
+198	4138	7929506422978382	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	d9d81b03407aa1f1
+2304	13025	7929504412767321	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	db93d0ec04ec0e5b
+4139	4519	7929506462391182	Sign_up.exe	a387f0479733a8ba
+41	245	7929541219780228	Sign_up_autogen/timestamp	ebb1fc109ce133f3
+41	245	7929541219780228	Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+41	245	7929541219780228	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	ebb1fc109ce133f3
+41	245	7929541219780228	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+246	2850	7929541221831173	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	4deab59dd386666c
+249	3006	7929541221868076	CMakeFiles/Sign_up.dir/createacc.cpp.obj	67d9431a5f10e7ec
+252	4743	7929541221897238	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	d9d81b03407aa1f1
+29	188	7929541477813470	Sign_up_autogen/timestamp	ebb1fc109ce133f3
+29	188	7929541477813470	Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+29	188	7929541477813470	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	ebb1fc109ce133f3
+29	188	7929541477813470	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+198	261	7929541479497250	CMakeFiles/Sign_up.dir/boat.cpp.obj	cc74a3a6aa345d53
+188	2632	7929541479406852	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	4deab59dd386666c
+191	2783	7929541479436963	CMakeFiles/Sign_up.dir/createacc.cpp.obj	67d9431a5f10e7ec
+195	4479	7929541479468485	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	d9d81b03407aa1f1
+4479	4857	7929541522316956	Sign_up.exe	2b109f800e2e29be
+50	221	7929542140636411	Sign_up_autogen/timestamp	ebb1fc109ce133f3
+50	221	7929542140636411	Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+50	221	7929542140636411	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	ebb1fc109ce133f3
+50	221	7929542140636411	C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	ebb1fc109ce133f3
+232	301	7929542142457442	CMakeFiles/Sign_up.dir/boat.cpp.obj	cc74a3a6aa345d53
+222	2724	7929542142353717	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	4deab59dd386666c
+225	2861	7929542142385899	CMakeFiles/Sign_up.dir/createacc.cpp.obj	67d9431a5f10e7ec
+229	4678	7929542142423348	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	d9d81b03407aa1f1
+4679	5079	7929542186918235	Sign_up.exe	2b109f800e2e29be
+>>>>>>> Stashed changes

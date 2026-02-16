@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
 	"BUILD_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
 	"CMAKE_BINARY_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
 	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
@@ -41,14 +42,70 @@
 		"C:/Users/Shaima/Downloads/Project/Sign_up/fonts/JustFreeFonts.url"
 	],
 	"LOCK_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutoRcc_style_EWIEGA46WW_Lock.lock",
+=======
+	"BUILD_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
+	"CMAKE_BINARY_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/xampp/htdocs/git/Hawata",
+	"CMAKE_SOURCE_DIR" : "C:/xampp/htdocs/git/Hawata",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/xampp/htdocs/git/Hawata/marine_theme.qss",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-Bold.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-BookCond.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Behove.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Happy School.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Light Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Shadow.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Behove.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Comic Book Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Black.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Hey Comic.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Light.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Medium Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks-Bold-Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Comic Book Bold Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks-Bold.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Compact.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Regular.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Contour.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-BoldCond.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-Book.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Wigglye.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-Book.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-Bold.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Type-Forward_Free_EULA.pdf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Comic Book Bold.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Hey Comic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-BoldCond.ttf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Bion-BookCond.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Comic Book.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks.txt",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Creative.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Arteks Version Italic.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/Happy School.otf",
+		"C:/xampp/htdocs/git/Hawata/fonts/JustFreeFonts.txt",
+		"C:/xampp/htdocs/git/Hawata/fonts/JustFreeFonts.url"
+	],
+	"LOCK_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutoRcc_style_EWIEGA46WW_Lock.lock",
+>>>>>>> Stashed changes
 	"MULTI_CONFIG" : false,
 	"OPTIONS" : [ "--no-zstd", "-name", "style" ],
 	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
 	"OUTPUT_NAME" : "qrc_style.cpp",
 	"RCC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/rcc.exe",
 	"RCC_LIST_OPTIONS" : [ "--list" ],
+<<<<<<< Updated upstream
 	"SETTINGS_FILE" : "C:/Users/Shaima/Downloads/Project/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutoRcc_style_EWIEGA46WW_Used.txt",
 	"SOURCE" : "C:/Users/Shaima/Downloads/Project/Sign_up/style.qrc",
+=======
+	"SETTINGS_FILE" : "C:/xampp/htdocs/git/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutoRcc_style_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/xampp/htdocs/git/Hawata/style.qrc",
+>>>>>>> Stashed changes
 	"USE_BETTER_GRAPH" : false,
 	"VERBOSITY" : 0
 }

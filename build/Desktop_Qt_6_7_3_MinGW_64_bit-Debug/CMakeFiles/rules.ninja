@@ -42,7 +42,11 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
+<<<<<<< Updated upstream
   command = C:\Qt\Tools\CMake_64\bin\cmake.exe --regenerate-during-build -SC:\Users\Shaima\Downloads\Project\Sign_up -BC:\Users\Shaima\Downloads\Project\Sign_up\build\Desktop_Qt_6_7_3_MinGW_64_bit-Debug
+=======
+  command = C:\Qt\Tools\CMake_64\bin\cmake.exe --regenerate-during-build -SC:\xampp\htdocs\git\Hawata -BC:\xampp\htdocs\git\Hawata\build\Desktop_Qt_6_7_3_MinGW_64_bit-Debug
+>>>>>>> Stashed changes
   description = Re-running CMake...
   generator = 1
 

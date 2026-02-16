@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     Connection conn;
     if (!conn.openConnection()) {
-        qDebug() << "Cannot start app without DB!";
+    qDebug() << "Cannot start app without DB!";
         return -1;
-    }
+   }
     //loading the fonts
 
     int fontId = QFontDatabase::addApplicationFont(":/fonts/Hey Comic.otf");

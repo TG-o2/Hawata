@@ -1,8 +1,10 @@
 #ifndef APPWINDOW_H
 #define APPWINDOW_H
+
 #include "Docking.h"
 #include "user.h"
 #include "connection.h"
+#include "product.h"
 
 #include <QDialog>
 #include <QFile>
@@ -35,8 +37,8 @@ public:
     void fillUserForm(const QModelIndex &index);
 private slots:
     void on_CreateDocking_clicked();
-
     void on_CreateUser_clicked();
+    void on_checkProductButton_2_clicked();  // ONLY ONCE!
 
     void on_deleteUSERBtn_clicked();
 
@@ -51,6 +53,7 @@ private:
     QSqlQueryModel *usersModel;
     Connection conn;
 
+    Product productManager;
 };
 
 #endif // APPWINDOW_H

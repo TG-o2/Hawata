@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -6047,14 +6047,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
+       <x>-30</x>
+       <y>30</y>
        <width>1271</width>
        <height>791</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -6280,7 +6280,7 @@ QPushButton:pressed {
         <string>Preferred Fish</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="emailEdit_4">
+      <widget class="QLineEdit" name="companyEmail">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6303,16 +6303,6 @@ QPushButton:pressed {
         <string>Email</string>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="dateTimeEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>340</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_51">
        <property name="geometry">
         <rect>
@@ -6326,7 +6316,7 @@ QPushButton:pressed {
         <string>Status</string>
        </property>
       </widget>
-      <widget class="QComboBox" name="role_option_7">
+      <widget class="QComboBox" name="companyStatus">
        <property name="geometry">
         <rect>
          <x>650</x>
@@ -6337,21 +6327,16 @@ QPushButton:pressed {
        </property>
        <item>
         <property name="text">
-         <string>Admin</string>
+         <string>active</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Manager</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Employee</string>
+         <string>inactive</string>
         </property>
        </item>
       </widget>
-      <widget class="QLineEdit" name="lastNameEdit_7">
+      <widget class="QLineEdit" name="companyLocation">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6361,7 +6346,7 @@ QPushButton:pressed {
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="passwordEdit_3">
+      <widget class="QLineEdit" name="companyPhone">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6371,7 +6356,7 @@ QPushButton:pressed {
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lastNameEdit_8">
+      <widget class="QLineEdit" name="preferredFish">
        <property name="geometry">
         <rect>
          <x>300</x>
@@ -6413,19 +6398,6 @@ font-size: 35px;
         <string>Name of Company</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_52">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>300</y>
-         <width>241</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Company Availability</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
@@ -6439,11 +6411,11 @@ font-size: 35px;
         <string>Phone</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="CreateUser_3">
+      <widget class="QPushButton" name="CreateCompany">
        <property name="geometry">
         <rect>
          <x>650</x>
-         <y>420</y>
+         <y>320</y>
          <width>191</width>
          <height>51</height>
         </rect>
@@ -6486,7 +6458,7 @@ QPushButton:pressed {
         <string>Location</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="firstNameEdit_8">
+      <widget class="QLineEdit" name="companyName">
        <property name="geometry">
         <rect>
          <x>300</x>

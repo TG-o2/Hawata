@@ -31,6 +31,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         appwindow.h appwindow.cpp appwindow.ui
         connection.h connection.cpp
         Docking.h Docking.cpp
+        company.h company.cpp
     )
 
     # ────────────────────────────────────────────────

@@ -2,6 +2,7 @@
 #define APPWINDOW_H
 #include "Docking.h"
 #include "user.h"
+#include "company.h"
 #include <QDialog>
 #include <QFile>
 #include <QFontDatabase>
@@ -28,10 +29,20 @@ private slots:
 
     void on_CreateUser_clicked();
 
+    void on_CreateCompany_clicked();
+
+    // Company CRUD operations
+    void loadCompaniesTable();
+    void on_edit_company_7_clicked();
+    void on_delete_company_7_clicked();
+    void on_searchbar_7_textChanged(const QString &text);
+    void on_clear_7_clicked();
+
 private:
     Ui::appwindow *ui;
     Docking dockingManager;
     User userManager;
+    Company companyManager;
 
 };
 

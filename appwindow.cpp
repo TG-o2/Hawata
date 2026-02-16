@@ -730,11 +730,297 @@ void appwindow::on_CreateUser_clicked()
 }
 
 
+
+
+//add company
+void appwindow::on_CreateCompany_clicked()
+{
+    // Get values from UI widgets
+    QString name = ui->companyName->text();
+    QString location = ui->companyLocation->text();
+    QString email = ui->companyEmail->text();
+    QString phone = ui->companyPhone->text();
+    QString preferredFish = ui->preferredFish->text();
+    QString status = ui->companyStatus->currentText().toUpper(); // Convert to uppercase to match DB constraint
+
+    // Validate required fields
+    if (name.isEmpty() || preferredFish.isEmpty() || status.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Name, Preferred Fish, and Status are required fields!");
+        return;
+    }
+
+    // Validate email format if provided
+    if (!email.isEmpty() && !email.contains("@")) {
+        QMessageBox::warning(this, "Error", "Please enter a valid email address!");
+        return;
+    }
+
+    // Call the create function
+    if (companyManager.createCompany(name, location, email, phone, preferredFish, status)) {
+        QMessageBox::information(this, "Success", "Company created successfully!");
+
+        // Clear the form
+        ui->companyName->clear();
+        ui->companyLocation->clear();
+        ui->companyEmail->clear();
+        ui->companyPhone->clear();
+        ui->preferredFish->clear();
+        ui->companyStatus->setCurrentIndex(0);
+
+        // Reload the companies table
+        loadCompaniesTable();
+    } else {
+        QString error = companyManager.getLastError();
+        qDebug() << "Database error:" << error;
+
+        // Check for specific error types
+        if (error.contains("unique constraint", Qt::CaseInsensitive)) {
+            QMessageBox::critical(this, "Error", "This email address is already in use. Please use a different email.");
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to create company. Database error: " + error);
+        }
+    }
+}
+
+// Load companies into table
+void appwindow::loadCompaniesTable()
+{
+    // Clear existing rows
+    ui->tableWidget_11->setRowCount(0);
+
+    // Set column count and headers
+    ui->tableWidget_11->setColumnCount(7);
+    QStringList headers;
+    headers << "ID" << "Name" << "Email" << "Phone" << "Preferred Fish" << "Location" << "Status";
+    ui->tableWidget_11->setHorizontalHeaderLabels(headers);
+
+    // Get companies from database
+    QSqlQuery query;
+    query.prepare("SELECT COMPANY_ID, NAME, EMAIL, PHONE, PREFERRED_FISH, LOCATION, STATUS "
+                  "FROM COMPANIES ORDER BY COMPANY_ID DESC");
+
+    if (!query.exec()) {
+        qDebug() << "Error loading companies:" << query.lastError().text();
+        return;
+    }
+
+    // Populate table
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidget_11->insertRow(row);
+
+        // Add data to columns
+        ui->tableWidget_11->setItem(row, 0, new QTableWidgetItem(query.value("COMPANY_ID").toString()));
+        ui->tableWidget_11->setItem(row, 1, new QTableWidgetItem(query.value("NAME").toString()));
+        ui->tableWidget_11->setItem(row, 2, new QTableWidgetItem(query.value("EMAIL").toString()));
+        ui->tableWidget_11->setItem(row, 3, new QTableWidgetItem(query.value("PHONE").toString()));
+        ui->tableWidget_11->setItem(row, 4, new QTableWidgetItem(query.value("PREFERRED_FISH").toString()));
+        ui->tableWidget_11->setItem(row, 5, new QTableWidgetItem(query.value("LOCATION").toString()));
+        ui->tableWidget_11->setItem(row, 6, new QTableWidgetItem(query.value("STATUS").toString()));
+
+        row++;
+    }
+
+    // Resize columns to content
+    ui->tableWidget_11->resizeColumnsToContents();
+
+    // Update the count label
+    ui->labelResults_7->setText(QString("Showing %1 Companies").arg(row));
+}
+
+// Edit company
+void appwindow::on_edit_company_7_clicked()
+{
+    // Get the selected row
+    int currentRow = ui->tableWidget_11->currentRow();
+
+    if (currentRow < 0) {
+        QMessageBox::warning(this, "No Selection", "Please select a company to edit.");
+        return;
+    }
+
+    // Get the company ID from the first column
+    int companyId = ui->tableWidget_11->item(currentRow, 0)->text().toInt();
+    QString name = ui->tableWidget_11->item(currentRow, 1)->text();
+    QString email = ui->tableWidget_11->item(currentRow, 2)->text();
+    QString phone = ui->tableWidget_11->item(currentRow, 3)->text();
+    QString preferredFish = ui->tableWidget_11->item(currentRow, 4)->text();
+    QString location = ui->tableWidget_11->item(currentRow, 5)->text();
+    QString status = ui->tableWidget_11->item(currentRow, 6)->text();
+
+    // Create a dialog for editing
+    QDialog editDialog(this);
+    editDialog.setWindowTitle("Edit Company");
+    editDialog.setMinimumWidth(400);
+
+    QVBoxLayout *layout = new QVBoxLayout(&editDialog);
+
+    // Create form fields
+    QLabel *nameLabel = new QLabel("Name: *");
+    QLineEdit *nameEdit = new QLineEdit(name);
+
+    QLabel *locationLabel = new QLabel("Location:");
+    QLineEdit *locationEdit = new QLineEdit(location);
+
+    QLabel *emailLabel = new QLabel("Email:");
+    QLineEdit *emailEdit = new QLineEdit(email);
+
+    QLabel *phoneLabel = new QLabel("Phone:");
+    QLineEdit *phoneEdit = new QLineEdit(phone);
+
+    QLabel *fishLabel = new QLabel("Preferred Fish: *");
+    QLineEdit *fishEdit = new QLineEdit(preferredFish);
+
+    QLabel *statusLabel = new QLabel("Status: *");
+    QComboBox *statusCombo = new QComboBox();
+    statusCombo->addItem("ACTIVE");
+    statusCombo->addItem("INACTIVE");
+    statusCombo->setCurrentText(status);
+
+    // Add widgets to layout
+    layout->addWidget(nameLabel);
+    layout->addWidget(nameEdit);
+    layout->addWidget(locationLabel);
+    layout->addWidget(locationEdit);
+    layout->addWidget(emailLabel);
+    layout->addWidget(emailEdit);
+    layout->addWidget(phoneLabel);
+    layout->addWidget(phoneEdit);
+    layout->addWidget(fishLabel);
+    layout->addWidget(fishEdit);
+    layout->addWidget(statusLabel);
+    layout->addWidget(statusCombo);
+
+    // Add buttons
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+    QPushButton *saveButton = new QPushButton("Save");
+    QPushButton *cancelButton = new QPushButton("Cancel");
+
+    buttonLayout->addWidget(saveButton);
+    buttonLayout->addWidget(cancelButton);
+    layout->addLayout(buttonLayout);
+
+    // Connect buttons
+    connect(saveButton, &QPushButton::clicked, &editDialog, &QDialog::accept);
+    connect(cancelButton, &QPushButton::clicked, &editDialog, &QDialog::reject);
+
+    // Show dialog and process result
+    if (editDialog.exec() == QDialog::Accepted) {
+        QString newName = nameEdit->text();
+        QString newLocation = locationEdit->text();
+        QString newEmail = emailEdit->text();
+        QString newPhone = phoneEdit->text();
+        QString newFish = fishEdit->text();
+        QString newStatus = statusCombo->currentText();
+
+        // Validate
+        if (newName.isEmpty() || newFish.isEmpty()) {
+            QMessageBox::warning(this, "Error", "Name and Preferred Fish are required!");
+            return;
+        }
+
+        if (!newEmail.isEmpty() && !newEmail.contains("@")) {
+            QMessageBox::warning(this, "Error", "Please enter a valid email address!");
+            return;
+        }
+
+        // Update the company
+        if (companyManager.updateCompany(companyId, newName, newLocation, newEmail,
+                                         newPhone, newFish, newStatus)) {
+            QMessageBox::information(this, "Success", "Company updated successfully!");
+            loadCompaniesTable();
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to update company.");
+        }
+    }
+}
+
+// Delete company
+void appwindow::on_delete_company_7_clicked()
+{
+    // Get the selected row
+    int currentRow = ui->tableWidget_11->currentRow();
+
+    if (currentRow < 0) {
+        QMessageBox::warning(this, "No Selection", "Please select a company to delete.");
+        return;
+    }
+
+    // Get the company ID and name
+    int companyId = ui->tableWidget_11->item(currentRow, 0)->text().toInt();
+    QString companyName = ui->tableWidget_11->item(currentRow, 1)->text();
+
+    // Confirm deletion
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm Delete",
+                                  QString("Are you sure you want to delete '%1'?").arg(companyName),
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (companyManager.deleteCompany(companyId)) {
+            QMessageBox::information(this, "Success", "Company deleted successfully!");
+            loadCompaniesTable();
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to delete company.");
+        }
+    }
+}
+
+// Search companies
+void appwindow::on_searchbar_7_textChanged(const QString &text)
+{
+    if (text.isEmpty()) {
+        loadCompaniesTable();
+    } else {
+        // Clear existing rows
+        ui->tableWidget_11->setRowCount(0);
+
+        // Perform search query
+        QSqlQuery query;
+        query.prepare("SELECT COMPANY_ID, NAME, EMAIL, PHONE, PREFERRED_FISH, LOCATION, STATUS "
+                      "FROM COMPANIES "
+                      "WHERE UPPER(NAME) LIKE :search OR UPPER(PHONE) LIKE :search "
+                      "OR UPPER(EMAIL) LIKE :search OR UPPER(LOCATION) LIKE :search "
+                      "ORDER BY COMPANY_ID DESC");
+
+        QString searchPattern = "%" + text.toUpper() + "%";
+        query.bindValue(":search", searchPattern);
+
+        if (!query.exec()) {
+            qDebug() << "Error searching companies:" << query.lastError().text();
+            return;
+        }
+
+        // Populate table with search results
+        int row = 0;
+        while (query.next()) {
+            ui->tableWidget_11->insertRow(row);
+
+            ui->tableWidget_11->setItem(row, 0, new QTableWidgetItem(query.value("COMPANY_ID").toString()));
+            ui->tableWidget_11->setItem(row, 1, new QTableWidgetItem(query.value("NAME").toString()));
+            ui->tableWidget_11->setItem(row, 2, new QTableWidgetItem(query.value("EMAIL").toString()));
+            ui->tableWidget_11->setItem(row, 3, new QTableWidgetItem(query.value("PHONE").toString()));
+            ui->tableWidget_11->setItem(row, 4, new QTableWidgetItem(query.value("PREFERRED_FISH").toString()));
+            ui->tableWidget_11->setItem(row, 5, new QTableWidgetItem(query.value("LOCATION").toString()));
+            ui->tableWidget_11->setItem(row, 6, new QTableWidgetItem(query.value("STATUS").toString()));
+
+            row++;
+        }
+
+        ui->tableWidget_11->resizeColumnsToContents();
+        ui->labelResults_7->setText(QString("Showing %1 Companies").arg(row));
+    }
+}
+
+// Clear search
+void appwindow::on_clear_7_clicked()
+{
+    ui->searchbar_7->clear();
+    loadCompaniesTable();
+}
+
+
 appwindow::~appwindow()
 {
     delete ui;
 }
-
-
-
-

@@ -118,4 +118,3 @@ void MainWindow::on_Sign_in_clicked()
         QMessageBox::warning(this, "Error", "Username or password is incorrect.");
     }
 }
-

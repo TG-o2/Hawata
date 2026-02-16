@@ -55,6 +55,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         connection.h connection.cpp
         Docking.h Docking.cpp
         product.h product.cpp
+        boats.h boats.cpp
     )
 
     # ────────────────────────────────────────────────

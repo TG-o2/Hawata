@@ -279,7 +279,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="user_page1_2">
       <widget class="QWidget" name="user_page1" native="true">
@@ -926,69 +926,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QTableWidget" name="tableWidget_7">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <column>
-           <property name="text">
-            <string>ID</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Email</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>First Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Last Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Role</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Gender</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Status</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Salary</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Shift Start</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Shift End</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Manage</string>
-           </property>
-          </column>
-         </widget>
+         <widget class="QTableView" name="usersTable"/>
         </item>
         <item>
          <widget class="QLabel" name="labelResults_3">
@@ -1019,7 +957,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-         <widget class="QPushButton" name="edit_company_3">
+         <widget class="QPushButton" name="editUSERBtn">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -1047,7 +985,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="delete_company_3">
+         <widget class="QPushButton" name="deleteUSERBtn">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #FF0000;
@@ -1073,7 +1011,7 @@ QPushButton:hover {
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="export_pdf_3">
+         <widget class="QPushButton" name="export_pdf_user">
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;

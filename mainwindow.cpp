@@ -109,11 +109,10 @@ void MainWindow::on_Sign_in_clicked()
     file.close();
 
     if (found) {
-        appwindow *app = new appwindow();
+        appwindow *app = new appwindow(this);
         app->show();
+        this->hide();
 
-        // Close login window
-        this->close();
     } else {
         QMessageBox::warning(this, "Error", "Username or password is incorrect.");
     }

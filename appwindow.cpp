@@ -2,6 +2,8 @@
 #include "ui_appwindow.h"
 #include "mainwindow.h"
 
+
+
 #include <QPixmap>
 #include <QMessageBox>
 #include <QFile>
@@ -18,6 +20,28 @@ appwindow::appwindow(QWidget *parent)
     , ui(new Ui::appwindow)
 {
     ui->setupUi(this);
+    QSqlQueryModel* queryModel = userManager.getUsersModel();
+    QStandardItemModel* model = new QStandardItemModel(queryModel->rowCount(), queryModel->columnCount());
+
+    for (int row = 0; row < queryModel->rowCount(); ++row) {
+        for (int col = 0; col < queryModel->columnCount(); ++col) {
+            QStandardItem* item = new QStandardItem(queryModel->data(queryModel->index(row, col)).toString());
+            if (col != 0) // make all except USERID editable
+                item->setFlags(item->flags() | Qt::ItemIsEditable);
+            model->setItem(row, col, item);
+        }
+    }
+
+    ui->usersTable->setModel(model);
+    ui->usersTable->setEditTriggers(QAbstractItemView::DoubleClicked |
+                                    QAbstractItemView::SelectedClicked);
+
+    // Improve table appearance
+    ui->usersTable->resizeColumnsToContents();
+    ui->usersTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->usersTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->usersTable->setAlternatingRowColors(true);
+    ui->usersTable->horizontalHeader()->setStretchLastSection(true);
 
     //photo logo set up
     QPixmap logo("icons/try1.png");
@@ -588,6 +612,69 @@ void appwindow::on_checkProductButton_2_clicked()
         QMessageBox::critical(this, "Error", "Failed to add product. Please check the database connection.");
     }
 }
+
+
+void appwindow::on_deleteUSERBtn_clicked()
+{
+    QModelIndexList selected = ui->usersTable->selectionModel()->selectedRows();
+
+    if (selected.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Please select a user to delete.");
+        return;
+    }
+
+    int row = selected.first().row();
+
+    // USERID is column 0 in your SELECT
+    int userId = ui->usersTable->model()->data(
+                                            ui->usersTable->model()->index(row, 0)
+                                            ).toInt();
+
+    // Optional confirmation
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm Delete",
+                                  "Are you sure you want to delete this user?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::No)
+        return;
+
+    if (userManager.deleteUser(userId)) {
+        QMessageBox::information(this, "Success", "User deleted successfully!");
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to delete user.");
+    }
+}
+
+
+void appwindow::on_editUSERBtn_clicked()
+{
+        QModelIndexList selected = ui->usersTable->selectionModel()->selectedRows();
+        if (selected.isEmpty()) {
+            QMessageBox::warning(this, "Error", "Please select a user to update.");
+            return;
+        }
+
+        int row = selected.first().row();
+
+        // Get data from each column
+        int userId = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 0)).toInt();
+        QString email = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 1)).toString();
+        QString firstName = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 2)).toString();
+        QString lastName = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 3)).toString();
+        QString role = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 4)).toString();
+        QString gender = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 5)).toString();
+        double salary = ui->usersTable->model()->data(ui->usersTable->model()->index(row, 6)).toDouble();
+
+        // Call the update function
+        if (userManager.updateUser(userId, email, firstName, lastName, role, gender, salary)) {
+            QMessageBox::information(this, "Success", "User updated successfully!");
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to update user.");
+        }
+}
+
+
 
 appwindow::~appwindow()
 {

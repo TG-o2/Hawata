@@ -7,7 +7,7 @@ Connection::Connection()
     db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=tasnim;Pwd=286919;");
 
     if (!db.open()) {
-        qDebug() << "Database connection failed:" << db.lastError().text();
+        qDebug() << "Database connection failed:";
     } else {
         qDebug() << "Database connected successfully!";
     }
@@ -23,7 +23,7 @@ bool Connection::openConnection()
 {
     if (!db.isOpen()) {
         if (!db.open()) {
-            qDebug() << "Database connection failed:" << db.lastError().text();
+            qDebug() << "Database connection failed:";
             return false;
         }
     }

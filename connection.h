@@ -1,8 +1,7 @@
-// connection.h
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
-#include <QtSql>
+#include <QSqlDatabase>
 #include <QDebug>
 
 class Connection
@@ -10,9 +9,11 @@ class Connection
 public:
     Connection();
     ~Connection();
+
     bool openConnection();
-private:
+
     QSqlDatabase db;
+
 };
 
 #endif // CONNECTION_H

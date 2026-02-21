@@ -774,7 +774,9 @@ C:/Users/USER/Downloads/Project (1)/Sign_up/appwindow.h
  mmc:Q_OBJECT
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/QFile
+ mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/QList
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/QString
+ mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/QStringList
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/q20functional.h
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/q20memory.h
  mdp:C:/Qt/6.7.3/mingw_64/include/QtCore/q20type_traits.h

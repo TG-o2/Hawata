@@ -1,19 +1,89 @@
 # ninja log v6
-15	60	7927906684608786	CMakeFiles/clean.additional	baedbe210acaa455
-60	78	7927906685058782	clean	577b940aee94fbd7
-41	1800	7927906702985085	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
-41	1800	7927906702985085	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
-41	1800	7927906702985085	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
-41	1800	7927906702985085	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
-1841	2570	7927906712223832	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
-1841	2570	7927906712223832	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
-2639	5962	7927906713104014	CMakeFiles/Sign_up.dir/connection.cpp.obj	a0094b91198ab1e7
-2646	6036	7927906713174013	CMakeFiles/Sign_up.dir/Docking.cpp.obj	11872d51f0f6be28
-2619	6080	7927906712903970	CMakeFiles/Sign_up.dir/user.cpp.obj	4dc9f22091038350
-2606	6839	7927906712773994	CMakeFiles/Sign_up.dir/main.cpp.obj	e23720ae6eafbd6b
-2600	6983	7927906712713974	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
-2612	7110	7927906712834023	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
-2626	7345	7927906712974002	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
-2632	9490	7927906713034007	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
-2653	9558	7927906713244003	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	25662290229cf2d7
-9559	10165	7927906782302983	Sign_up.exe	e0cfe93fda7bde69
+2203	5909	7933772177898015	CMakeFiles/Sign_up.dir/main.cpp.obj	e23720ae6eafbd6b
+18	126	7933772152352190	CMakeFiles/clean.additional	baedbe210acaa455
+128	186	7933772153459114	clean	577b940aee94fbd7
+89	392	7933787482334280	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+89	392	7933787482334280	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+89	392	7933787482334280	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+422	4473	7933786841443871	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+1558	2185	7933772177419249	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+89	392	7933787482334280	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+1558	2185	7933772177419249	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+2266	4952	7933772178538159	CMakeFiles/Sign_up.dir/connection.cpp.obj	a0094b91198ab1e7
+375	4629	7933779344443616	CMakeFiles/Sign_up.dir/Docking.cpp.obj	11872d51f0f6be28
+2237	5087	7933772178248172	CMakeFiles/Sign_up.dir/user.cpp.obj	4dc9f22091038350
+2186	6130	7933772177728179	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
+435	4839	7933786841574176	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+650	9864	7933785398383861	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+2285	8975	7933772178728108	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	25662290229cf2d7
+9865	10761	7933785490532430	Sign_up.exe	e0cfe93fda7bde69
+165	8665	7933787653612103	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+8666	9347	7933787738614772	Sign_up.exe	e0cfe93fda7bde69
+14	298	7933790144574520	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+14	298	7933790144574520	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+14	298	7933790144574520	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+14	298	7933790144574520	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+299	4342	7933790147434517	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+303	4794	7933790147473613	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+308	8339	7933790147523574	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+8339	8908	7933790227830448	Sign_up.exe	e0cfe93fda7bde69
+82	159	7933793119998681	CMakeFiles/clean.additional	baedbe210acaa455
+159	187	7933793120767533	clean	577b940aee94fbd7
+40	1180	7933793132833727	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+40	1180	7933793132833727	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+40	1180	7933793132833727	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+40	1180	7933793132833727	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+1182	1636	7933793138425134	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+1182	1636	7933793138425134	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	384b9f6cda39bc5e
+1660	4296	7933793138774198	CMakeFiles/Sign_up.dir/connection.cpp.obj	a0094b91198ab1e7
+1648	4569	7933793138644283	CMakeFiles/Sign_up.dir/user.cpp.obj	4dc9f22091038350
+1665	4627	7933793138814133	CMakeFiles/Sign_up.dir/Docking.cpp.obj	11872d51f0f6be28
+1636	5309	7933793138534085	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
+1640	5325	7933793138564067	CMakeFiles/Sign_up.dir/main.cpp.obj	e23720ae6eafbd6b
+1644	5524	7933793138604091	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+1652	5866	7933793138684122	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+1656	7740	7933793138724034	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+1669	8063	7933793138854065	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	25662290229cf2d7
+8063	8636	7933793202799296	Sign_up.exe	e0cfe93fda7bde69
+14	449	7933793974387283	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+14	449	7933793974387283	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+14	449	7933793974387283	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+14	449	7933793974387283	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+450	2906	7933793978748968	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+456	3065	7933793978808996	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+472	5089	7933793978968927	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+5089	5697	7933794025137724	Sign_up.exe	e0cfe93fda7bde69
+108	436	7933794180439066	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+108	436	7933794180439066	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+108	436	7933794180439066	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+108	436	7933794180439066	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+439	2866	7933794183740573	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+444	3055	7933794183800495	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+452	4950	7933794183880533	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+4950	5540	7933794228852439	Sign_up.exe	e0cfe93fda7bde69
+89	447	7933794835282670	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+89	447	7933794835282670	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+89	447	7933794835282670	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+89	447	7933794835282670	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+447	2848	7933794838874005	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+451	3022	7933794838902999	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+455	5094	7933794838942784	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+5094	5670	7933794885344690	Sign_up.exe	e0cfe93fda7bde69
+66	824	7933795714870079	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+66	824	7933795714870079	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+66	824	7933795714870079	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+66	824	7933795714870079	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+826	5314	7933795715930582	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
+829	5658	7933795715970610	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+833	6051	7933795716010548	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+838	8733	7933795716050578	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+8733	9305	7933795795005027	Sign_up.exe	e0cfe93fda7bde69
+75	878	7933798349470348	Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+75	878	7933798349470348	Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+75	878	7933798349470348	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/timestamp	f9e9e3e4437a4dc
+75	878	7933798349470348	C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp	f9e9e3e4437a4dc
+880	5899	7933798350600392	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	b6492ae3feb8408f
+884	6131	7933798350650379	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	188181de43cfc83b
+888	6355	7933798350690438	CMakeFiles/Sign_up.dir/createacc.cpp.obj	560196d0bb7d5287
+893	9120	7933798350740386	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	75c872137f5938a8
+9120	9735	7933798433009989	Sign_up.exe	e0cfe93fda7bde69

@@ -25,10 +25,17 @@ public:
 
 private slots:
     void on_CreateDocking_clicked();
+    void on_edit_Docking_clicked();
+    void on_delete_docking_clicked();
+    void on_tabdocking_cellDoubleClicked(int row, int column);
+    void on_tabdocking_cellClicked(int row, int column);
+    void on_clear_docking_clicked();
 
 private:
     Ui::appwindow *ui;
     Docking dockingManager;
+    int selectedDockingId = -1;
+    void loadDockingTable();
 };
 
 #endif // APPWINDOW_H

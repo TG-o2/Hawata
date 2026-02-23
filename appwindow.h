@@ -5,6 +5,7 @@
 #include "user.h"
 #include "connection.h"
 #include "product.h"
+#include "boats.h"
 
 #include <QDialog>
 #include <QFile>
@@ -22,7 +23,7 @@
 #include <QSqlTableModel>
 #include <QStandardItemModel>
 #include <QStandardItem>
-
+#include <QTableWidgetItem>
 #include <QPixmap>
 #include <QTextStream>
 #include <QMessageBox>
@@ -68,8 +69,12 @@ private slots:
     void on_edit_company_6_clicked();
     void on_delete_company_6_clicked();
     void on_clear_6_clicked();
-
-
+    //boats
+    void on_addBoatButton_clicked();
+    void on_deleteBoatButton_clicked();
+    void on_updateBoatButton_clicked();
+    void on_searchBoatButton_clicked();
+    void on_tableWidgetBoat_itemClicked(QTableWidgetItem *item);
 
 private:
     Ui::appwindow *ui;
@@ -87,6 +92,15 @@ private:
     Product productManager;
     int selectedProductId = -1;
     void loadProductTable();
+
+    //boats
+    void displayBoats();
+    void clearBoatInputs();
+    int currentlySelectedId;
+
+
+
+    Boats boatsTmp;
 };
 
 #endif // APPWINDOW_H

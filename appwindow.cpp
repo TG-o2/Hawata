@@ -16,6 +16,8 @@ appwindow::appwindow(QWidget *parent)
     loadUsersTable();
     // loadProductTable();  // Temporarily disabled to debug build issues
 
+    //load boat table
+    displayBoats();
 
     //photo logo set up
 
@@ -1059,15 +1061,15 @@ void appwindow::loadUsersTable()
     for (const UserRecord &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
-        table->setItem(row, 1, new QTableWidgetItem(r.email()));
-        table->setItem(row, 2, new QTableWidgetItem(r.firstName()));
-        table->setItem(row, 3, new QTableWidgetItem(r.lastName()));
-        table->setItem(row, 4, new QTableWidgetItem(r.role()));
-        table->setItem(row, 5, new QTableWidgetItem(r.gender()));
-        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary())));
-        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart()));
-        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd()));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id)));
+        table->setItem(row, 1, new QTableWidgetItem(r.email));
+        table->setItem(row, 2, new QTableWidgetItem(r.firstName));
+        table->setItem(row, 3, new QTableWidgetItem(r.lastName));
+        table->setItem(row, 4, new QTableWidgetItem(r.role));
+        table->setItem(row, 5, new QTableWidgetItem(r.gender));
+        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary)));
+        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart));
+        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -1583,3 +1585,352 @@ appwindow::~appwindow()
 
 
 
+
+//boat section
+
+void appwindow::displayBoats()
+{
+    // Block signals so inserting rows does not fire itemClicked,
+    // which would overwrite input fields and reset currentlySelectedId.
+    ui->tableWidgetBoat->blockSignals(true);
+
+    ui->tableWidgetBoat->setRowCount(0);
+    ui->tableWidgetBoat->setColumnCount(10);
+
+    QStringList headers;
+    headers << "Boat ID" << "Size" << "Location" << "Owner Name"
+            << "Owner Email" << "Status" << "Type" << "Last Maintenance"
+            << "Total Trips" << "Total Fish";
+    ui->tableWidgetBoat->setHorizontalHeaderLabels(headers);
+
+    QSqlQuery query = Boats::getAll();
+
+    if (!query.isActive()) {
+        ui->tableWidgetBoat->blockSignals(false);
+        QMessageBox::critical(this, "Error", "Failed to retrieve boats");
+        return;
+    }
+
+    int row = 0;
+    while (query.next()) {
+        ui->tableWidgetBoat->insertRow(row);
+
+        for (int col = 0; col < 10; col++) {
+            QTableWidgetItem *item;
+
+            if (col == 5) {
+                int statusValue = query.value(col).toInt();
+                QString statusText = (statusValue == 1) ? "IN PORT" : "OUT";
+                item = new QTableWidgetItem(statusText);
+            } else {
+                item = new QTableWidgetItem(query.value(col).toString());
+            }
+
+            if (col == 0) {
+                item->setData(Qt::UserRole, query.value("BOATID").toInt());
+            }
+
+            ui->tableWidgetBoat->setItem(row, col, item);
+        }
+        row++;
+    }
+
+    ui->tableWidgetBoat->resizeColumnsToContents();
+    ui->tableWidgetBoat->horizontalHeader()->setStretchLastSection(true);
+
+    // Restore signals now that the table is fully populated
+    ui->tableWidgetBoat->blockSignals(false);
+}
+
+void appwindow::clearBoatInputs()
+{
+    ui->boatIdLineEdit->clear();
+    ui->boatIdLineEdit->setReadOnly(false);
+    ui->boatSizeLineEdit->clear();
+    ui->boatLocationLineEdit->clear();
+    ui->boatOwnerNameLineEdit->clear();
+    ui->boatOwnerEmailLineEdit->clear();
+    ui->boatStatusComboBox->setCurrentIndex(1); // Default to IN PORT
+    ui->boatTypeLineEdit->clear();
+    ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+    ui->boatTripsSpinBox->setValue(0);
+    ui->boatFishSpinBox->setValue(0);
+    ui->boatSearchLineEdit->clear();
+
+    currentlySelectedId = -1;
+    ui->deleteBoatButton->setEnabled(false);
+    ui->updateBoatButton->setEnabled(false);
+}
+
+
+void appwindow::on_tableWidgetBoat_itemClicked(QTableWidgetItem *item)
+{
+    if (!item) return;
+
+    int currentRow = ui->tableWidgetBoat->currentRow();
+    if (currentRow < 0) {
+        return;
+    }
+
+    // Get the boat ID from the first column's UserRole
+    QTableWidgetItem *idItem = ui->tableWidgetBoat->item(currentRow, 0);
+    if (idItem) {
+        currentlySelectedId = idItem->data(Qt::UserRole).toInt();
+        qDebug() << "Selected boat ID:" << currentlySelectedId;
+
+        // Load the boat data into boatsTmp
+        boatsTmp.setId(currentlySelectedId);
+        boatsTmp.read();
+
+        // Populate input fields
+        if (boatsTmp.getLastError().isEmpty()) {
+            // ID field is display-only since it's auto-generated
+            ui->boatIdLineEdit->setText(QString::number(boatsTmp.getId()));
+            ui->boatIdLineEdit->setReadOnly(true);
+
+            ui->boatSizeLineEdit->setText(boatsTmp.getSize());
+            ui->boatLocationLineEdit->setText(boatsTmp.getLocation());
+            ui->boatOwnerNameLineEdit->setText(boatsTmp.getOwnerName());
+            ui->boatOwnerEmailLineEdit->setText(boatsTmp.getOwnerEmail());
+            ui->boatStatusComboBox->setCurrentIndex(boatsTmp.getStatus());
+            ui->boatTypeLineEdit->setText(boatsTmp.getType());
+
+            // Handle date parsing
+            QDate date = QDate::fromString(boatsTmp.getLastMaintenanceDate(), "yyyy-MM-dd");
+            if (date.isValid()) {
+                ui->boatMaintenanceDateEdit->setDate(date);
+            } else {
+                ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+            }
+
+            ui->boatTripsSpinBox->setValue(boatsTmp.getTotalTrips());
+            ui->boatFishSpinBox->setValue(boatsTmp.getTotalFish());
+
+            // Enable delete and update buttons
+            ui->deleteBoatButton->setEnabled(true);
+            ui->updateBoatButton->setEnabled(true);
+        }
+    }
+}
+
+
+
+
+void appwindow::on_addBoatButton_clicked()
+{
+    // Input validation
+    if (ui->boatSizeLineEdit->text().isEmpty() ||
+        ui->boatLocationLineEdit->text().isEmpty() ||
+        ui->boatOwnerNameLineEdit->text().isEmpty() ||
+        ui->boatOwnerEmailLineEdit->text().isEmpty() ||
+        ui->boatTypeLineEdit->text().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "All fields must be filled!");
+        return;
+    }
+
+    // Email validation (basic)
+    if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
+        QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
+        return;
+    }
+
+    // Create boats object with input data (ID is auto-generated, so we pass 0)
+    Boats newBoat(
+        0, // ID is auto-generated, value will be ignored in create()
+        ui->boatSizeLineEdit->text(),
+        ui->boatLocationLineEdit->text(),
+        ui->boatOwnerNameLineEdit->text(),
+        ui->boatOwnerEmailLineEdit->text(),
+        ui->boatStatusComboBox->currentIndex(), // 1=IN PORT, 0=OUT
+        ui->boatTypeLineEdit->text(),
+        ui->boatMaintenanceDateEdit->date().toString("yyyy-MM-dd"),
+        ui->boatTripsSpinBox->value(),
+        ui->boatFishSpinBox->value()
+        );
+
+    // Call create method
+    if (newBoat.create()) {
+        QMessageBox::information(this, "Success",
+                                 "Boat added successfully with ID: " + QString::number(newBoat.getId()));
+        clearBoatInputs();
+        displayBoats(); // Refresh display after addition
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());
+    }
+}
+
+void appwindow::on_deleteBoatButton_clicked()
+{
+    if (currentlySelectedId == -1) {
+        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");
+        return;
+    }
+
+    // Confirm deletion
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirm Delete",
+        "Are you sure you want to delete boat with ID: " + QString::number(currentlySelectedId) + "?",
+        QMessageBox::Yes | QMessageBox::No
+        );
+
+    if (reply == QMessageBox::Yes) {
+        // Set the ID in the temporary boats object
+        boatsTmp.setId(currentlySelectedId);
+
+        // Call delete method
+        if (boatsTmp.deleteBoat()) {
+            QMessageBox::information(this, "Success", "Boat deleted successfully!");
+            clearBoatInputs();
+            displayBoats(); // Refresh display after deletion
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to delete boat: " + boatsTmp.getLastError());
+        }
+    }
+}
+
+void appwindow::on_updateBoatButton_clicked()
+{
+    // Guard: must have a row selected
+    if (currentlySelectedId <= 0) {
+        QMessageBox::warning(this, "Selection Error",
+                             "Please click a row in the table first to select a boat.");
+        return;
+    }
+
+    // Validation
+    if (ui->boatSizeLineEdit->text().trimmed().isEmpty() ||
+        ui->boatLocationLineEdit->text().trimmed().isEmpty() ||
+        ui->boatOwnerNameLineEdit->text().trimmed().isEmpty() ||
+        ui->boatOwnerEmailLineEdit->text().trimmed().isEmpty() ||
+        ui->boatTypeLineEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "All fields must be filled!");
+        return;
+    }
+    if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
+        QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
+        return;
+    }
+
+    // Collect values
+    int     boatId  = currentlySelectedId;
+    QString size    = ui->boatSizeLineEdit->text().trimmed();
+    QString loc     = ui->boatLocationLineEdit->text().trimmed();
+    QString oName   = ui->boatOwnerNameLineEdit->text().trimmed();
+    QString oEmail  = ui->boatOwnerEmailLineEdit->text().trimmed();
+    int     status  = ui->boatStatusComboBox->currentIndex();
+    QString type    = ui->boatTypeLineEdit->text().trimmed();
+    QString dateStr = ui->boatMaintenanceDateEdit->date().toString("dd-MMM-yyyy").toUpper();
+    int     trips   = ui->boatTripsSpinBox->value();
+    int     fish    = ui->boatFishSpinBox->value();
+
+    qDebug() << "=== UPDATE ATTEMPT ===";
+    qDebug() << "ID:" << boatId << "Size:" << size << "Loc:" << loc;
+    qDebug() << "Owner:" << oName << "Email:" << oEmail;
+    qDebug() << "Status:" << status << "Type:" << type;
+    qDebug() << "Date:" << dateStr << "Trips:" << trips << "Fish:" << fish;
+
+    // Check DB is open
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "DB Error", "Database is not open!");
+        return;
+    }
+
+    // Execute directly - no Boats wrapper, so we can see the raw Oracle error
+    QSqlQuery q(db);
+    q.prepare(
+        "UPDATE QTUSERC.TABLE1 SET "
+        "  SIZEBOAT            = :size,    "
+        "  LOCATION            = :loc,     "
+        "  OWNERNAME           = :oName,   "
+        "  OWNERMAIL           = :oEmail,  "
+        "  STATUS              = :status,  "
+        "  TYPE                = :type,    "
+        "  LASTMAINTENANCEDATE = TO_DATE(:dateStr, 'DD-MON-YYYY'), "
+        "  TOTALTRIPS          = :trips,   "
+        "  TOTALFISH           = :fish     "
+        "WHERE BOATID = :boatId"
+    );
+    q.bindValue(":size",    size);
+    q.bindValue(":loc",     loc);
+    q.bindValue(":oName",   oName);
+    q.bindValue(":oEmail",  oEmail);
+    q.bindValue(":status",  status);
+    q.bindValue(":type",    type);
+    q.bindValue(":dateStr", dateStr);
+    q.bindValue(":trips",   trips);
+    q.bindValue(":fish",    fish);
+    q.bindValue(":boatId",  boatId);
+
+    if (!q.exec()) {
+        QString err = q.lastError().text();
+        qDebug() << "UPDATE FAILED:" << err;
+        QMessageBox::critical(this, "Update Failed",
+                              "Oracle error:\n\n" + err +
+                              "\n\nBoat ID attempted: " + QString::number(boatId) +
+                              "\nDate string sent: " + dateStr);
+        return;
+    }
+
+    int rows = q.numRowsAffected();
+    qDebug() << "Rows affected:" << rows;
+
+    if (rows == 0) {
+        QMessageBox::warning(this, "Not Updated",
+                             "Query ran without error but no row was changed.\n"
+                             "Boat ID " + QString::number(boatId) + " may not exist.");
+        return;
+    }
+
+    QMessageBox::information(this, "Success", "Boat updated successfully!");
+    displayBoats();
+    clearBoatInputs();
+    ui->tableWidgetBoat->clearSelection();
+}
+
+
+void appwindow::on_searchBoatButton_clicked()
+{
+    // Search by ID
+    if (ui->boatSearchLineEdit->text().isEmpty()) {
+        displayBoats(); // Show all if search is empty
+        return;
+    }
+
+    bool ok;
+    int id = ui->boatSearchLineEdit->text().toInt(&ok);
+    if (!ok) {
+        QMessageBox::warning(this, "Validation Error", "Search ID must be a number!");
+        return;
+    }
+
+    // Clear table and show only the searched boat
+    ui->tableWidgetBoat->setRowCount(0);
+
+    // Set ID in temporary boats and read from database
+    boatsTmp.setId(id);
+    boatsTmp.read();
+
+    if (boatsTmp.getLastError().isEmpty()) {
+        ui->tableWidgetBoat->insertRow(0);
+        ui->tableWidgetBoat->setItem(0, 0, new QTableWidgetItem(QString::number(boatsTmp.getId())));
+        ui->tableWidgetBoat->setItem(0, 1, new QTableWidgetItem(boatsTmp.getSize()));
+        ui->tableWidgetBoat->setItem(0, 2, new QTableWidgetItem(boatsTmp.getLocation()));
+        ui->tableWidgetBoat->setItem(0, 3, new QTableWidgetItem(boatsTmp.getOwnerName()));
+        ui->tableWidgetBoat->setItem(0, 4, new QTableWidgetItem(boatsTmp.getOwnerEmail()));
+
+        QString statusText = boatsTmp.getStatus() == 1 ? "IN PORT" : "OUT";
+        ui->tableWidgetBoat->setItem(0, 5, new QTableWidgetItem(statusText));
+
+        ui->tableWidgetBoat->setItem(0, 6, new QTableWidgetItem(boatsTmp.getType()));
+        ui->tableWidgetBoat->setItem(0, 7, new QTableWidgetItem(boatsTmp.getLastMaintenanceDate()));
+        ui->tableWidgetBoat->setItem(0, 8, new QTableWidgetItem(QString::number(boatsTmp.getTotalTrips())));
+        ui->tableWidgetBoat->setItem(0, 9, new QTableWidgetItem(QString::number(boatsTmp.getTotalFish())));
+
+        // Store the boat ID in the first column item
+        ui->tableWidgetBoat->item(0, 0)->setData(Qt::UserRole, boatsTmp.getId());
+    } else {
+        QMessageBox::information(this, "Not Found", "No boat found with ID: " + QString::number(id));
+        displayBoats(); // Show all boats
+    }
+}

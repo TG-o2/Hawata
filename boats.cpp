@@ -1,83 +1,126 @@
-#include "Boats.h"
+#include "boats.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
-#include <QSqlError>
-#include <QDebug>
+#include <QVariant>
+#include <QSqlRecord>
 
-Boats::Boats() {}
-
-bool Boats::createBoat(const QString &boatId, const QString &size,
-                       const QString &location, const QString &ownerName,
-                       const QString &ownerEmail, int status,
-                       const QString &type, const QString &lastMaintenanceDate,
-                       int totalTrips, int totalFish)
+Boats::Boats() : id(0), status(1), totalTrips(0), totalFish(0)
 {
-    QSqlDatabase db = QSqlDatabase::database();
-
-    if (!db.isOpen()) {
-        qDebug() << "Database is not open!";
-        return false;
-    }
-
-    QSqlQuery query(db);
-    // Use uppercase column names without quotes
-    query.prepare("INSERT INTO BOATS (BOATID, SIZE, LOCATION, OWNERNAME, OWNEREMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH) "
-                  "VALUES (:boatId, :size, :location, :ownerName, :ownerEmail, :status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD HH24:MI:SS'), :totalTrips, :totalFish)");
-
-    query.addBindValue(boatId);
-    query.addBindValue(size);
-    query.addBindValue(location);
-    query.addBindValue(ownerName);
-    query.addBindValue(ownerEmail);
-    query.addBindValue(status);
-    query.addBindValue(type);
-    query.addBindValue(lastMaintenanceDate);
-    query.addBindValue(totalTrips);
-    query.addBindValue(totalFish);
-
-    if (!query.exec()) {
-        qDebug() << "Error inserting boat:" << query.lastError().text();
-        return false;
-    }
-
-    qDebug() << "Boat created successfully!";
-    return true;
 }
 
-bool Boats::updateBoat(const QString &boatId, const QString &size,
-                       const QString &location, const QString &ownerName,
-                       const QString &ownerEmail, int status,
-                       const QString &type, const QString &lastMaintenanceDate,
-                       int totalTrips, int totalFish)
+Boats::Boats(int id, const QString &size, const QString &location,
+             const QString &ownerName, const QString &ownerEmail, int status,
+             const QString &type, const QString &lastMaintenanceDate,
+             int totalTrips, int totalFish)
+    : id(id), size(size), location(location), ownerName(ownerName),
+    ownerEmail(ownerEmail), status(status), type(type),
+    lastMaintenanceDate(lastMaintenanceDate), totalTrips(totalTrips),
+    totalFish(totalFish)
 {
+}
+
+bool Boats::create()
+{
+    lastError.clear();
     QSqlDatabase db = QSqlDatabase::database();
 
     if (!db.isOpen()) {
-        qDebug() << "Database is not open!";
+        lastError = "Database is not open!";
+        qDebug() << lastError;
         return false;
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE BOATS SET SIZE = :size, LOCATION = :location, "
-                  "OWNERNAME = :ownerName, OWNEREMAIL = :ownerEmail, "
-                  "STATUS = :status, TYPE = :type, "
-                  "LASTMAINTENANCEDATE = TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD HH24:MI:SS'), "
-                  "TOTALTRIPS = :totalTrips, TOTALFISH = :totalFish "
-                  "WHERE BOATID = :boatId");
 
-    query.addBindValue(size);
-    query.addBindValue(location);
-    query.addBindValue(ownerName);
-    query.addBindValue(ownerEmail);
-    query.addBindValue(status);
-    query.addBindValue(type);
-    query.addBindValue(lastMaintenanceDate);
-    query.addBindValue(totalTrips);
-    query.addBindValue(totalFish);
-    query.addBindValue(boatId);
+    // If ID is 0, we need to get the next value
+    if (id == 0) {
+        // Get the max ID and add 1
+        QSqlQuery maxQuery(db);
+        maxQuery.exec("SELECT NVL(MAX(BOATID), 0) + 1 FROM QTUSERC.TABLE1");
+        if (maxQuery.next()) {
+            id = maxQuery.value(0).toInt();
+        } else {
+            lastError = "Failed to generate ID";
+            return false;
+        }
+    }
+
+    // Now include BOATID in the INSERT
+    query.prepare("INSERT INTO QTUSERC.TABLE1 (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
+                  "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH) "
+                  "VALUES (:id, :size, :location, :ownerName, :ownerEmail, "
+                  ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish)");
+
+    // Bind values including ID
+    query.bindValue(":id", id);
+    query.bindValue(":size", size);
+    query.bindValue(":location", location);
+    query.bindValue(":ownerName", ownerName);
+    query.bindValue(":ownerEmail", ownerEmail);
+    query.bindValue(":status", status);
+    query.bindValue(":type", type);
+    query.bindValue(":lastMaintenanceDate", lastMaintenanceDate);
+    query.bindValue(":totalTrips", totalTrips);
+    query.bindValue(":totalFish", totalFish);
 
     if (!query.exec()) {
-        qDebug() << "Error updating boat:" << query.lastError().text();
+        lastError = query.lastError().text();
+        qDebug() << "Error inserting boat:" << lastError;
+        return false;
+    }
+
+    qDebug() << "Boat created successfully with ID:" << id;
+    return true;
+}
+bool Boats::update()
+{
+    lastError.clear();
+    QSqlDatabase db = QSqlDatabase::database();
+
+    if (!db.isOpen()) {
+        lastError = "Database is not open!";
+        qDebug() << lastError;
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE QTUSERC.TABLE1 SET "
+                  "SIZEBOAT = :size, "
+                  "LOCATION = :location, "
+                  "OWNERNAME = :ownerName, "
+                  "OWNERMAIL = :ownerEmail, "
+                  "STATUS = :status, "
+                  "TYPE = :type, "
+                  "LASTMAINTENANCEDATE = TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), "
+                  "TOTALTRIPS = :totalTrips, "
+                  "TOTALFISH = :totalFish "
+                  "WHERE BOATID = :id");
+
+    query.bindValue(":size", size);
+    query.bindValue(":location", location);
+    query.bindValue(":ownerName", ownerName);
+    query.bindValue(":ownerEmail", ownerEmail);
+    query.bindValue(":status", status);
+    query.bindValue(":type", type);
+    query.bindValue(":lastMaintenanceDate", lastMaintenanceDate);
+    query.bindValue(":totalTrips", totalTrips);
+    query.bindValue(":totalFish", totalFish);
+    query.bindValue(":id", id);
+
+    if (!query.exec()) {
+        lastError = query.lastError().text();
+        qDebug() << "Error updating boat:" << lastError;
+        return false;
+    }
+
+    // Check if any row was actually updated
+    int rowsAffected = query.numRowsAffected();
+    qDebug() << "Rows affected by update:" << rowsAffected;
+
+    if (rowsAffected == 0) {
+        lastError = "No boat found with ID: " + QString::number(id);
+        qDebug() << lastError;
         return false;
     }
 
@@ -85,21 +128,32 @@ bool Boats::updateBoat(const QString &boatId, const QString &size,
     return true;
 }
 
-bool Boats::deleteBoat(const QString &boatId)
+bool Boats::deleteBoat()
 {
+    lastError.clear();
     QSqlDatabase db = QSqlDatabase::database();
 
     if (!db.isOpen()) {
-        qDebug() << "Database is not open!";
+        lastError = "Database is not open!";
+        qDebug() << lastError;
         return false;
     }
 
     QSqlQuery query(db);
-    query.prepare("DELETE FROM BOATS WHERE BOATID = :boatId");
-    query.addBindValue(boatId);
+
+    query.prepare("DELETE FROM QTUSERC.TABLE1 WHERE BOATID = :id");
+    query.bindValue(":id", id);
 
     if (!query.exec()) {
-        qDebug() << "Error deleting boat:" << query.lastError().text();
+        lastError = query.lastError().text();
+        qDebug() << "Error deleting boat:" << lastError;
+        return false;
+    }
+
+    // Check if any row was actually deleted
+    if (query.numRowsAffected() == 0) {
+        lastError = "No boat found with ID: " + QString::number(id);
+        qDebug() << lastError;
         return false;
     }
 
@@ -107,35 +161,64 @@ bool Boats::deleteBoat(const QString &boatId)
     return true;
 }
 
-QSqlQuery Boats::getBoat(const QString &boatId)
+void Boats::read()
 {
-    QSqlQuery query;
+    lastError.clear();
+    QSqlDatabase db = QSqlDatabase::database();
 
-    if (!QSqlDatabase::database().isOpen()) {
-        qDebug() << "Database is not open!";
-        return query;
+    if (!db.isOpen()) {
+        lastError = "Database is not open!";
+        qDebug() << lastError;
+        return;
     }
 
-    query.prepare("SELECT * FROM BOATS WHERE BOATID = :boatId");
-    query.addBindValue(boatId);
+    QSqlQuery query(db);
+
+    query.prepare("SELECT SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
+                  "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
+                  "FROM QTUSERC.TABLE1 WHERE BOATID = :id");
+    query.bindValue(":id", id);
 
     if (!query.exec()) {
-        qDebug() << "Error retrieving boat:" << query.lastError().text();
+        lastError = query.lastError().text();
+        qDebug() << "Error reading boat:" << lastError;
+        return;
     }
 
-    return query;
+    if (query.next()) {
+        size = query.value(0).toString();
+        location = query.value(1).toString();
+        ownerName = query.value(2).toString();
+        ownerEmail = query.value(3).toString();
+        status = query.value(4).toInt();
+        type = query.value(5).toString();
+        lastMaintenanceDate = query.value(6).toString();
+        totalTrips = query.value(7).toInt();
+        totalFish = query.value(8).toInt();
+
+        qDebug() << "Boat read successfully!";
+    } else {
+        lastError = "No boat found with ID: " + QString::number(id);
+        qDebug() << lastError;
+    }
 }
 
-QSqlQuery Boats::getAllBoats()
+QSqlQuery Boats::getAll()
 {
     QSqlQuery query;
 
-    if (!QSqlDatabase::database().isOpen()) {
+    QSqlDatabase db = QSqlDatabase::database();
+
+    if (!db.isOpen()) {
         qDebug() << "Database is not open!";
         return query;
     }
 
-    query.prepare("SELECT * FROM BOATS ORDER BY BOATID");
+    query = QSqlQuery(db);
+
+    query.prepare("SELECT BOATID, SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
+                  "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
+                  "FROM QTUSERC.TABLE1 ORDER BY BOATID");
 
     if (!query.exec()) {
         qDebug() << "Error retrieving boats:" << query.lastError().text();
@@ -144,8 +227,3 @@ QSqlQuery Boats::getAllBoats()
     return query;
 }
 
-QString Boats::getLastError()
-{
-    QSqlDatabase db = QSqlDatabase::database();
-    return db.lastError().text();
-}

@@ -496,43 +496,52 @@ appwindow::appwindow(QWidget *parent)
 
     //page BOAT :,D
     connect(ui->add_user_22  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(0);
-    });
-    connect(ui->Manage_22 , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(1);
-    });
-    connect(ui->Display_22  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(2);
+        ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->add_user_21  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(0);
+        ui->boatPage->setCurrentIndex(0);
     });
-    connect(ui->Manage_21 , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(1);
-    });
-    connect(ui->Display_21  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(2);
+    connect(ui->add_user_20  , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->add_user_19  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(0);
+        ui->boatPage->setCurrentIndex(0);
+    });
+    connect(ui->Manage_22 , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(1);
+    });
+    connect(ui->Manage_20 , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(1);
+    });
+    connect(ui->Manage_21 , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(1);
     });
     connect(ui->Manage_19 , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(1);
+        ui->boatPage->setCurrentIndex(1);
+    });
+    connect(ui->Display_22  , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(2);
+    });
+    connect(ui->Display_20  , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(2);
+    });
+    connect(ui->Display_21  , &QPushButton::clicked, this, [=]() {
+        ui->boatPage->setCurrentIndex(2);
     });
     connect(ui->Display_19  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(2);
+        ui->boatPage->setCurrentIndex(2);
     });
     connect(ui->forgetpwd_7  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(3);
+        ui->boatPage->setCurrentIndex(3);
     });
     connect(ui->forgetpwd_8  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(3);
+        ui->boatPage->setCurrentIndex(3);
     });
     connect(ui->forgetpwd_9  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(3);
+        ui->boatPage->setCurrentIndex(3);
     });
     connect(ui->forgetpwd_10  , &QPushButton::clicked, this, [=]() {
-        ui->stackedWidget_3->setCurrentIndex(3);
+        ui->boatPage->setCurrentIndex(3);
     });
 
     //page Prod
@@ -1061,15 +1070,15 @@ void appwindow::loadUsersTable()
     for (const UserRecord &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id)));
-        table->setItem(row, 1, new QTableWidgetItem(r.email));
-        table->setItem(row, 2, new QTableWidgetItem(r.firstName));
-        table->setItem(row, 3, new QTableWidgetItem(r.lastName));
-        table->setItem(row, 4, new QTableWidgetItem(r.role));
-        table->setItem(row, 5, new QTableWidgetItem(r.gender));
-        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary)));
-        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart));
-        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
+        table->setItem(row, 1, new QTableWidgetItem(r.email()));
+        table->setItem(row, 2, new QTableWidgetItem(r.firstName()));
+        table->setItem(row, 3, new QTableWidgetItem(r.lastName()));
+        table->setItem(row, 4, new QTableWidgetItem(r.role()));
+        table->setItem(row, 5, new QTableWidgetItem(r.gender()));
+        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary())));
+        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart()));
+        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd()));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -1592,28 +1601,28 @@ void appwindow::displayBoats()
 {
     // Block signals so inserting rows does not fire itemClicked,
     // which would overwrite input fields and reset currentlySelectedId.
-    ui->tableWidgetBoat->blockSignals(true);
+    ui->Boatwidget_2->blockSignals(true);
 
-    ui->tableWidgetBoat->setRowCount(0);
-    ui->tableWidgetBoat->setColumnCount(10);
+    ui->Boatwidget_2->setRowCount(0);
+    ui->Boatwidget_2->setColumnCount(10);
 
     QStringList headers;
     headers << "Boat ID" << "Size" << "Location" << "Owner Name"
             << "Owner Email" << "Status" << "Type" << "Last Maintenance"
             << "Total Trips" << "Total Fish";
-    ui->tableWidgetBoat->setHorizontalHeaderLabels(headers);
+    ui->Boatwidget_2->setHorizontalHeaderLabels(headers);
 
     QSqlQuery query = Boats::getAll();
 
     if (!query.isActive()) {
-        ui->tableWidgetBoat->blockSignals(false);
+        ui->Boatwidget_2->blockSignals(false);
         QMessageBox::critical(this, "Error", "Failed to retrieve boats");
         return;
     }
 
     int row = 0;
     while (query.next()) {
-        ui->tableWidgetBoat->insertRow(row);
+        ui->Boatwidget_2->insertRow(row);
 
         for (int col = 0; col < 10; col++) {
             QTableWidgetItem *item;
@@ -1630,22 +1639,22 @@ void appwindow::displayBoats()
                 item->setData(Qt::UserRole, query.value("BOATID").toInt());
             }
 
-            ui->tableWidgetBoat->setItem(row, col, item);
+            ui->Boatwidget_2->setItem(row, col, item);
         }
         row++;
     }
 
-    ui->tableWidgetBoat->resizeColumnsToContents();
-    ui->tableWidgetBoat->horizontalHeader()->setStretchLastSection(true);
+    ui->Boatwidget_2->resizeColumnsToContents();
+    ui->Boatwidget_2->horizontalHeader()->setStretchLastSection(true);
 
     // Restore signals now that the table is fully populated
-    ui->tableWidgetBoat->blockSignals(false);
+    ui->Boatwidget_2->blockSignals(false);
 }
 
 void appwindow::clearBoatInputs()
 {
-    ui->boatIdLineEdit->clear();
-    ui->boatIdLineEdit->setReadOnly(false);
+    //ui->boatPage->clear();
+    //ui->boatPage->setReadOnly(false);
     ui->boatSizeLineEdit->clear();
     ui->boatLocationLineEdit->clear();
     ui->boatOwnerNameLineEdit->clear();
@@ -1663,17 +1672,17 @@ void appwindow::clearBoatInputs()
 }
 
 
-void appwindow::on_tableWidgetBoat_itemClicked(QTableWidgetItem *item)
+void appwindow::on_Boatwidget_2_clicked(QTableWidgetItem *item)
 {
     if (!item) return;
 
-    int currentRow = ui->tableWidgetBoat->currentRow();
+    int currentRow = ui->Boatwidget_2->currentRow();
     if (currentRow < 0) {
         return;
     }
 
     // Get the boat ID from the first column's UserRole
-    QTableWidgetItem *idItem = ui->tableWidgetBoat->item(currentRow, 0);
+    QTableWidgetItem *idItem = ui->Boatwidget_2->item(currentRow, 0);
     if (idItem) {
         currentlySelectedId = idItem->data(Qt::UserRole).toInt();
         qDebug() << "Selected boat ID:" << currentlySelectedId;
@@ -1685,8 +1694,8 @@ void appwindow::on_tableWidgetBoat_itemClicked(QTableWidgetItem *item)
         // Populate input fields
         if (boatsTmp.getLastError().isEmpty()) {
             // ID field is display-only since it's auto-generated
-            ui->boatIdLineEdit->setText(QString::number(boatsTmp.getId()));
-            ui->boatIdLineEdit->setReadOnly(true);
+            //ui->boatPage->setText(QString::number(boatsTmp.getId()));
+            //ui->boatPage->setReadOnly(true);
 
             ui->boatSizeLineEdit->setText(boatsTmp.getSize());
             ui->boatLocationLineEdit->setText(boatsTmp.getLocation());
@@ -1839,7 +1848,7 @@ void appwindow::on_updateBoatButton_clicked()
     // Execute directly - no Boats wrapper, so we can see the raw Oracle error
     QSqlQuery q(db);
     q.prepare(
-        "UPDATE QTUSERC.TABLE1 SET "
+        "UPDATE BOAT SET "
         "  SIZEBOAT            = :size,    "
         "  LOCATION            = :loc,     "
         "  OWNERNAME           = :oName,   "
@@ -1885,11 +1894,11 @@ void appwindow::on_updateBoatButton_clicked()
     QMessageBox::information(this, "Success", "Boat updated successfully!");
     displayBoats();
     clearBoatInputs();
-    ui->tableWidgetBoat->clearSelection();
+    ui->Boatwidget_2->clearSelection();
 }
 
 
-void appwindow::on_searchBoatButton_clicked()
+void appwindow::on_searchBoatButton_3_clicked()
 {
     // Search by ID
     if (ui->boatSearchLineEdit->text().isEmpty()) {
@@ -1905,32 +1914,34 @@ void appwindow::on_searchBoatButton_clicked()
     }
 
     // Clear table and show only the searched boat
-    ui->tableWidgetBoat->setRowCount(0);
+    ui->Boatwidget_2->setRowCount(0);
 
     // Set ID in temporary boats and read from database
     boatsTmp.setId(id);
     boatsTmp.read();
 
     if (boatsTmp.getLastError().isEmpty()) {
-        ui->tableWidgetBoat->insertRow(0);
-        ui->tableWidgetBoat->setItem(0, 0, new QTableWidgetItem(QString::number(boatsTmp.getId())));
-        ui->tableWidgetBoat->setItem(0, 1, new QTableWidgetItem(boatsTmp.getSize()));
-        ui->tableWidgetBoat->setItem(0, 2, new QTableWidgetItem(boatsTmp.getLocation()));
-        ui->tableWidgetBoat->setItem(0, 3, new QTableWidgetItem(boatsTmp.getOwnerName()));
-        ui->tableWidgetBoat->setItem(0, 4, new QTableWidgetItem(boatsTmp.getOwnerEmail()));
+        ui->Boatwidget_2->insertRow(0);
+        ui->Boatwidget_2->setItem(0, 0, new QTableWidgetItem(QString::number(boatsTmp.getId())));
+        ui->Boatwidget_2->setItem(0, 1, new QTableWidgetItem(boatsTmp.getSize()));
+        ui->Boatwidget_2->setItem(0, 2, new QTableWidgetItem(boatsTmp.getLocation()));
+        ui->Boatwidget_2->setItem(0, 3, new QTableWidgetItem(boatsTmp.getOwnerName()));
+        ui->Boatwidget_2->setItem(0, 4, new QTableWidgetItem(boatsTmp.getOwnerEmail()));
 
         QString statusText = boatsTmp.getStatus() == 1 ? "IN PORT" : "OUT";
-        ui->tableWidgetBoat->setItem(0, 5, new QTableWidgetItem(statusText));
+        ui->Boatwidget_2->setItem(0, 5, new QTableWidgetItem(statusText));
 
-        ui->tableWidgetBoat->setItem(0, 6, new QTableWidgetItem(boatsTmp.getType()));
-        ui->tableWidgetBoat->setItem(0, 7, new QTableWidgetItem(boatsTmp.getLastMaintenanceDate()));
-        ui->tableWidgetBoat->setItem(0, 8, new QTableWidgetItem(QString::number(boatsTmp.getTotalTrips())));
-        ui->tableWidgetBoat->setItem(0, 9, new QTableWidgetItem(QString::number(boatsTmp.getTotalFish())));
+        ui->Boatwidget_2->setItem(0, 6, new QTableWidgetItem(boatsTmp.getType()));
+        ui->Boatwidget_2->setItem(0, 7, new QTableWidgetItem(boatsTmp.getLastMaintenanceDate()));
+        ui->Boatwidget_2->setItem(0, 8, new QTableWidgetItem(QString::number(boatsTmp.getTotalTrips())));
+        ui->Boatwidget_2->setItem(0, 9, new QTableWidgetItem(QString::number(boatsTmp.getTotalFish())));
 
         // Store the boat ID in the first column item
-        ui->tableWidgetBoat->item(0, 0)->setData(Qt::UserRole, boatsTmp.getId());
+        ui->Boatwidget_2->item(0, 0)->setData(Qt::UserRole, boatsTmp.getId());
     } else {
         QMessageBox::information(this, "Not Found", "No boat found with ID: " + QString::number(id));
         displayBoats(); // Show all boats
     }
 }
+
+

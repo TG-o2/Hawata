@@ -36,7 +36,7 @@ bool Boats::create()
     if (id == 0) {
         // Get the max ID and add 1
         QSqlQuery maxQuery(db);
-        maxQuery.exec("SELECT NVL(MAX(BOATID), 0) + 1 FROM QTUSERC.TABLE1");
+        maxQuery.exec("SELECT NVL(MAX(BOATID), 0) + 1 FROM BOAT");
         if (maxQuery.next()) {
             id = maxQuery.value(0).toInt();
         } else {
@@ -46,7 +46,7 @@ bool Boats::create()
     }
 
     // Now include BOATID in the INSERT
-    query.prepare("INSERT INTO QTUSERC.TABLE1 (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
+    query.prepare("INSERT INTO BOAT (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
                   "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH) "
                   "VALUES (:id, :size, :location, :ownerName, :ownerEmail, "
                   ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish)");
@@ -85,7 +85,7 @@ bool Boats::update()
 
     QSqlQuery query(db);
 
-    query.prepare("UPDATE QTUSERC.TABLE1 SET "
+    query.prepare("UPDATE BOAT SET "
                   "SIZEBOAT = :size, "
                   "LOCATION = :location, "
                   "OWNERNAME = :ownerName, "
@@ -141,7 +141,7 @@ bool Boats::deleteBoat()
 
     QSqlQuery query(db);
 
-    query.prepare("DELETE FROM QTUSERC.TABLE1 WHERE BOATID = :id");
+    query.prepare("DELETE FROM BOAT WHERE BOATID = :id");
     query.bindValue(":id", id);
 
     if (!query.exec()) {
@@ -176,7 +176,7 @@ void Boats::read()
 
     query.prepare("SELECT SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
                   "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
-                  "FROM QTUSERC.TABLE1 WHERE BOATID = :id");
+                  "FROM BOAT WHERE BOATID = :id");
     query.bindValue(":id", id);
 
     if (!query.exec()) {
@@ -218,7 +218,7 @@ QSqlQuery Boats::getAll()
 
     query.prepare("SELECT BOATID, SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
                   "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
-                  "FROM QTUSERC.TABLE1 ORDER BY BOATID");
+                  "FROM BOAT ORDER BY BOATID");
 
     if (!query.exec()) {
         qDebug() << "Error retrieving boats:" << query.lastError().text();

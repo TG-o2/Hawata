@@ -73,8 +73,8 @@ private slots:
     void on_addBoatButton_clicked();
     void on_deleteBoatButton_clicked();
     void on_updateBoatButton_clicked();
-    void on_searchBoatButton_clicked();
-    void on_tableWidgetBoat_itemClicked(QTableWidgetItem *item);
+    void on_searchBoatButton_3_clicked();
+    void on_Boatwidget_2_clicked(QTableWidgetItem *item);
 
 private:
     Ui::appwindow *ui;

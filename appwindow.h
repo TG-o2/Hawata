@@ -6,7 +6,7 @@
 #include "connection.h"
 #include "product.h"
 #include "boats.h"
-
+#include "company.h"
 #include <QDialog>
 #include <QFile>
 #include <QFontDatabase>
@@ -75,6 +75,15 @@ private slots:
     void on_updateBoatButton_clicked();
     void on_searchBoatButton_3_clicked();
     void on_Boatwidget_2_clicked(QTableWidgetItem *item);
+    //companies
+    void loadCompaniesTable();
+    void fillCompanyForm(int row);
+    void on_tableWidget_11_cellClicked(int row, int column);
+    void on_tableWidget_11_cellDoubleClicked(int row, int column);
+    void on_CreateUser_3_clicked();
+    void on_edit_company_7_clicked();
+    void on_delete_company_7_clicked();
+    void on_clear_7_clicked();
 
 private:
     Ui::appwindow *ui;
@@ -97,6 +106,9 @@ private:
     void displayBoats();
     void clearBoatInputs();
     int currentlySelectedId;
+
+    Company companyManager;
+    int selectedCompanyId = -1;
 
 
 

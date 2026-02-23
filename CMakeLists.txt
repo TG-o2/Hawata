@@ -49,7 +49,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(Sign_up
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        boat.ui
+        company.h company.cpp
+
 
 
     )

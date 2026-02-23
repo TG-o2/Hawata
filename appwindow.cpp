@@ -6,7 +6,6 @@
 
 
 
-
 appwindow::appwindow(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::appwindow)
@@ -1942,6 +1941,205 @@ void appwindow::on_searchBoatButton_3_clicked()
         QMessageBox::information(this, "Not Found", "No boat found with ID: " + QString::number(id));
         displayBoats(); // Show all boats
     }
+}
+///=============COMPANY SECTION=============
+
+
+void appwindow::loadCompaniesTable()
+{
+    QList<CompanyRecord> records = companyManager.getAllCompanies();
+
+    QTableWidget *table = ui->tableWidget_11;
+    table->setRowCount(0);
+    table->setColumnCount(7);
+    table->setHorizontalHeaderLabels(
+        {"ID", "Name", "Location", "Email", "Phone", "Preferred Fish", "Status"});
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->setAlternatingRowColors(true);
+
+    for (const CompanyRecord &r : records) {
+        int row = table->rowCount();
+        table->insertRow(row);
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
+        table->setItem(row, 1, new QTableWidgetItem(r.name()));
+        table->setItem(row, 2, new QTableWidgetItem(r.location()));
+        table->setItem(row, 3, new QTableWidgetItem(r.email()));
+        table->setItem(row, 4, new QTableWidgetItem(r.phone()));
+        table->setItem(row, 5, new QTableWidgetItem(r.preferredFish()));
+        table->setItem(row, 6, new QTableWidgetItem(r.status()));
+    }
+
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->labelResults_7->setText(QString("Showing %1 Companies").arg(records.size()));
+}
+
+void appwindow::fillCompanyForm(int row)
+{
+    if (row < 0) return;
+
+    QTableWidget *table = ui->tableWidget_11;
+
+    selectedCompanyId = table->item(row, 0)->text().toInt();
+
+    ui->firstNameEdit_8->setText(table->item(row, 1)->text());   // Name
+    ui->lastNameEdit_7->setText(table->item(row, 2)->text());    // Location
+    ui->emailEdit_4->setText(table->item(row, 3)->text());       // Email
+    ui->passwordEdit_3->setText(table->item(row, 4)->text());    // Phone
+    ui->lastNameEdit_8->setText(table->item(row, 5)->text());    // Preferred Fish
+
+    int statusIdx = ui->role_option_7->findText(table->item(row, 6)->text());
+    if (statusIdx >= 0) ui->role_option_7->setCurrentIndex(statusIdx);
+
+    // Switch to Add page and update button label
+    ui->stackedWidget_5->setCurrentIndex(0);
+    ui->CreateUser_3->setText("Update Company");
+}
+
+void appwindow::on_tableWidget_11_cellClicked(int row, int /*column*/)
+{
+    if (row < 0 || !ui->tableWidget_11->item(row, 0)) return;
+    selectedCompanyId = ui->tableWidget_11->item(row, 0)->text().toInt();
+}
+
+void appwindow::on_tableWidget_11_cellDoubleClicked(int row, int column)
+{
+    Q_UNUSED(column);
+    fillCompanyForm(row);
+}
+
+///CREATE / UPDATE
+void appwindow::on_CreateUser_3_clicked()
+{
+    QString name         = ui->firstNameEdit_8->text().trimmed();
+    QString location     = ui->lastNameEdit_7->text().trimmed();
+    QString email        = ui->emailEdit_4->text().trimmed();
+    QString phone        = ui->passwordEdit_3->text().trimmed();
+    QString preferredFish= ui->lastNameEdit_8->text().trimmed();
+    QString status       = ui->role_option_7->currentText();
+
+    // ===== VALIDATION =====
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Company name is required.");
+        return;
+    }
+    if (location.isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Location is required.");
+        return;
+    }
+    if (email.isEmpty() || !email.contains('@')) {
+        QMessageBox::warning(this, "Validation Error", "A valid email is required.");
+        return;
+    }
+    if (phone.isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Phone number is required.");
+        return;
+    }
+    // Phone: digits only
+    for (QChar c : phone) {
+        if (!c.isDigit() && c != '+' && c != '-' && c != ' ') {
+            QMessageBox::warning(this, "Validation Error", "Phone must contain only digits.");
+            return;
+        }
+    }
+    if (preferredFish.isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Preferred fish is required.");
+        return;
+    }
+
+    // ===== ALL VALIDATIONS PASSED =====
+    bool isEditMode = (selectedCompanyId != -1);
+    bool success = false;
+
+    if (isEditMode) {
+        success = companyManager.updateCompany(selectedCompanyId, name, location,
+                                               email, phone, preferredFish, status);
+    } else {
+        success = companyManager.createCompany(name, location, email,
+                                               phone, preferredFish, status);
+    }
+
+    if (success) {
+        QMessageBox::information(this, "Success",
+                                 isEditMode ? "Company updated successfully!" : "Company created successfully!");
+
+        // Clear form
+        ui->firstNameEdit_8->clear();
+        ui->lastNameEdit_7->clear();
+        ui->emailEdit_4->clear();
+        ui->passwordEdit_3->clear();
+        ui->lastNameEdit_8->clear();
+        ui->role_option_7->setCurrentIndex(0);
+        ui->CreateUser_3->setText("Create Company");
+        selectedCompanyId = -1;
+
+        loadCompaniesTable();
+        if (isEditMode) {
+            ui->stackedWidget_5->setCurrentIndex(1); // go back to manage page
+        }
+    } else {
+        QMessageBox::critical(this, "Error",
+                              isEditMode ? "Failed to update company." : "Failed to create company.");
+    }
+}
+
+///EDIT
+void appwindow::on_edit_company_7_clicked()
+{
+    int row = ui->tableWidget_11->currentRow();
+    if (row < 0) {
+        QMessageBox::warning(this, "No Selection", "Please select a company row first.");
+        return;
+    }
+    fillCompanyForm(row);
+}
+
+///DELETE
+void appwindow::on_delete_company_7_clicked()
+{
+    QModelIndexList selected = ui->tableWidget_11->selectionModel()->selectedRows();
+    if (selected.isEmpty()) {
+        QMessageBox::warning(this, "No Selection", "Please select a company to delete.");
+        return;
+    }
+
+    int row = selected.first().row();
+    int id  = ui->tableWidget_11->item(row, 0)->text().toInt();
+    QString name = ui->tableWidget_11->item(row, 1)->text();
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirm Delete",
+        QString("Are you sure you want to delete \"%1\" (ID: %2)?").arg(name).arg(id),
+        QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        if (companyManager.deleteCompany(id)) {
+            QMessageBox::information(this, "Deleted", "Company deleted successfully.");
+            selectedCompanyId = -1;
+            loadCompaniesTable();
+        } else {
+            QMessageBox::critical(this, "Error", "Failed to delete company.");
+        }
+    }
+}
+
+///CLEAR
+void appwindow::on_clear_7_clicked()
+{
+    ui->firstNameEdit_8->clear();
+    ui->lastNameEdit_7->clear();
+    ui->emailEdit_4->clear();
+    ui->passwordEdit_3->clear();
+    ui->lastNameEdit_8->clear();
+    ui->role_option_7->setCurrentIndex(0);
+    ui->searchbar_7->clear();
+    ui->comboBox_19->setCurrentIndex(0);
+    ui->CreateUser_3->setText("Create Company");
+    selectedCompanyId = -1;
+
+    if (ui->tableWidget_11->selectionModel())
+        ui->tableWidget_11->selectionModel()->clearSelection();
 }
 
 

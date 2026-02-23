@@ -1059,15 +1059,15 @@ void appwindow::loadUsersTable()
     for (const UserRecord &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id)));
-        table->setItem(row, 1, new QTableWidgetItem(r.email));
-        table->setItem(row, 2, new QTableWidgetItem(r.firstName));
-        table->setItem(row, 3, new QTableWidgetItem(r.lastName));
-        table->setItem(row, 4, new QTableWidgetItem(r.role));
-        table->setItem(row, 5, new QTableWidgetItem(r.gender));
-        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary)));
-        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart));
-        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
+        table->setItem(row, 1, new QTableWidgetItem(r.email()));
+        table->setItem(row, 2, new QTableWidgetItem(r.firstName()));
+        table->setItem(row, 3, new QTableWidgetItem(r.lastName()));
+        table->setItem(row, 4, new QTableWidgetItem(r.role()));
+        table->setItem(row, 5, new QTableWidgetItem(r.gender()));
+        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary())));
+        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart()));
+        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd()));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);

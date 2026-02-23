@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Sign_up::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Sign_up-Debug-e7340903814fe59c93c6.json",
+					"jsonFile" : "target-Sign_up-Debug-89cb006e09f3c221aea4.json",
 					"name" : "Sign_up",
 					"projectIndex" : 0
 				},
@@ -68,8 +68,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/school/Documents/Hawata-main/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
-		"source" : "C:/Users/school/Documents/Hawata-main"
+		"build" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata"
 	},
 	"version" : 
 	{

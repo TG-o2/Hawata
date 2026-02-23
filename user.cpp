@@ -29,17 +29,18 @@ QList<UserRecord> User::getAllUsers()
     }
 
     while (query.next()) {
-        UserRecord record;
-        record.id = query.value(0).toInt();
-        record.email = query.value(1).toString();
-        record.firstName = query.value(2).toString();
-        record.lastName = query.value(3).toString();
-        record.role = query.value(4).toString();
-        record.gender = query.value(5).toString();
-        record.salary = query.value(6).toDouble();
-        record.shiftStart = query.value(7).toString();
-        record.shiftEnd = query.value(8).toString();
-        records.append(record);
+        records.append(UserRecord(
+            query.value(0).toInt(),
+            query.value(1).toString(),
+            query.value(2).toString(),
+            query.value(3).toString(),
+            QString(),
+            query.value(4).toString(),
+            query.value(5).toString(),
+            query.value(6).toDouble(),
+            query.value(7).toString(),
+            query.value(8).toString()
+            ));
     }
 
     qDebug() << "Fetched" << records.size() << "user records";

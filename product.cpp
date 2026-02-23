@@ -23,13 +23,6 @@ Product::Product(const QString &type,
 }
 Product::Product() {}
 
-/*
-  Correct version:
-  - No ID (Oracle identity handles it)
-  - Correct column names
-  - Correct data types
-  - No TO_DATE (Qt handles QDateTime automatically)
-*/
 bool Product::createProduct(const QString &type,
                             const QString &location,
                             const QString &status,

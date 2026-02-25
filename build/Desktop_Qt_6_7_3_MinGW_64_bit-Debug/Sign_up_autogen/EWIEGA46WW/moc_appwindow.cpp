@@ -61,12 +61,14 @@ constexpr auto qt_meta_stringdata_CLASSappwindowENDCLASS = QtMocHelpers::stringD
     "on_delete_company_6_clicked",
     "on_clear_6_clicked",
     "on_addBoatButton_clicked",
+    "on_editBoatButton_clicked",
     "on_deleteBoatButton_clicked",
     "on_updateBoatButton_clicked",
     "on_searchBoatButton_3_clicked",
     "on_Boatwidget_2_clicked",
     "QTableWidgetItem*",
-    "item"
+    "item",
+    "on_Boatwidget_2_itemDoubleClicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -79,7 +81,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSappwindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      25,   14, // methods
+      27,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -87,31 +89,33 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSappwindowENDCLASS[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,  164,    2, 0x08,    1 /* Private */,
-       3,    0,  165,    2, 0x08,    2 /* Private */,
-       4,    0,  166,    2, 0x08,    3 /* Private */,
-       5,    2,  167,    2, 0x08,    4 /* Private */,
-       8,    2,  172,    2, 0x08,    7 /* Private */,
-       9,    0,  177,    2, 0x08,   10 /* Private */,
-      10,    0,  178,    2, 0x08,   11 /* Private */,
-      11,    0,  179,    2, 0x08,   12 /* Private */,
-      12,    2,  180,    2, 0x08,   13 /* Private */,
-      13,    2,  185,    2, 0x08,   16 /* Private */,
-      14,    0,  190,    2, 0x08,   19 /* Private */,
-      15,    0,  191,    2, 0x08,   20 /* Private */,
-      16,    0,  192,    2, 0x08,   21 /* Private */,
-      17,    0,  193,    2, 0x08,   22 /* Private */,
-      18,    0,  194,    2, 0x08,   23 /* Private */,
-      19,    2,  195,    2, 0x08,   24 /* Private */,
-      20,    2,  200,    2, 0x08,   27 /* Private */,
-      21,    0,  205,    2, 0x08,   30 /* Private */,
-      22,    0,  206,    2, 0x08,   31 /* Private */,
-      23,    0,  207,    2, 0x08,   32 /* Private */,
-      24,    0,  208,    2, 0x08,   33 /* Private */,
-      25,    0,  209,    2, 0x08,   34 /* Private */,
-      26,    0,  210,    2, 0x08,   35 /* Private */,
-      27,    0,  211,    2, 0x08,   36 /* Private */,
-      28,    1,  212,    2, 0x08,   37 /* Private */,
+       1,    0,  176,    2, 0x08,    1 /* Private */,
+       3,    0,  177,    2, 0x08,    2 /* Private */,
+       4,    0,  178,    2, 0x08,    3 /* Private */,
+       5,    2,  179,    2, 0x08,    4 /* Private */,
+       8,    2,  184,    2, 0x08,    7 /* Private */,
+       9,    0,  189,    2, 0x08,   10 /* Private */,
+      10,    0,  190,    2, 0x08,   11 /* Private */,
+      11,    0,  191,    2, 0x08,   12 /* Private */,
+      12,    2,  192,    2, 0x08,   13 /* Private */,
+      13,    2,  197,    2, 0x08,   16 /* Private */,
+      14,    0,  202,    2, 0x08,   19 /* Private */,
+      15,    0,  203,    2, 0x08,   20 /* Private */,
+      16,    0,  204,    2, 0x08,   21 /* Private */,
+      17,    0,  205,    2, 0x08,   22 /* Private */,
+      18,    0,  206,    2, 0x08,   23 /* Private */,
+      19,    2,  207,    2, 0x08,   24 /* Private */,
+      20,    2,  212,    2, 0x08,   27 /* Private */,
+      21,    0,  217,    2, 0x08,   30 /* Private */,
+      22,    0,  218,    2, 0x08,   31 /* Private */,
+      23,    0,  219,    2, 0x08,   32 /* Private */,
+      24,    0,  220,    2, 0x08,   33 /* Private */,
+      25,    0,  221,    2, 0x08,   34 /* Private */,
+      26,    0,  222,    2, 0x08,   35 /* Private */,
+      27,    0,  223,    2, 0x08,   36 /* Private */,
+      28,    0,  224,    2, 0x08,   37 /* Private */,
+      29,    1,  225,    2, 0x08,   38 /* Private */,
+      32,    1,  228,    2, 0x08,   40 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -138,7 +142,9 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSappwindowENDCLASS[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 29,   30,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 30,   31,
+    QMetaType::Void, 0x80000000 | 30,   31,
 
        0        // eod
 };
@@ -206,6 +212,8 @@ Q_CONSTINIT const QMetaObject appwindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_addBoatButton_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'on_editBoatButton_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_deleteBoatButton_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_updateBoatButton_clicked'
@@ -213,6 +221,9 @@ Q_CONSTINIT const QMetaObject appwindow::staticMetaObject = { {
         // method 'on_searchBoatButton_3_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_Boatwidget_2_clicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<QTableWidgetItem *, std::false_type>,
+        // method 'on_Boatwidget_2_itemDoubleClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<QTableWidgetItem *, std::false_type>
     >,
@@ -246,10 +257,12 @@ void appwindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, v
         case 18: _t->on_delete_company_6_clicked(); break;
         case 19: _t->on_clear_6_clicked(); break;
         case 20: _t->on_addBoatButton_clicked(); break;
-        case 21: _t->on_deleteBoatButton_clicked(); break;
-        case 22: _t->on_updateBoatButton_clicked(); break;
-        case 23: _t->on_searchBoatButton_3_clicked(); break;
-        case 24: _t->on_Boatwidget_2_clicked((*reinterpret_cast< std::add_pointer_t<QTableWidgetItem*>>(_a[1]))); break;
+        case 21: _t->on_editBoatButton_clicked(); break;
+        case 22: _t->on_deleteBoatButton_clicked(); break;
+        case 23: _t->on_updateBoatButton_clicked(); break;
+        case 24: _t->on_searchBoatButton_3_clicked(); break;
+        case 25: _t->on_Boatwidget_2_clicked((*reinterpret_cast< std::add_pointer_t<QTableWidgetItem*>>(_a[1]))); break;
+        case 26: _t->on_Boatwidget_2_itemDoubleClicked((*reinterpret_cast< std::add_pointer_t<QTableWidgetItem*>>(_a[1]))); break;
         default: ;
         }
     }
@@ -274,13 +287,13 @@ int appwindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 25)
+        if (_id < 27)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 25;
+        _id -= 27;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 25)
+        if (_id < 27)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 25;
+        _id -= 27;
     }
     return _id;
 }

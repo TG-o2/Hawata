@@ -71,10 +71,12 @@ private slots:
     void on_clear_6_clicked();
     //boats
     void on_addBoatButton_clicked();
+    void on_editBoatButton_clicked();
     void on_deleteBoatButton_clicked();
     void on_updateBoatButton_clicked();
     void on_searchBoatButton_3_clicked();
     void on_Boatwidget_2_clicked(QTableWidgetItem *item);
+    void on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item);
 
 private:
     Ui::appwindow *ui;
@@ -94,11 +96,13 @@ private:
     void loadProductTable();
 
     //boats
+    enum class BoatMode { Add, Edit };
     void displayBoats();
     void clearBoatInputs();
+    void setBoatMode(BoatMode mode);
+    void populateBoatForm(int boatId);
     int currentlySelectedId;
-
-
+    BoatMode currentBoatMode = BoatMode::Add;
 
     Boats boatsTmp;
 };

@@ -1,5 +1,5 @@
-C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_appwindow.cpp: C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/appwindow.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
+C:/xampp/htdocs/git/New\ folder/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/EWIEGA46WW/moc_appwindow.cpp: C:/xampp/htdocs/git/New\ folder/Hawata/appwindow.h \
+  C:/xampp/htdocs/git/New\ folder/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QDateTime \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QDebug \
   C:/Qt/6.7.3/mingw_64/include/QtCore/QFile \
@@ -446,8 +446,8 @@ C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/H
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wchar.h \
   C:/Qt/Tools/mingw1120_64/x86_64-w64-mingw32/include/wctype.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/Docking.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/boats.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/connection.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/product.h \
-  C:/Users/SKYMIL_INFORMATIQUE/OneDrive\ -\ ESPRIT/Documents/Qt\ project/Sign_up/Hawata/user.h
+  C:/xampp/htdocs/git/New\ folder/Hawata/Docking.h \
+  C:/xampp/htdocs/git/New\ folder/Hawata/boats.h \
+  C:/xampp/htdocs/git/New\ folder/Hawata/connection.h \
+  C:/xampp/htdocs/git/New\ folder/Hawata/product.h \
+  C:/xampp/htdocs/git/New\ folder/Hawata/user.h

@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -1376,7 +1376,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="user_page1_3">
       <widget class="QWidget" name="user_page1_4" native="true">
@@ -3144,6 +3144,42 @@ QPushButton:pressed {
        </property>
        <property name="text">
         <string>Create Boat</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="editBoatButton">
+       <property name="geometry">
+        <rect>
+         <x>660</x>
+         <y>500</y>
+         <width>181</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #38bdf8, stop:1 #0ea5e9);
+}
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #0369a1, stop:1 #075985);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Save Changes ✏️</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_103">

@@ -229,6 +229,7 @@ public:
     QLineEdit *boatOwnerNameLineEdit;
     QLineEdit *boatLocationLineEdit;
     QPushButton *addBoatButton;
+    QPushButton *editBoatButton;
     QLabel *label_103;
     QComboBox *boatStatusComboBox;
     QLineEdit *boatOwnerEmailLineEdit;
@@ -2036,6 +2037,28 @@ public:
         addBoatButton = new QPushButton(user_page1_5);
         addBoatButton->setObjectName("addBoatButton");
         addBoatButton->setGeometry(QRect(660, 500, 181, 51));
+        editBoatButton = new QPushButton(user_page1_5);
+        editBoatButton->setObjectName("editBoatButton");
+        editBoatButton->setGeometry(QRect(660, 500, 181, 51));
+        editBoatButton->setVisible(false);
+        editBoatButton->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"    background-color: #3498db;\n"
+"    color: white;\n"
+"    font-size: 18px;\n"
+"    font-weight: bold;\n"
+"    border: none;\n"
+"    border-radius: 8px;\n"
+"    padding: 8px 16px;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                stop:0 #38bdf8, stop:1 #0ea5e9);\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,\n"
+"                                stop:0 #0369a1, stop:1 #075985);\n"
+"}\n"
+""));
         label_103 = new QLabel(user_page1_5);
         label_103->setObjectName("label_103");
         label_103->setGeometry(QRect(300, 130, 111, 20));
@@ -4449,9 +4472,9 @@ public:
 
         retranslateUi(appwindow);
 
-        WebBrowsing->setCurrentIndex(3);
+        WebBrowsing->setCurrentIndex(2);
         stackedWidget->setCurrentIndex(1);
-        stackedWidget_2->setCurrentIndex(1);
+        stackedWidget_2->setCurrentIndex(3);
         boatPage->setCurrentIndex(0);
         stackedWidget_4->setCurrentIndex(0);
         stackedWidget_5->setCurrentIndex(3);
@@ -4619,6 +4642,7 @@ public:
         label_101->setText(QCoreApplication::translate("appwindow", "Last maintenance date", nullptr));
         clearBoatButton->setText(QCoreApplication::translate("appwindow", "Clear All Feilds", nullptr));
         addBoatButton->setText(QCoreApplication::translate("appwindow", "Create Boat", nullptr));
+        editBoatButton->setText(QCoreApplication::translate("appwindow", "Save Changes \342\234\217\357\270\217", nullptr));
         label_103->setText(QCoreApplication::translate("appwindow", "size", nullptr));
         boatStatusComboBox->setItemText(0, QCoreApplication::translate("appwindow", "Inside Dock", nullptr));
         boatStatusComboBox->setItemText(1, QCoreApplication::translate("appwindow", "Outside Dock", nullptr));

@@ -37,6 +37,7 @@ namespace {
 struct qt_meta_stringdata_CLASSMainWindowENDCLASS_t {};
 constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::stringData(
     "MainWindow",
+<<<<<<< HEAD
     "openSignupPage",
     "",
     "on_logo_linkActivated",
@@ -44,6 +45,13 @@ constexpr auto qt_meta_stringdata_CLASSMainWindowENDCLASS = QtMocHelpers::string
     "on_Exit_clicked",
     "on_create_acc_linkActivated",
     "on_Create_clicked",
+=======
+    "on_logo_linkActivated",
+    "",
+    "link",
+    "on_Exit_clicked",
+    "on_create_acc_linkActivated",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     "on_Sign_in_clicked"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
@@ -57,7 +65,11 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
+<<<<<<< HEAD
        6,   14, // methods
+=======
+       4,   14, // methods
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -65,6 +77,7 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
+<<<<<<< HEAD
        1,    0,   50,    2, 0x0a,    1 /* Public */,
        3,    1,   51,    2, 0x08,    2 /* Private */,
        5,    0,   54,    2, 0x08,    4 /* Private */,
@@ -78,6 +91,17 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSMainWindowENDCLASS[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::QString,    4,
     QMetaType::Void,
+=======
+       1,    1,   38,    2, 0x08,    1 /* Private */,
+       4,    0,   41,    2, 0x08,    3 /* Private */,
+       5,    1,   42,    2, 0x08,    4 /* Private */,
+       6,    0,   45,    2, 0x08,    6 /* Private */,
+
+ // slots: parameters
+    QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QString,    3,
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     QMetaType::Void,
 
        0        // eod
@@ -92,8 +116,11 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSMainWindowENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<MainWindow, std::true_type>,
+<<<<<<< HEAD
         // method 'openSignupPage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+=======
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         // method 'on_logo_linkActivated'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
@@ -102,8 +129,11 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'on_create_acc_linkActivated'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+<<<<<<< HEAD
         // method 'on_Create_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
+=======
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         // method 'on_Sign_in_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
@@ -116,12 +146,19 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         auto *_t = static_cast<MainWindow *>(_o);
         (void)_t;
         switch (_id) {
+<<<<<<< HEAD
         case 0: _t->openSignupPage(); break;
         case 1: _t->on_logo_linkActivated((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 2: _t->on_Exit_clicked(); break;
         case 3: _t->on_create_acc_linkActivated((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 4: _t->on_Create_clicked(); break;
         case 5: _t->on_Sign_in_clicked(); break;
+=======
+        case 0: _t->on_logo_linkActivated((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 1: _t->on_Exit_clicked(); break;
+        case 2: _t->on_create_acc_linkActivated((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 3: _t->on_Sign_in_clicked(); break;
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         default: ;
         }
     }
@@ -146,6 +183,7 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
+<<<<<<< HEAD
         if (_id < 6)
             qt_static_metacall(this, _c, _id, _a);
         _id -= 6;
@@ -153,6 +191,15 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         if (_id < 6)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
         _id -= 6;
+=======
+        if (_id < 4)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 4;
+    } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 4)
+            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+        _id -= 4;
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     }
     return _id;
 }

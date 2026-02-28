@@ -7,7 +7,7 @@
 				{
 					"build" : ".",
 					"hasInstallRule" : true,
-					"jsonFile" : "directory-.-Debug-d9dd9275d73313ff2bec.json",
+					"jsonFile" : "directory-.-Debug-87bdc232be24bf85dda3.json",
 					"minimumCMakeVersion" : 
 					{
 						"string" : "3.16"
@@ -44,7 +44,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Sign_up::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Sign_up-Debug-4e62a92ee0284d2c6256.json",
+					"jsonFile" : "target-Sign_up-Debug-535f01c7efb80d187dda.json",
 					"name" : "Sign_up",
 					"projectIndex" : 0
 				},
@@ -68,8 +68,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
-		"source" : "C:/Users/USER/Downloads/Project (1)/Sign_up"
+		"build" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata"
 	},
 	"version" : 
 	{

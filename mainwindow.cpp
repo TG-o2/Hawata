@@ -2,6 +2,10 @@
 #include "ui_mainwindow.h"
 #include "createacc.h"
 #include "appwindow.h"
+<<<<<<< HEAD
+=======
+//#include "connection.h"
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 
 
 //libraries
@@ -17,6 +21,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     //logo
     QPixmap pix("icons/try2.png");
     ui->logo->setPixmap(pix);
@@ -74,6 +83,7 @@ void MainWindow::on_create_acc_linkActivated(const QString &link)
 
 void MainWindow::on_Sign_in_clicked()
 {
+<<<<<<< HEAD
     QString firstName = ui->firstName_input->text();
     QString password = ui->password_input->text();
 
@@ -131,3 +141,33 @@ void MainWindow::on_Create_clicked()
     create_account.exec();
 }
 
+=======
+
+    QSqlQuery query;
+    query.prepare("SELECT EMAIL FROM USERS WHERE EMAIL = :email AND PASSWORD = :password");
+
+    query.bindValue(":email", ui->firstName_input->text());
+    query.bindValue(":password", ui->password_input->text());
+
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            QString connectedEmail = query.value(0).toString();
+            qDebug() << "Connected user:" << connectedEmail;
+            appwindow *app = new appwindow(this);
+            app->show();
+            this->hide();
+        }
+        else
+        {
+            QMessageBox::warning(this, "Login", "Invalid Login or Password");
+        }
+    }
+    else
+    {
+        qDebug() << query.lastError();
+    }
+
+}
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1

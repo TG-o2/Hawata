@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug"
+			"value" : "c:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -563,7 +563,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/USER/Downloads/Project (1)/Sign_up"
+			"value" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata"
 		},
 		{
 			"name" : "CMAKE_INSTALL_BINDIR",
@@ -1063,7 +1063,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/auto-setup.cmake"
+			"value" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/auto-setup.cmake"
 		},
 		{
 			"name" : "CMAKE_PROJECT_NAME",
@@ -2004,6 +2004,114 @@
 				{
 					"name" : "HELPSTRING",
 					"value" : "Qt feature: cborstreamwriter (from target Qt6::Core)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_area_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_area_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_bar_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_bar_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_boxplot_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_boxplot_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_candlestick_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_candlestick_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_datetime_axis",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_datetime_axis (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_line_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_line_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_pie_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_pie_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_scatter_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_scatter_chart (from target Qt6::Charts)"
+				}
+			],
+			"type" : "INTERNAL",
+			"value" : "ON"
+		},
+		{
+			"name" : "QT_FEATURE_charts_spline_chart",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "Qt feature: charts_spline_chart (from target Qt6::Charts)"
 				}
 			],
 			"type" : "INTERNAL",
@@ -6030,6 +6138,18 @@
 			"value" : "C:/Qt/6.7.3/mingw_64/bin/qmake.exe"
 		},
 		{
+			"name" : "Qt6Charts_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for Qt6Charts."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts"
+		},
+		{
 			"name" : "Qt6CoreTools_DIR",
 			"properties" : 
 			[
@@ -6088,6 +6208,30 @@
 			],
 			"type" : "PATH",
 			"value" : "C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Gui"
+		},
+		{
+			"name" : "Qt6OpenGLWidgets_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for Qt6OpenGLWidgets."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets"
+		},
+		{
+			"name" : "Qt6OpenGL_DIR",
+			"properties" : 
+			[
+				{
+					"name" : "HELPSTRING",
+					"value" : "The directory containing a CMake configuration file for Qt6OpenGL."
+				}
+			],
+			"type" : "PATH",
+			"value" : "C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL"
 		},
 		{
 			"name" : "Qt6Sql_DIR",
@@ -6159,7 +6303,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug"
+			"value" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug"
 		},
 		{
 			"name" : "Sign_up_IS_TOP_LEVEL",
@@ -6183,7 +6327,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/USER/Downloads/Project (1)/Sign_up"
+			"value" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata"
 		},
 		{
 			"name" : "Vulkan_GLSLANG_VALIDATOR_EXECUTABLE",

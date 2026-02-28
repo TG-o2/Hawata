@@ -1,5 +1,6 @@
 {
 	"AUTOGEN_COMMAND_LINE_LENGTH_MAX" : 32000,
+<<<<<<< HEAD
 	"BUILD_DIR" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
 	"CMAKE_BINARY_DIR" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
 	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
@@ -14,6 +15,22 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-Initialize.cmake",
 		"C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
+=======
+	"BUILD_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata",
+	"CMAKE_EXECUTABLE" : "C:/Qt/Tools/CMake_64/bin/cmake.exe",
+	"CMAKE_LIST_FILES" : 
+	[
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/CMakeLists.txt",
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/auto-setup.cmake",
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeSystem.cmake",
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qtc/package-manager/maintenance_tool_provider.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-Initialize.cmake",
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeCXXCompiler.cmake",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeGenericSystem.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake",
@@ -26,7 +43,11 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU.cmake",
+<<<<<<< HEAD
 		"C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
+=======
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.30.5/CMakeRCCompiler.cmake",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeRCInformation.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-windres.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/Platform/Windows-GNU-CXX-ABI.cmake",
@@ -307,6 +328,113 @@
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginTargets.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginTargets-relwithdebinfo.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6QSQLiteDriverPluginAdditionalTargetInfo.cmake",
+<<<<<<< HEAD
+=======
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/FindWrapVulkanHeaders.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindVulkan.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageHandleStandardArgs.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/FindPackageMessage.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGL/Qt6OpenGLVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6OpenGLWidgets/Qt6OpenGLWidgetsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsTargets-relwithdebinfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Targets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6VersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtFeature.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CheckCXXCompilerFlag.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtFeatureCommon.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsMacros.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Widgets/Qt6WidgetsPlugins.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Charts/Qt6ChartsVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersion.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfigVersionImpl.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlConfig.cmake",
+		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlDependencies.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlAdditionalTargetInfo.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlVersionlessTargets.cmake",
+		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6Sql/Qt6SqlPlugins.cmake",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Config.cmake",
@@ -332,52 +460,97 @@
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeFindDependencyMacro.cmake",
 		"C:/Qt/6.7.3/mingw_64/lib/cmake/Qt6/Qt6Dependencies.cmake",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/GNUInstallDirs.cmake",
+<<<<<<< HEAD
 		"C:/Users/USER/Downloads/Project (1)/Sign_up/style.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "C:/Users/USER/Downloads/Project (1)/Sign_up",
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/deps",
+=======
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/style.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/deps",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 	"DEP_FILE_RULE_NAME" : "Sign_up_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/Docking.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/Docking.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_Docking.cpp",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/appwindow.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/appwindow.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_appwindow.cpp",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/connection.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/boats.h",
+			"MU",
+			"EWIEGA46WW/moc_boats.cpp",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/connection.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_connection.cpp",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/createacc.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/createacc.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_createacc.cpp",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/mainwindow.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/mainwindow.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/user.h",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/product.h",
+			"MU",
+			"EWIEGA46WW/moc_product.cpp",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/user.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			"EWIEGA46WW/moc_user.cpp",
 			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+<<<<<<< HEAD
 	"INCLUDE_DIR" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
 	"MOC_COMPILATION_FILE" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
@@ -386,6 +559,19 @@
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
 		"QT_NEEDS_QMAIN",
+=======
+	"INCLUDE_DIR" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+	"MOC_COMPILATION_FILE" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"MINGW_HAS_SECURE_API=1",
+		"QT_CHARTS_LIB",
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NEEDS_QMAIN",
+		"QT_OPENGLWIDGETS_LIB",
+		"QT_OPENGL_LIB",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"QT_SQL_LIB",
 		"QT_WIDGETS_LIB",
 		"UNICODE",
@@ -404,12 +590,22 @@
 	],
 	"MOC_INCLUDES" : 
 	[
+<<<<<<< HEAD
 		"C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+=======
+		"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/include",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"C:/Qt/6.7.3/mingw_64/include/QtCore",
 		"C:/Qt/6.7.3/mingw_64/include",
 		"C:/Qt/6.7.3/mingw_64/mkspecs/win32-g++",
 		"C:/Qt/6.7.3/mingw_64/include/QtWidgets",
 		"C:/Qt/6.7.3/mingw_64/include/QtGui",
+<<<<<<< HEAD
+=======
+		"C:/Qt/6.7.3/mingw_64/include/QtCharts",
+		"C:/Qt/6.7.3/mingw_64/include/QtOpenGL",
+		"C:/Qt/6.7.3/mingw_64/include/QtOpenGLWidgets",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 		"C:/Qt/6.7.3/mingw_64/include/QtSql",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++",
 		"C:/Qt/Tools/mingw1120_64/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/x86_64-w64-mingw32",
@@ -438,31 +634,52 @@
 		"-c",
 		"C:/Qt/Tools/CMake_64/share/cmake-3.30/Modules/CMakeCXXCompilerABI.cpp"
 	],
+<<<<<<< HEAD
 	"MOC_PREDEFS_FILE" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h",
+=======
+	"MOC_PREDEFS_FILE" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/Sign_up_autogen/moc_predefs.h",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 10,
+<<<<<<< HEAD
 	"PARSE_CACHE_FILE" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/ParseCache.txt",
+=======
+	"PARSE_CACHE_FILE" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/ParseCache.txt",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 	"QT_MOC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/moc.exe",
 	"QT_UIC_EXECUTABLE" : "C:/Qt/6.7.3/mingw_64/bin/uic.exe",
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 7,
+<<<<<<< HEAD
 	"SETTINGS_FILE" : "C:/Users/USER/Downloads/Project (1)/Sign_up/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
 		[ "C:/Users/USER/Downloads/Project (1)/Sign_up/Docking.cpp", "MU", null ],
 		[
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/appwindow.cpp",
+=======
+	"SETTINGS_FILE" : "C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/Sign_up_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/Docking.cpp",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/connection.cpp",
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/appwindow.cpp",
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 			"MU",
 			null
 		],
 		[
+<<<<<<< HEAD
 			"C:/Users/USER/Downloads/Project (1)/Sign_up/createacc.cpp",
 			"MU",
 			null
@@ -474,6 +691,42 @@
 			null
 		],
 		[ "C:/Users/USER/Downloads/Project (1)/Sign_up/user.cpp", "MU", null ]
+=======
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/boats.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/connection.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/createacc.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/mainwindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/product.cpp",
+			"MU",
+			null
+		],
+		[
+			"C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/user.cpp",
+			"MU",
+			null
+		]
+>>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

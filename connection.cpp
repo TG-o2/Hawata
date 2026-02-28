@@ -2,31 +2,22 @@
 
 Connection::Connection()
 {
-    db = QSqlDatabase::addDatabase("QODBC");  // or "QOCI" for Oracle client
-    db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=ahmed;Pwd=root;");
 
-    if (!db.open()) {
-        qDebug() << "Database connection failed:";
-    } else {
-        qDebug() << "Database connected successfully!";
-    }
 }
 
-Connection::~Connection()
-{
-    if (db.isOpen())
-        db.close();
-}
+bool Connection::createconnect()
+{bool test=false;
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("projet_2A");//inserer le nom de la source de données
+    db.setUserName("jihene");//inserer nom de l'utilisateur
+    db.setPassword("jihene");//inserer mot de passe de cet utilisateur
 
-bool Connection::openConnection()
-{
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Database connection failed:";
-            return false;
-        }
-    }
+    if (db.open())
+        test=true;
 
-    qDebug() << "Database connected successfully!";
-    return true;
+
+
+
+
+    return  test;
 }

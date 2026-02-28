@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -2068,7 +2068,7 @@ QPushButton:pressed {
            <string/>
           </property>
           <property name="placeholderText">
-           <string>Search by ID or Status</string>
+           <string>Search</string>
           </property>
          </widget>
         </item>
@@ -2083,15 +2083,20 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_13">
+         <widget class="QComboBox" name="docking_sort">
           <item>
            <property name="text">
-            <string>Status</string>
+            <string>Date</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Capacity</string>
+            <string>Ascending</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Descending</string>
            </property>
           </item>
          </widget>
@@ -2172,7 +2177,7 @@ QPushButton:pressed {
            <number>1</number>
           </property>
           <property name="text">
-           <string/>
+           <string>Showing 0 Docks</string>
           </property>
          </widget>
         </item>

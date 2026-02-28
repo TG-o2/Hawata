@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "connection.h"
-
 #include <QMainWindow>
 #include <QApplication>
 #include <QFile>
@@ -10,15 +9,11 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    Connection conn;
-    if (!conn.openConnection()) {
-    qDebug() << "Cannot start app without DB!";
-        return -1;
-   }
     //loading the fonts
 
     int fontId = QFontDatabase::addApplicationFont(":/fonts/Hey Comic.otf");
@@ -55,6 +50,14 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+
+    // Test database connection
+    Connection conn;
+    if (conn.createconnect()) {
+        QMessageBox::information(nullptr, "Database Connection", "Database connection succeeded!");
+    } else {
+        QMessageBox::critical(nullptr, "Database Connection", "Database connection failed!\nPlease check your credentials and database setup.");
+    }
 
     return app.exec();
 }

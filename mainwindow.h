@@ -24,7 +24,6 @@ public:
     ~MainWindow();  // <-- declared, so you must define it
 
 public slots:
-
 private slots:
     void on_logo_linkActivated(const QString &link);
 

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 18.0.2, 2026-02-28T10:16:17. -->
+=======
+<!-- Written by QtCreator 18.0.2, 2026-02-28T08:21:39. -->
+>>>>>>> docking
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>

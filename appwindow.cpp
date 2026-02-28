@@ -2,8 +2,18 @@
 #include "ui_appwindow.h"
 #include "mainwindow.h"
 
-
-
+#include <QPixmap>
+#include <QMessageBox>
+#include <QFile>
+#include <QTextStream>
+#include <QDate>
+#include <QDateTime>
+#include <QTime>
+#include <algorithm>
+#include <QPdfWriter>
+#include <QPainter>
+#include <QFileDialog>
+#include <QPageLayout>
 
 
 appwindow::appwindow(QWidget *parent)
@@ -38,7 +48,7 @@ appwindow::appwindow(QWidget *parent)
 
     //pictures for product--------
     QPixmap fish("icons/fishicon.png");
-    QPixmap pic_2("icons/logoQT.png");
+    QPixmap pic_2("logoQT.png");
     QPixmap homepage("icons/Ports1.jpg");
     QPixmap waves("icons/wave.jpg");
     //product picture set up
@@ -126,7 +136,7 @@ appwindow::appwindow(QWidget *parent)
     ui->dispuser_6->setPixmap(user_display);
     ui->dispuser_6->setScaledContents(true);
     //boat page 7,8 & 9
-    ui->Dock1->setPixmap(Dock);
+    ui->Dock2->setPixmap(Dock);
     ui->Dock2->setScaledContents(true);
 
     ui->deluser_18->setPixmap(user_delete);
@@ -449,6 +459,7 @@ appwindow::appwindow(QWidget *parent)
     });
     connect(ui->Manage_18 , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(1);
+        loadDockingTable();
     });
     connect(ui->Display_18  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
@@ -458,27 +469,33 @@ appwindow::appwindow(QWidget *parent)
     });
     connect(ui->Manage_17 , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(1);
+        loadDockingTable();
     });
     connect(ui->Display_17  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
+        loadDockingTable();
     });
     connect(ui->add_user_5  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(0);
     });
     connect(ui->Manage_5 , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(1);
+        loadDockingTable();
     });
     connect(ui->Display_5  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
+        loadDockingTable();
     });
     connect(ui->add_user_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(0);
     });
     connect(ui->Manage_6 , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(1);
+        loadDockingTable();
     });
     connect(ui->Display_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
+        loadDockingTable();
     });
     connect(ui->forgetpwd_4  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
@@ -659,10 +676,15 @@ appwindow::appwindow(QWidget *parent)
         w->show();
         this->close();   // or hide()
     });
+
+    //docking connects
+
+    // Wire double-click (add once, anywhere in the constructor)
+    connect(ui->tabdocking, &QTableWidget::cellDoubleClicked,
+            this, &appwindow::on_tabdocking_cellDoubleClicked);
+    connect(ui->tabdocking, &QTableWidget::cellClicked,
+            this, &appwindow::on_tabdocking_cellClicked);
 }
-
-
-///DOCKING
 
 //add docking
 void appwindow::on_CreateDocking_clicked()
@@ -675,15 +697,15 @@ void appwindow::on_CreateDocking_clicked()
     QString capacity = ui->capacity->text().trimmed();
     QDateTime startDate = ui->startDate->dateTime();
     QDateTime endDate = ui->endDate->dateTime();
-
+    
     // ===== VALIDATION CONTROLS =====
-
+    
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-
+    
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -691,78 +713,78 @@ void appwindow::on_CreateDocking_clicked()
             return;
         }
     }
-
+    
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-
+    
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-
+    
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-
+    
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-
+    
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-
+    
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-
+    
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-
+    
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-
+    
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-
+    
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error",
-                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
-                                 .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error", 
+                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                           .arg(QDate::currentDate().toString("MM/dd/yy"))
+                           .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-
+    
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error",
-                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
-                                 .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error", 
+                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                           .arg(QDate::currentDate().toString("MM/dd/yy"))
+                           .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-
+    
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-
+    
     // ===== ALL VALIDATIONS PASSED =====
-
-    QString startDateStr = startDate.toString("MM/dd/yy");
-    QString endDateStr = endDate.toString("MM/dd/yy");
-
+    
+    QString startDateStr = startDate.toString("dd/MM/yy");
+    QString endDateStr = endDate.toString("dd/MM/yy");
+    
     // Call the create function
     if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr)) {
         QMessageBox::information(this, "Success", "Docking created successfully!");
@@ -782,13 +804,27 @@ void appwindow::on_CreateDocking_clicked()
 
 void appwindow::loadDockingTable()
 {
-    QList<DockingRecord> records = dockingManager.getAllDockings();
-    qDebug() << "Records fetched:" << records.size();  // verify in output
+    allDockingRecords = dockingManager.getAllDockings();
+    qDebug() << "Records fetched:" << allDockingRecords.size();  // verify in output
+    
+    // Clear search and reset sort to default
+    ui->searchbar_docking->blockSignals(true);
+    ui->searchbar_docking->clear();
+    ui->searchbar_docking->blockSignals(false);
+    
+    ui->docking_sort->blockSignals(true);
+    ui->docking_sort->setCurrentIndex(0);  // Set to "Date" (default)
+    ui->docking_sort->blockSignals(false);
+    
+    // Populate table with all records
+    populateDockingTable(allDockingRecords);
+}
 
+void appwindow::populateDockingTable(const QList<DockingRecord> &records)
+{
     QTableWidget *table = ui->tabdocking;
     table->setRowCount(0);
     table->setColumnCount(8);
-    // ✅ Display all columns including Height and Capacity
     table->setHorizontalHeaderLabels(
         {"ID", "Status", "Date Start", "Date End", "Location", "Length", "Height", "Capacity"});
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -810,8 +846,8 @@ void appwindow::loadDockingTable()
     // Stretch all columns to fill available space evenly
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    // Update the count label at the bottom if you have one
-    // ui->countLabel->setText(QString("Showing %1 Docks").arg(records.size()));
+    // Update the count label at the bottom with the number of docks
+    ui->labelResults_4->setText(QString("Showing %1 Docks").arg(records.size()));
 }
 
 
@@ -819,7 +855,7 @@ void appwindow::on_tabdocking_cellClicked(int row, int /*column*/)
 {
     if (row < 0) return;
     QString id = ui->tabdocking->item(row, 0)->text();
-    ui->selected_id->setText(id);
+    ui->selected_id->setText(id);           // ✅ shows ID in your line edit
     selectedDockingId = id.toInt();
 }
 
@@ -839,7 +875,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     // Parse dates - try multiple formats since database may store in different format
     QString startDateStr = table->item(row, 2)->text();
     QString endDateStr = table->item(row, 3)->text();
-
+    
     QDateTime startDt = QDateTime::fromString(startDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!startDt.isValid()) {
         startDt = QDateTime::fromString(startDateStr, "MM/dd/yy");
@@ -858,7 +894,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     if (startDt.isValid()) {
         ui->startDate->setDateTime(startDt);
     }
-
+    
     QDateTime endDt = QDateTime::fromString(endDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!endDt.isValid()) {
         endDt = QDateTime::fromString(endDateStr, "MM/dd/yy");
@@ -907,13 +943,13 @@ void appwindow::on_edit_Docking_clicked()
     QDateTime endDate = ui->endDate->dateTime();
 
     // ===== VALIDATION CONTROLS =====
-
+    
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-
+    
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -921,77 +957,77 @@ void appwindow::on_edit_Docking_clicked()
             return;
         }
     }
-
+    
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-
+    
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-
+    
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-
+    
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-
+    
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-
+    
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-
+    
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-
+    
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-
+    
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-
+    
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error",
-                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
-                                 .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error", 
+                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                           .arg(QDate::currentDate().toString("MM/dd/yy"))
+                           .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-
+    
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error",
-                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
-                                 .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error", 
+                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                           .arg(QDate::currentDate().toString("MM/dd/yy"))
+                           .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-
+    
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-
+    
     // ===== ALL VALIDATIONS PASSED =====
-
-    QString startDateStr = startDate.toString("MM/dd/yy");
-    QString endDateStr = endDate.toString("MM/dd/yy");
+    
+    QString startDateStr = startDate.toString("dd/MM/yy");
+    QString endDateStr = endDate.toString("dd/MM/yy");
 
     if (dockingManager.updateDocking(selectedDockingId, location, length,
                                      height, status, capacity, startDateStr, endDateStr)) {
@@ -1050,6 +1086,276 @@ void appwindow::on_clear_docking_clicked()
     ui->status->setCurrentIndex(0);
     ui->selected_id->clear();
     selectedDockingId = -1;
+}
+
+void appwindow::on_searchbar_docking_textChanged(const QString &text)
+{
+    QString searchText = text.trimmed().toLower();
+    QList<DockingRecord> filteredRecords;
+
+    // Filter records based on search text (search in all attributes)
+    for (const DockingRecord &r : allDockingRecords) {
+        if (QString::number(r.id).contains(searchText, Qt::CaseInsensitive) ||
+            r.status.contains(searchText, Qt::CaseInsensitive) ||
+            r.startDate.contains(searchText, Qt::CaseInsensitive) ||
+            r.endDate.contains(searchText, Qt::CaseInsensitive) ||
+            r.location.contains(searchText, Qt::CaseInsensitive) ||
+            r.length.contains(searchText, Qt::CaseInsensitive) ||
+            r.height.contains(searchText, Qt::CaseInsensitive) ||
+            r.capacity.contains(searchText, Qt::CaseInsensitive)) {
+            filteredRecords.append(r);
+        }
+    }
+
+    // Apply the current sort to the filtered results
+    int sortIndex = ui->docking_sort->currentIndex();
+    on_docking_sort_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_docking_sort_currentIndexChanged(int index)
+{
+    // Get the current filtered records (or all if no filter)
+    QString searchText = ui->searchbar_docking->text().trimmed().toLower();
+    QList<DockingRecord> recordsToSort;
+
+    if (searchText.isEmpty()) {
+        recordsToSort = allDockingRecords;
+    } else {
+        // Apply filter first
+        for (const DockingRecord &r : allDockingRecords) {
+            if (QString::number(r.id).contains(searchText, Qt::CaseInsensitive) ||
+                r.status.contains(searchText, Qt::CaseInsensitive) ||
+                r.startDate.contains(searchText, Qt::CaseInsensitive) ||
+                r.endDate.contains(searchText, Qt::CaseInsensitive) ||
+                r.location.contains(searchText, Qt::CaseInsensitive) ||
+                r.length.contains(searchText, Qt::CaseInsensitive) ||
+                r.height.contains(searchText, Qt::CaseInsensitive) ||
+                r.capacity.contains(searchText, Qt::CaseInsensitive)) {
+                recordsToSort.append(r);
+            }
+        }
+    }
+
+    // Sort based on start date
+    if (index == 1) {  // Ascending - closest date to furthest (from today)
+        QDate today = QDate::currentDate();
+        std::sort(recordsToSort.begin(), recordsToSort.end(), [today](const DockingRecord &a, const DockingRecord &b) {
+            QDate dateA = QDate::fromString(a.startDate, "yyyy-MM-dd");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "MM/dd/yy");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "dd/MM/yy");
+
+            QDate dateB = QDate::fromString(b.startDate, "yyyy-MM-dd");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "MM/dd/yy");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "dd/MM/yy");
+
+            qint64 distA = qAbs(today.daysTo(dateA));
+            qint64 distB = qAbs(today.daysTo(dateB));
+            return distA < distB;
+        });
+    } else if (index == 2) {  // Descending - furthest date to closest (from today)
+        QDate today = QDate::currentDate();
+        std::sort(recordsToSort.begin(), recordsToSort.end(), [today](const DockingRecord &a, const DockingRecord &b) {
+            QDate dateA = QDate::fromString(a.startDate, "yyyy-MM-dd");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "MM/dd/yy");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "dd/MM/yy");
+
+            QDate dateB = QDate::fromString(b.startDate, "yyyy-MM-dd");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "MM/dd/yy");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "dd/MM/yy");
+
+            qint64 distA = qAbs(today.daysTo(dateA));
+            qint64 distB = qAbs(today.daysTo(dateB));
+            return distA > distB;
+        });
+    }
+    // Index 0 = "Date" (default, no sorting needed)
+
+    populateDockingTable(recordsToSort);
+}
+
+void appwindow::on_export_docking_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export Docking Data to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Landscape); // Landscape for more width
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor darkBlue(0, 102, 204);
+    QColor veryLightBlue(230, 242, 255);
+    QColor lightGray(245, 245, 245);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+
+    // Use painter units directly (no extra margin since QPdfWriter margins are set)
+    int marginLeft   = 0;
+    int marginTop    = 0;
+    int contentWidth = pageWidth;
+
+    int yPos = marginTop;
+
+    // ── TITLE BLOCK ──────────────────────────────────────────────────────────
+    int titleBlockHeight = 120;
+    // Background banner
+    painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
+
+    // Title text
+    QFont titleFont("Arial", 32, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(Qt::white);
+    painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
+                     Qt::AlignCenter | Qt::AlignVCenter, "DOCKING DATA REPORT");
+
+    yPos += titleBlockHeight + 30; // gap after banner
+
+    // ── DATE LINE ────────────────────────────────────────────────────────────
+    QFont dateFont("Arial", 11);
+    painter.setFont(dateFont);
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(marginLeft, yPos,
+                     QString("Generated: %1")
+                         .arg(QDateTime::currentDateTime()
+                                  .toString("yyyy-MM-dd  hh:mm:ss")));
+    yPos += 50;
+
+    // ── TABLE ─────────────────────────────────────────────────────────────────
+    QTableWidget *table = ui->tabdocking;
+    int rowCount    = table->rowCount();
+    int columnCount = table->columnCount();
+
+    if (rowCount == 0) {
+        painter.setFont(QFont("Arial", 14));
+        painter.setPen(textColor);
+        painter.drawText(marginLeft, yPos, "No data to export.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The table is empty. Nothing to export.");
+        return;
+    }
+
+    // Distribute column widths evenly across full content width
+    int columnWidth = contentWidth / columnCount;
+    int headerHeight = 80;
+
+    auto drawHeader = [&]() {
+        // Header background
+        painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
+
+        QFont headerFont("Arial", 13, QFont::Bold);
+        painter.setFont(headerFont);
+        painter.setPen(Qt::white);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QString headerText = table->horizontalHeaderItem(col)
+            ? table->horizontalHeaderItem(col)->text()
+            : "";
+            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headerText);
+
+            // Vertical separator between columns
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(Qt::white, 2));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + headerHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += columnWidth;
+        }
+    };
+
+    drawHeader();
+    yPos += headerHeight;
+
+    // Row sizing — fill available vertical space nicely
+    int rowHeight    = 75;
+    int footerHeight = 80;
+    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+
+    QFont cellFont("Arial", 11);
+    painter.setFont(cellFont);
+
+    for (int row = 0; row < rowCount; row++) {
+
+        // ── New page if needed ──
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            yPos = marginTop;
+            drawHeader();
+            yPos += headerHeight;
+            painter.setFont(cellFont);
+        }
+
+        // Alternating row background
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
+
+        // Row outer border
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(marginLeft, yPos, contentWidth, rowHeight);
+
+        // Cell content + column separators
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            QString cellText = item ? item->text() : "";
+
+            painter.setPen(textColor);
+            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             cellText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(borderColor, 1));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + rowHeight);
+            }
+            xPos += columnWidth;
+        }
+
+        yPos += rowHeight;
+    }
+
+    // ── FOOTER ───────────────────────────────────────────────────────────────
+    yPos += 30;
+
+    // Thin separator line
+    painter.setPen(QPen(darkBlue, 3));
+    painter.drawLine(marginLeft, yPos, marginLeft + contentWidth, yPos);
+    yPos += 20;
+
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Total Records: %1").arg(rowCount));
+
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Marina Management System"));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("PDF exported successfully to:\n%1").arg(fileName));
 }
 
 void appwindow::loadUsersTable()

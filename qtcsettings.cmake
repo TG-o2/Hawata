@@ -1,5 +1,6 @@
 # This file is managed by Qt Creator, do not edit!
 
+<<<<<<< HEAD
 set("CMAKE_C_COMPILER" "C:/Qt/Tools/mingw1120_64/bin/gcc.exe" CACHE "FILEPATH" "" FORCE)
 set("CMAKE_CXX_FLAGS_INIT" "" CACHE "STRING" "" FORCE)
 set("CMAKE_PROJECT_INCLUDE_BEFORE" "C:/Users/USER/Downloads/Project (1)/Sign_up/.qtc/package-manager/auto-setup.cmake" CACHE "FILEPATH" "" FORCE)
@@ -10,3 +11,5 @@ set("CMAKE_CXX_COMPILER" "C:/Qt/Tools/mingw1120_64/bin/g++.exe" CACHE "FILEPATH"
 set("CMAKE_GENERATOR" "Ninja" CACHE "STRING" "" FORCE)
 set("QT_MAINTENANCE_TOOL" "C:/Qt/MaintenanceTool.exe" CACHE "FILEPATH" "" FORCE)
 set("CMAKE_BUILD_TYPE" "Debug" CACHE "STRING" "" FORCE)
+=======
+>>>>>>> docking

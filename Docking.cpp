@@ -50,7 +50,7 @@ QList<DockingRecord> Docking::getAllDockings()
     }
     
     QSqlQuery query(db);
-    query.prepare("SELECT DOCKID, LOCATION, LENGTH, HEIGHT, STATUS, CAPACITY, STARTDATE, ENDDATE FROM DOCKING");
+    query.prepare("SELECT DOCKID, LOCATION, LENGTH, HEIGHT, STATUS, CAPACITY, STARTDATE, ENDDATE FROM DOCKING ORDER BY DOCKID ASC");
     
     if (!query.exec()) {
         qDebug() << "Error fetching dockings:" << query.lastError().text();

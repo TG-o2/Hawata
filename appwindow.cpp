@@ -763,8 +763,8 @@ void appwindow::on_CreateDocking_clicked()
     
     // ===== ALL VALIDATIONS PASSED =====
     
-    QString startDateStr = startDate.toString("MM/dd/yy");
-    QString endDateStr = endDate.toString("MM/dd/yy");
+    QString startDateStr = startDate.toString("dd/MM/yy");
+    QString endDateStr = endDate.toString("dd/MM/yy");
     
     // Call the create function
     if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr)) {
@@ -993,8 +993,8 @@ void appwindow::on_edit_Docking_clicked()
     
     // ===== ALL VALIDATIONS PASSED =====
     
-    QString startDateStr = startDate.toString("MM/dd/yy");
-    QString endDateStr = endDate.toString("MM/dd/yy");
+    QString startDateStr = startDate.toString("dd/MM/yy");
+    QString endDateStr = endDate.toString("dd/MM/yy");
 
     if (dockingManager.updateDocking(selectedDockingId, location, length,
                                      height, status, capacity, startDateStr, endDateStr)) {

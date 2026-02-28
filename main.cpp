@@ -1,9 +1,5 @@
 #include "mainwindow.h"
 #include "connection.h"
-<<<<<<< HEAD
-=======
-
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 #include <QMainWindow>
 #include <QApplication>
 #include <QFile>
@@ -13,23 +9,11 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-<<<<<<< HEAD
 #include <QMessageBox>
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-<<<<<<< HEAD
-
-=======
-    Connection conn;
-    if (!conn.openConnection()) {
-    qDebug() << "Cannot start app without DB!";
-        return -1;
-   }
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     //loading the fonts
 
     int fontId = QFontDatabase::addApplicationFont(":/fonts/Hey Comic.otf");
@@ -67,7 +51,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-<<<<<<< HEAD
     // Test database connection
     Connection conn;
     if (conn.createconnect()) {
@@ -76,8 +59,6 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, "Database Connection", "Database connection failed!\nPlease check your credentials and database setup.");
     }
 
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     return app.exec();
 }
 

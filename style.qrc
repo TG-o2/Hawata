@@ -2,11 +2,8 @@
     <qresource prefix="/">
         <file>marine_theme.qss</file>
         <file>fonts/Arteks Black.otf</file>
-<<<<<<< HEAD
-=======
         <file>fonts/Arteks-Bold-Italic.otf</file>
         <file>fonts/Arteks-Bold.otf</file>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <file>fonts/Arteks Compact.otf</file>
         <file>fonts/Arteks Contour.otf</file>
         <file>fonts/Arteks Creative.otf</file>
@@ -14,7 +11,6 @@
         <file>fonts/Arteks Light Italic.otf</file>
         <file>fonts/Arteks Light.otf</file>
         <file>fonts/Arteks Medium Italic.otf</file>
-<<<<<<< HEAD
         <file>fonts/Arteks Medium.otf</file>
         <file>fonts/Arteks Regular.otf</file>
         <file>fonts/Arteks Shadow.otf</file>
@@ -22,12 +18,6 @@
         <file>fonts/Arteks Version Regular.otf</file>
         <file>fonts/Arteks-Bold-Italic.otf</file>
         <file>fonts/Arteks-Bold.otf</file>
-=======
-        <file>fonts/Arteks Regular.otf</file>
-        <file>fonts/Arteks Shadow.otf</file>
-        <file>fonts/Arteks Version Italic.otf</file>
-        <file>fonts/Arteks.txt</file>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <file>fonts/Behove.otf</file>
         <file>fonts/Behove.ttf</file>
         <file>fonts/Bion-Bold.otf</file>
@@ -38,8 +28,6 @@
         <file>fonts/Bion-Book.ttf</file>
         <file>fonts/Bion-BookCond.otf</file>
         <file>fonts/Bion-BookCond.ttf</file>
-<<<<<<< HEAD
-=======
         <file>fonts/JustFreeFonts.txt</file>
         <file>fonts/JustFreeFonts.url</file>
         <file>fonts/Type-Forward_Free_EULA.pdf</file>
@@ -52,6 +40,5 @@
         <file>fonts/Hey Comic.otf</file>
         <file>fonts/Hey Comic.ttf</file>
         <file>fonts/Wigglye.ttf</file>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     </qresource>
 </RCC>

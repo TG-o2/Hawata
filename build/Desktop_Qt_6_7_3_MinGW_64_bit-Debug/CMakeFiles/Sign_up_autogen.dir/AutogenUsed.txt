@@ -1,6 +1,0 @@
-<<<<<<< HEAD
-moc:6253b0ba9a48e2a7ad2d33d9a5d95336b2bc61373b389438de2fdd193e352620
-=======
-moc:685c30eedbf44f698ae91ce99f7c20516bdcadf9e1a5ae0003e75acd57fab603
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
-uic:dcf3f1ba7cce532edfba2b7a70dd3abdf39db4fb45bcbb4c2f04fcabc2d2ab6b

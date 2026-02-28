@@ -28,11 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-<<<<<<< HEAD
     <number>2</number>
-=======
-    <number>5</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -283,11 +279,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-<<<<<<< HEAD
-      <number>0</number>
-=======
       <number>1</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </property>
      <widget class="QWidget" name="user_page1_2">
       <widget class="QWidget" name="user_page1" native="true">
@@ -347,11 +339,7 @@ font-size: 35px;
          <string>Email</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="lastNameEdit_6">
-=======
        <widget class="QLineEdit" name="salary">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -400,11 +388,7 @@ font-size: 35px;
          <string>Last Name:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QComboBox" name="role_option_6">
-=======
        <widget class="QComboBox" name="gender">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -437,11 +421,7 @@ font-size: 35px;
          <string>Choose Role</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="emailEdit_3">
-=======
        <widget class="QLineEdit" name="email">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -451,11 +431,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QComboBox" name="role_option_5">
-=======
        <widget class="QComboBox" name="role">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>400</x>
@@ -480,11 +456,7 @@ font-size: 35px;
          </property>
         </item>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="lastNameEdit_5">
-=======
        <widget class="QLineEdit" name="Lname">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -494,11 +466,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="firstNameEdit_7">
-=======
        <widget class="QLineEdit" name="Fname">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -521,11 +489,7 @@ font-size: 35px;
          <string>First Name:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="passwordEdit_2">
-=======
        <widget class="QLineEdit" name="password">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -574,11 +538,7 @@ font-size: 35px;
          <string>Start of Shift</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QDateTimeEdit" name="dateTimeEdit_7">
-=======
        <widget class="QDateTimeEdit" name="startShift">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>620</x>
@@ -588,11 +548,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QDateTimeEdit" name="dateTimeEdit_8">
-=======
        <widget class="QDateTimeEdit" name="endShift">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>620</x>
@@ -602,11 +558,7 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QPushButton" name="CreateUser_2">
-=======
        <widget class="QPushButton" name="UPDUser">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>640</x>
@@ -637,11 +589,7 @@ QPushButton:pressed {
 </string>
         </property>
         <property name="text">
-<<<<<<< HEAD
-         <string>Create User 💫</string>
-=======
          <string> Create User 💫</string>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         </property>
        </widget>
       </widget>
@@ -816,52 +764,6 @@ QPushButton:pressed {
          <height>621</height>
         </rect>
        </property>
-<<<<<<< HEAD
-      </widget>
-      <widget class="QLabel" name="adduser_2">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>60</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Add User</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="deluser_2">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>260</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Manage User</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Manage_2">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>330</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
        <widget class="QLabel" name="dispuser_2">
         <property name="geometry">
          <rect>
@@ -889,7 +791,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -908,24 +809,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Manage</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Display_2">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>540</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
         </property>
         <property name="text">
          <string>Statistics</string>
@@ -942,7 +825,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -961,24 +843,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Statistics</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="add_user_2">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>130</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
         </property>
         <property name="text">
          <string>Manage</string>
@@ -1011,7 +875,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -1030,28 +893,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Add User</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="dispuser_2">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>470</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Display Activity </string>
-       </property>
-=======
         </property>
         <property name="text">
          <string>Add User</string>
@@ -1073,7 +914,6 @@ QPushButton:pressed {
          <string>Manage User</string>
         </property>
        </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       </widget>
       <widget class="QWidget" name="layoutWidget_7">
        <property name="geometry">
@@ -1086,73 +926,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-<<<<<<< HEAD
-         <widget class="QTableWidget" name="tableWidget_7">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <column>
-           <property name="text">
-            <string>ID</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Email</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>First Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Last Name</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Role</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Gender</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Status</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Salary</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Shift Start</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Shift End</string>
-           </property>
-          </column>
-          <column>
-           <property name="text">
-            <string>Manage</string>
-           </property>
-          </column>
-         </widget>
-=======
          <widget class="QTableWidget" name="usersTable"/>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         </item>
         <item>
          <widget class="QLabel" name="labelResults_3">
@@ -1183,11 +957,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="edit_company_3">
-=======
          <widget class="QPushButton" name="editUSERBtn">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -1215,11 +985,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="delete_company_3">
-=======
          <widget class="QPushButton" name="deleteUSERBtn">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #FF0000;
@@ -1245,11 +1011,7 @@ QPushButton:hover {
          </widget>
         </item>
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="export_pdf_3">
-=======
          <widget class="QPushButton" name="export_pdf_user">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -1345,20 +1107,6 @@ QPushButton:pressed {
          <height>621</height>
         </rect>
        </property>
-<<<<<<< HEAD
-      </widget>
-      <widget class="QPushButton" name="Manage_3">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>330</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
        <widget class="QLabel" name="deluser_3">
         <property name="geometry">
          <rect>
@@ -1386,7 +1134,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -1405,40 +1152,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Manage</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="deluser_3">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>260</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Manage User</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="add_user_3">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>130</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
         </property>
         <property name="text">
          <string>Add User</string>
@@ -1455,7 +1168,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -1474,56 +1186,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Add User</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="adduser_3">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>60</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Add User</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="dispuser_3">
-       <property name="geometry">
-        <rect>
-         <x>80</x>
-         <y>470</y>
-         <width>64</width>
-         <height>64</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">ui-&gt;adduser-&gt;setFixedSize(32, 32);</string>
-       </property>
-       <property name="text">
-        <string>Display Activity </string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="Display_3">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>540</y>
-         <width>110</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-=======
         </property>
         <property name="text">
          <string>Statistics</string>
@@ -1556,7 +1218,6 @@ QPushButton:pressed {
         </property>
         <property name="styleSheet">
          <string notr="true">QPushButton {
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     background-color: #3498db;
     color: white;
     font-size: 17px;
@@ -1575,12 +1236,6 @@ QPushButton:pressed {
                                 stop:0 #0369a1, stop:1 #075985);
 }
 </string>
-<<<<<<< HEAD
-       </property>
-       <property name="text">
-        <string>Statistics</string>
-       </property>
-=======
         </property>
         <property name="text">
          <string>Manage</string>
@@ -1602,18 +1257,12 @@ QPushButton:pressed {
          <string>Add User</string>
         </property>
        </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       </widget>
       <widget class="QLabel" name="label_75">
        <property name="geometry">
         <rect>
-<<<<<<< HEAD
-         <x>290</x>
-         <y>560</y>
-=======
          <x>250</x>
          <y>570</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>281</width>
          <height>31</height>
         </rect>
@@ -1628,13 +1277,8 @@ QPushButton:pressed {
       <widget class="QProgressBar" name="progressBar_2">
        <property name="geometry">
         <rect>
-<<<<<<< HEAD
-         <x>550</x>
-         <y>570</y>
-=======
          <x>510</x>
          <y>580</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>471</width>
          <height>21</height>
         </rect>
@@ -1643,8 +1287,6 @@ QPushButton:pressed {
         <number>24</number>
        </property>
       </widget>
-<<<<<<< HEAD
-=======
       <widget class="QChartView" name="chartView_2" native="true">
        <property name="geometry">
         <rect>
@@ -1655,7 +1297,6 @@ QPushButton:pressed {
         </rect>
        </property>
       </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       <widget class="QLabel" name="labelStatsTitle_2">
        <property name="geometry">
         <rect>
@@ -1718,31 +1359,12 @@ border: none;
         </item>
        </layout>
       </widget>
-<<<<<<< HEAD
-      <widget class="QWidget" name="widget_5" native="true">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>140</y>
-         <width>811</width>
-         <height>391</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_3">
-    <attribute name="title">
-     <string>Docking</string>
-=======
      </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="DOCKS">
     <attribute name="title">
      <string>Page</string>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
     </attribute>
     <widget class="QStackedWidget" name="stackedWidget_2">
      <property name="geometry">
@@ -1754,11 +1376,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-<<<<<<< HEAD
-      <number>0</number>
-=======
       <number>1</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </property>
      <widget class="QWidget" name="user_page1_3">
       <widget class="QWidget" name="user_page1_4" native="true">
@@ -2450,7 +2068,7 @@ QPushButton:pressed {
            <string/>
           </property>
           <property name="placeholderText">
-           <string>Search by ID or Status</string>
+           <string>Search</string>
           </property>
          </widget>
         </item>
@@ -2465,15 +2083,20 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_13">
+         <widget class="QComboBox" name="docking_sort">
           <item>
            <property name="text">
-            <string>Status</string>
+            <string>Date</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Capacity</string>
+            <string>Ascending</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Descending</string>
            </property>
           </item>
          </widget>
@@ -2554,7 +2177,7 @@ QPushButton:pressed {
            <number>1</number>
           </property>
           <property name="text">
-           <string/>
+           <string>Showing 0 Docks</string>
           </property>
          </widget>
         </item>
@@ -3213,11 +2836,7 @@ border: none;
     <attribute name="title">
      <string>Page</string>
     </attribute>
-<<<<<<< HEAD
-    <widget class="QStackedWidget" name="stackedWidget_3">
-=======
     <widget class="QStackedWidget" name="boatPage">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -3227,11 +2846,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-<<<<<<< HEAD
-      <number>2</number>
-=======
       <number>0</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </property>
      <widget class="QWidget" name="user_page1_5">
       <widget class="QWidget" name="BackFrame_19" native="true">
@@ -3444,35 +3059,16 @@ QPushButton:pressed {
         </property>
        </widget>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLabel" name="label_97">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>340</y>
-         <width>111</width>
-=======
       <widget class="QLabel" name="label_105">
        <property name="geometry">
         <rect>
          <x>650</x>
          <y>300</y>
          <width>251</width>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-<<<<<<< HEAD
-        <string>ownerName</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="emailEdit_8">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>370</y>
-=======
         <string>Total number of fish caught</string>
        </property>
       </widget>
@@ -3527,19 +3123,11 @@ QPushButton:pressed {
         <rect>
          <x>300</x>
          <y>310</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>251</width>
          <height>31</height>
         </rect>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLabel" name="label_98">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>410</y>
-=======
       <widget class="QLineEdit" name="boatLocationLineEdit">
        <property name="geometry">
         <rect>
@@ -3568,41 +3156,11 @@ QPushButton:pressed {
         <rect>
          <x>300</x>
          <y>130</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>111</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-<<<<<<< HEAD
-        <string>Status</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_99">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>100</y>
-         <width>441</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-family: &quot;Behove&quot;;
-font-size: 35px;
-    font-weight: bold;
-    color: #0a4c73;</string>
-       </property>
-       <property name="text">
-        <string>Create Boat:</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="role_option_10">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>440</y>
-=======
         <string>size</string>
        </property>
       </widget>
@@ -3611,7 +3169,6 @@ font-size: 35px;
         <rect>
          <x>300</x>
          <y>380</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>151</width>
          <height>41</height>
         </rect>
@@ -3627,96 +3184,21 @@ font-size: 35px;
         </property>
        </item>
       </widget>
-<<<<<<< HEAD
-      <widget class="QDateTimeEdit" name="dateTimeEdit_13">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>240</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_21">
-       <property name="geometry">
-        <rect>
-         <x>720</x>
-         <y>450</y>
-         <width>181</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Create Boat</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lastNameEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>290</y>
-=======
       <widget class="QLineEdit" name="boatOwnerEmailLineEdit">
        <property name="geometry">
         <rect>
          <x>300</x>
          <y>480</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>251</width>
          <height>31</height>
         </rect>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLabel" name="label_100">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>290</y>
-         <width>111</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Total Trips</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="firstNameEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>220</y>
-         <width>251</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_101">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>210</y>
-         <width>211</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Last maintenance date</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_102">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>260</y>
-=======
       <widget class="QLabel" name="label_102">
        <property name="geometry">
         <rect>
          <x>300</x>
          <y>200</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>111</width>
          <height>20</height>
         </rect>
@@ -3725,31 +3207,16 @@ font-size: 35px;
         <string>Location</string>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLineEdit" name="emailEdit_9">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>540</y>
-=======
       <widget class="QLineEdit" name="boatTypeLineEdit">
        <property name="geometry">
         <rect>
          <x>650</x>
          <y>410</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>251</width>
          <height>31</height>
         </rect>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLabel" name="label_103">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>190</y>
-=======
       <widget class="QLabel" name="label_106">
        <property name="geometry">
         <rect>
@@ -3768,15 +3235,11 @@ font-size: 35px;
         <rect>
          <x>300</x>
          <y>280</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>111</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-<<<<<<< HEAD
-        <string>size</string>
-=======
         <string>ownerName</string>
        </property>
       </widget>
@@ -3817,19 +3280,13 @@ font-size: 35px;
          <width>251</width>
          <height>31</height>
         </rect>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
        </property>
       </widget>
       <widget class="QLabel" name="label_104">
        <property name="geometry">
         <rect>
-<<<<<<< HEAD
-         <x>360</x>
-         <y>510</y>
-=======
          <x>300</x>
          <y>450</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>111</width>
          <height>20</height>
         </rect>
@@ -3838,49 +3295,16 @@ font-size: 35px;
         <string>Owner Email</string>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLineEdit" name="firstNameEdit_11">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>390</y>
-         <width>251</width>
-         <height>31</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_105">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>360</y>
-         <width>251</width>
-=======
       <widget class="QLabel" name="label_100">
        <property name="geometry">
         <rect>
          <x>650</x>
          <y>230</y>
          <width>111</width>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-<<<<<<< HEAD
-        <string>Total number of fish caught</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="firstNameEdit_12">
-       <property name="geometry">
-        <rect>
-         <x>710</x>
-         <y>320</y>
-         <width>251</width>
-         <height>31</height>
-        </rect>
-       </property>
-=======
         <string>Total Trips</string>
        </property>
       </widget>
@@ -3896,7 +3320,6 @@ font-size: 35px;
        <property name="text">
         <string>Status</string>
        </property>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       </widget>
      </widget>
      <widget class="QWidget" name="user_page2_3">
@@ -4121,11 +3544,7 @@ QPushButton:pressed {
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
-<<<<<<< HEAD
-         <widget class="QLineEdit" name="searchbar_5">
-=======
          <widget class="QLineEdit" name="boatSearchLineEdit">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="text">
            <string/>
           </property>
@@ -4159,15 +3578,9 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="clear_5">
-          <property name="text">
-           <string>Clear</string>
-=======
          <widget class="QPushButton" name="searchBoatButton_3">
           <property name="text">
            <string>Search</string>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           </property>
          </widget>
         </item>
@@ -4184,11 +3597,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-<<<<<<< HEAD
-         <widget class="QTableWidget" name="tableWidget_9">
-=======
          <widget class="QTableWidget" name="Boatwidget_2">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -4266,11 +3675,7 @@ QPushButton:pressed {
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="edit_company_5">
-=======
          <widget class="QPushButton" name="updateBoatButton">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #3498db;
@@ -4298,11 +3703,7 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-<<<<<<< HEAD
-         <widget class="QPushButton" name="delete_company_5">
-=======
          <widget class="QPushButton" name="deleteBoatButton">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <property name="styleSheet">
            <string notr="true">QPushButton {
     background-color: #FF0000;
@@ -4663,21 +4064,12 @@ border: none;
         <bool>false</bool>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QWidget" name="widget_3" native="true">
-       <property name="geometry">
-        <rect>
-         <x>310</x>
-         <y>130</y>
-         <width>811</width>
-=======
       <widget class="QChartView" name="chartView_4" native="true">
        <property name="geometry">
         <rect>
          <x>290</x>
          <y>130</y>
          <width>781</width>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <height>421</height>
         </rect>
        </property>
@@ -5043,11 +4435,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-<<<<<<< HEAD
-      <number>2</number>
-=======
       <number>0</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -5075,11 +4463,7 @@ border: none;
          <string>Type Of Fish:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="firstNameEdit_3">
-=======
        <widget class="QLineEdit" name="prodcode">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -5092,13 +4476,8 @@ border: none;
        <widget class="QLabel" name="pic">
         <property name="geometry">
          <rect>
-<<<<<<< HEAD
-          <x>490</x>
-          <y>250</y>
-=======
           <x>530</x>
           <y>260</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <width>350</width>
           <height>350</height>
          </rect>
@@ -5114,11 +4493,7 @@ border: none;
         <property name="geometry">
          <rect>
           <x>300</x>
-<<<<<<< HEAD
-          <y>250</y>
-=======
           <y>360</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           <width>161</width>
           <height>51</height>
          </rect>
@@ -5127,11 +4502,7 @@ border: none;
          <string>Add Product</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QDateTimeEdit" name="dateTimeEdit_5">
-=======
        <widget class="QDateTimeEdit" name="fishdate1">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>300</x>
@@ -5141,11 +4512,7 @@ border: none;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QDateTimeEdit" name="dateTimeEdit_6">
-=======
        <widget class="QDateTimeEdit" name="fishdate2">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>570</x>
@@ -5194,11 +4561,7 @@ border: none;
          <string>Quantity:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QComboBox" name="role_option_4">
-=======
        <widget class="QComboBox" name="fishStatus">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -5252,11 +4615,7 @@ font-size: 35px;
          <string>ADD New Product:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="firstNameEdit_4">
-=======
        <widget class="QLineEdit" name="fishtype">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -5305,11 +4664,7 @@ font-size: 35px;
          <string>Check Products</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="firstNameEdit_5">
-=======
        <widget class="QLineEdit" name="qtyfish">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -5332,11 +4687,7 @@ font-size: 35px;
          <string>Product Code:</string>
         </property>
        </widget>
-<<<<<<< HEAD
-       <widget class="QLineEdit" name="firstNameEdit_6">
-=======
        <widget class="QLineEdit" name="fishprice">
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -5346,8 +4697,6 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-=======
        <widget class="QLabel" name="label_28">
         <property name="geometry">
          <rect>
@@ -5371,7 +4720,6 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       </widget>
       <widget class="QWidget" name="BackFrame_23" native="true">
        <property name="geometry">
@@ -6335,21 +5683,12 @@ border: none;
         <bool>false</bool>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QWidget" name="widget_2" native="true">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>130</y>
-         <width>811</width>
-=======
       <widget class="QChartView" name="chartView_5" native="true">
        <property name="geometry">
         <rect>
          <x>270</x>
          <y>130</y>
          <width>781</width>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <height>421</height>
         </rect>
        </property>
@@ -6721,23 +6060,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_5">
      <property name="geometry">
       <rect>
-<<<<<<< HEAD
-       <x>20</x>
-       <y>10</y>
-=======
        <x>0</x>
        <y>0</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
        <width>1271</width>
        <height>791</height>
       </rect>
      </property>
      <property name="currentIndex">
-<<<<<<< HEAD
-      <number>2</number>
-=======
       <number>0</number>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -6986,19 +6316,6 @@ QPushButton:pressed {
         <string>Email</string>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QDateTimeEdit" name="dateTimeEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>340</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       <widget class="QLabel" name="label_51">
        <property name="geometry">
         <rect>
@@ -7023,25 +6340,12 @@ QPushButton:pressed {
        </property>
        <item>
         <property name="text">
-<<<<<<< HEAD
-         <string>Admin</string>
-=======
          <string>ACTIVE</string>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         </property>
        </item>
        <item>
         <property name="text">
-<<<<<<< HEAD
-         <string>Manager</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Employee</string>
-=======
          <string>INACTIVE</string>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
         </property>
        </item>
       </widget>
@@ -7107,22 +6411,6 @@ font-size: 35px;
         <string>Name of Company</string>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QLabel" name="label_52">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>300</y>
-         <width>241</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Company Availability</string>
-       </property>
-      </widget>
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
@@ -7140,11 +6428,7 @@ font-size: 35px;
        <property name="geometry">
         <rect>
          <x>650</x>
-<<<<<<< HEAD
-         <y>420</y>
-=======
          <y>310</y>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          <width>191</width>
          <height>51</height>
         </rect>
@@ -7936,8 +7220,6 @@ border: none;
         <string>Percentage of associated Companies in system</string>
        </property>
       </widget>
-<<<<<<< HEAD
-=======
       <widget class="QChartView" name="chartView_6" native="true">
        <property name="geometry">
         <rect>
@@ -7948,7 +7230,6 @@ border: none;
         </rect>
        </property>
       </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
       <widget class="QProgressBar" name="progressBar_7">
        <property name="geometry">
         <rect>
@@ -7962,19 +7243,6 @@ border: none;
         <number>24</number>
        </property>
       </widget>
-<<<<<<< HEAD
-      <widget class="QWidget" name="widget" native="true">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>160</y>
-         <width>811</width>
-         <height>421</height>
-        </rect>
-       </property>
-      </widget>
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
      </widget>
      <widget class="QWidget" name="user_page3_5">
       <widget class="QGroupBox" name="groupBox_target">
@@ -8196,11 +7464,7 @@ border: none;
            <x>10</x>
            <y>60</y>
            <width>1020</width>
-<<<<<<< HEAD
-           <height>63</height>
-=======
            <height>65</height>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_subject_2">
@@ -8764,19 +8028,6 @@ QPushButton:pressed {
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_charts">
          <item>
-<<<<<<< HEAD
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-=======
           <widget class="QChartView" name="chartView_main" native="true">
            <property name="minimumSize">
             <size>
@@ -8785,7 +8036,6 @@ QPushButton:pressed {
             </size>
            </property>
           </widget>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_insights">
@@ -8945,8 +8195,6 @@ QPushButton:pressed {
    </widget>
   </widget>
  </widget>
-<<<<<<< HEAD
-=======
  <customwidgets>
   <customwidget>
    <class>QChartView</class>
@@ -8955,7 +8203,6 @@ QPushButton:pressed {
    <container>1</container>
   </customwidget>
  </customwidgets>
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
  <resources/>
  <connections/>
 </ui>

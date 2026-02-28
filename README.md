@@ -9,10 +9,7 @@ The application is designed to assist port staff in managing port operations eff
 -Programming Language: C++
 -Framework: Qt (Qt Creator)
 -Application Type: Desktop Application
-<<<<<<< HEAD
-=======
 -Database: Oracle SQL (via QOCI driver)
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 
 ========Project Objectives========
 
@@ -20,8 +17,6 @@ The application is designed to assist port staff in managing port operations eff
 -Manage fishing port operations digitally
 -Apply object-oriented programming concepts in C++
 -Use Qt tools (UI, signals & slots, widgets, layouts)
-<<<<<<< HEAD
-=======
 
 ========Features Implemented========
 
@@ -67,4 +62,3 @@ make
 3. Update database credentials in `appwindow.cpp`
 
 See PRODUCT_CRUD_SETUP.md for detailed instructions.
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1

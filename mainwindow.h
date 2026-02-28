@@ -24,21 +24,11 @@ public:
     ~MainWindow();  // <-- declared, so you must define it
 
 public slots:
-<<<<<<< HEAD
-    //opens a new window :
-    void openSignupPage();
-=======
-
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 private slots:
     void on_logo_linkActivated(const QString &link);
 
     void on_Exit_clicked();
     void on_create_acc_linkActivated(const QString &link);
-<<<<<<< HEAD
-    void on_Create_clicked();
-=======
->>>>>>> 71f93a09f10e0ea93fabf2f98f463c8f24f647a1
 
     void on_Sign_in_clicked();
 

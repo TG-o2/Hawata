@@ -1,0 +1,3 @@
+C:/Users/USER/Downloads/Project (1)/Sign_up/CMakeFiles/CMakeScratch/TryCompile-zj3z59/CMakeFiles/cmTC_975a4.dir
+C:/Users/USER/Downloads/Project (1)/Sign_up/CMakeFiles/CMakeScratch/TryCompile-zj3z59/CMakeFiles/edit_cache.dir
+C:/Users/USER/Downloads/Project (1)/Sign_up/CMakeFiles/CMakeScratch/TryCompile-zj3z59/CMakeFiles/rebuild_cache.dir

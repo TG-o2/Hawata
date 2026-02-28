@@ -1,0 +1,48 @@
+# --- Qt Creator specific files ---
+*.pro.user
+*.user
+*.autosave
+*.qbs.user
+*.creator.user
+.qt/
+.qtc_clangd/
+.qtcreator/
+.qtc/package-manager/
+
+# --- CMake generated files ---
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.cmake
+
+# --- Build and binary folders ---
+build/
+debug/
+release/
+bin/
+obj/
+
+# --- Auto-generated code from Qt (MOC, UIC, RCC) ---
+*_autogen/
+*Autogen/
+*.moc
+*.qrc.cpp
+*.ui.h
+
+# --- Backups and temporary files ---
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+
+# --- Compiled object and library files ---
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# --- Other temporary or user-specific files ---
+Testing/Temporary/

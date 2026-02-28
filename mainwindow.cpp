@@ -76,7 +76,7 @@ void MainWindow::on_Sign_in_clicked()
 {
 
     QSqlQuery query;
-    query.prepare("SELECT EMAIL FROM USERS WHERE EMAIL = :email AND PASSWORD = :password");
+    query.prepare("SELECT USERID, EMAIL, ROLE FROM USERS WHERE EMAIL = :email AND PASSWORD = :password");
 
     query.bindValue(":email", ui->firstName_input->text());
     query.bindValue(":password", ui->password_input->text());
@@ -85,9 +85,11 @@ void MainWindow::on_Sign_in_clicked()
     {
         if(query.next())
         {
-            QString connectedEmail = query.value(0).toString();
-            qDebug() << "Connected user:" << connectedEmail;
-            appwindow *app = new appwindow(this);
+            int connectedUserId = query.value(0).toInt();
+            QString connectedEmail = query.value(1).toString();
+            QString connectedUserRole = query.value(2).toString();
+            qDebug() << "Connected user:" << connectedEmail << "ID:" << connectedUserId << "Role:" << connectedUserRole;
+            appwindow *app = new appwindow(this, connectedUserId, connectedUserRole);
             app->show();
             this->hide();
         }

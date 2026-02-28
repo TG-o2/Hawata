@@ -14,11 +14,15 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <QPageLayout>
+#include <QSqlQuery>
+#include <QSqlDatabase>
 
 
-appwindow::appwindow(QWidget *parent)
+appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
     : QDialog(parent)
     , ui(new Ui::appwindow)
+    , connectedUserId(currentUserId)
+    , connectedUserRole(currentUserRole)
 {
     ui->setupUi(this);
     loadDockingTable();
@@ -60,6 +64,8 @@ appwindow::appwindow(QWidget *parent)
 
     //end of product picture code--------------
 
+    // ============================ USER MODULE ============================
+    // User UI assets + user management visuals
     //chart for page 4 of window 1 (User management)
 
 
@@ -785,8 +791,38 @@ void appwindow::on_CreateDocking_clicked()
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
     
-    // Call the create function
-    if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr)) {
+    // Call create docking + create manage relation in one transaction
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "Error", "Database is not open.");
+        return;
+    }
+
+    if (!db.transaction()) {
+        QMessageBox::critical(this, "Error", "Failed to start database transaction.");
+        return;
+    }
+
+    int createdDockId = -1;
+    if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr, &createdDockId)) {
+        if (connectedUserId <= 0 || createdDockId <= 0) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Failed to resolve UserID or DockID for MANAGE relation.");
+            return;
+        }
+
+        if (!manageManager.ajouter_manage(connectedUserId, createdDockId)) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Docking was created but MANAGE relation failed. Transaction rolled back.");
+            return;
+        }
+
+        if (!db.commit()) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Failed to commit docking transaction.");
+            return;
+        }
+
         QMessageBox::information(this, "Success", "Docking created successfully!");
         // Clear the form
         ui->location->clear();
@@ -797,7 +833,9 @@ void appwindow::on_CreateDocking_clicked()
         ui->endDate->setDateTime(QDateTime::currentDateTime());
         // Reset to first index of status combo
         ui->status->setCurrentIndex(0);
+        loadDockingTable();
     } else {
+        db.rollback();
         QMessageBox::critical(this, "Error", "Failed to create docking. Please check the database connection.");
     }
 }
@@ -1358,9 +1396,105 @@ void appwindow::on_export_docking_clicked()
                              QString("PDF exported successfully to:\n%1").arg(fileName));
 }
 
+
+
+// =====================================================================
+// =================== START OF USER MODULE ============================
+// =====================================================================
+
+
+/// Add / Update user  --> not really
+
+void appwindow::on_UPDUser_clicked()
+{
+    QString email = ui->email->text().trimmed();
+    QString firstName = ui->Fname->text().trimmed();
+    QString lastName = ui->Lname->text().trimmed();
+    QString password = ui->password->text().trimmed();
+    QString role = ui->role->currentText();
+    QString gender = ui->gender->currentText().left(1).toUpper(); // M/F
+
+    bool ok;
+    double salary = ui->salary->text().toDouble(&ok);
+    if (!ok || salary <= 0) {
+        QMessageBox::warning(this, "Error", "Salary must be a positive number!");
+        return;
+    }
+
+    QString shiftStart = ui->startShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString shiftEnd = ui->endShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    bool isEditMode = (selectedUserId != -1);
+
+    if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || (!isEditMode && password.isEmpty())) {
+        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
+        return;
+    }
+
+    if (ui->endShift->dateTime() < ui->startShift->dateTime()) {
+        QMessageBox::warning(this, "Error", "Shift end must be on or after shift start.");
+        return;
+    }
+
+    bool success = false;
+
+    int supervisorId = 0;
+
+    if (!isEditMode && connectedUserRole.compare("ADMIN", Qt::CaseInsensitive) == 0 && connectedUserId > 0) {
+        supervisorId = connectedUserId;
+    }
+
+    if (isEditMode) {
+        QSqlQuery supervisorQuery;
+        supervisorQuery.prepare("SELECT SUPERVISORID FROM USERS WHERE USERID = :id");
+        supervisorQuery.bindValue(":id", selectedUserId);
+        if (supervisorQuery.exec() && supervisorQuery.next()) {
+            supervisorId = supervisorQuery.value(0).toInt();
+        }
+    }
+
+    if (isEditMode) {
+        User editedUser(selectedUserId, email, firstName, lastName, password,
+                        role, gender, salary, shiftStart, shiftEnd, supervisorId);
+        success = editedUser.modifier_user();
+    } else {
+        User newUser(0, email, firstName, lastName, password,
+                     role, gender, salary, shiftStart, shiftEnd, supervisorId);
+        success = newUser.ajouter_user();
+    }
+
+    if (success) {
+        QMessageBox::information(this, "Success", isEditMode ? "User updated successfully!" : "User created successfully!");
+
+        // Clear the form
+        ui->email->clear();
+        ui->Fname->clear();
+        ui->Lname->clear();
+        ui->password->clear();
+        ui->role->setCurrentIndex(0);
+        ui->gender->setCurrentIndex(0);
+        ui->salary->clear();
+        ui->startShift->setDateTime(QDateTime::currentDateTime());
+        ui->endShift->setDateTime(QDateTime::currentDateTime());
+        ui->UPDUser->setText("Create User 💫");
+        selectedUserId = -1;
+        loadUsersTable();
+        if (isEditMode) {
+            ui->stackedWidget->setCurrentIndex(1);
+        }
+    } else {
+        QMessageBox::critical(this, "Error", isEditMode
+                                               ? "Failed to update user. Please check the database connection."
+                                               : "Failed to create user. Please check the database connection.");
+    }
+}
+
+
+// Load users table from database +++
+
 void appwindow::loadUsersTable()
 {
-    QList<UserRecord> records = userManager.getAllUsers();
+    QList<User> records = userManager.afficher_liste();
 
     QTableWidget *table = ui->usersTable;
     table->setRowCount(0);
@@ -1372,23 +1506,27 @@ void appwindow::loadUsersTable()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setAlternatingRowColors(true);
 
-    for (const UserRecord &r : records) {
+    for (const User &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
-        table->setItem(row, 1, new QTableWidgetItem(r.email()));
-        table->setItem(row, 2, new QTableWidgetItem(r.firstName()));
-        table->setItem(row, 3, new QTableWidgetItem(r.lastName()));
-        table->setItem(row, 4, new QTableWidgetItem(r.role()));
-        table->setItem(row, 5, new QTableWidgetItem(r.gender()));
-        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary())));
-        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart()));
-        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd()));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.getUserId())));
+        table->setItem(row, 1, new QTableWidgetItem(r.getEmail()));
+        table->setItem(row, 2, new QTableWidgetItem(r.getFirstName()));
+        table->setItem(row, 3, new QTableWidgetItem(r.getLastName()));
+        table->setItem(row, 4, new QTableWidgetItem(r.getRole()));
+        table->setItem(row, 5, new QTableWidgetItem(r.getGender()));
+        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.getSalary())));
+        table->setItem(row, 7, new QTableWidgetItem(r.getShiftStart()));
+        table->setItem(row, 8, new QTableWidgetItem(r.getShiftEnd()));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->labelResults_3->setText(QString("Showing %1 Users").arg(records.size()));
 }
+
+
+
+// +++ Table logic for Display & Edit user ++++
 
 void appwindow::fillUserForm(const QModelIndex &index)
 {
@@ -1446,6 +1584,7 @@ void appwindow::fillUserForm(const QModelIndex &index)
     ui->UPDUser->setText("Update User");
 }
 
+
 void appwindow::on_usersTable_cellClicked(int row, int /*column*/)
 {
     if (row < 0 || !ui->usersTable->item(row, 0)) {
@@ -1454,6 +1593,7 @@ void appwindow::on_usersTable_cellClicked(int row, int /*column*/)
 
     selectedUserId = ui->usersTable->item(row, 0)->text().toInt();
 }
+
 
 void appwindow::on_usersTable_cellDoubleClicked(int row, int column)
 {
@@ -1464,79 +1604,7 @@ void appwindow::on_usersTable_cellDoubleClicked(int row, int column)
     fillUserForm(ui->usersTable->model()->index(row, column));
 }
 
-///USER
-//add user
-void appwindow::on_UPDUser_clicked()
-{
-    // Get values from UI widgets
-    QString email = ui->email->text().trimmed();
-    QString firstName = ui->Fname->text().trimmed();
-    QString lastName = ui->Lname->text().trimmed();
-    QString password = ui->password->text().trimmed();
-    QString role = ui->role->currentText();
-    QString gender = ui->gender->currentText().left(1).toUpper(); // M/F
-
-    bool ok;
-    double salary = ui->salary->text().toDouble(&ok);
-    if (!ok || salary <= 0) {
-        QMessageBox::warning(this, "Error", "Salary must be a positive number!");
-        return;
-    }
-
-    QString shiftStart = ui->startShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
-    QString shiftEnd = ui->endShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
-
-    bool isEditMode = (selectedUserId != -1);
-
-    // Validate required fields
-    if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || (!isEditMode && password.isEmpty())) {
-        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
-        return;
-    }
-
-    if (ui->endShift->dateTime() < ui->startShift->dateTime()) {
-        QMessageBox::warning(this, "Error", "Shift end must be on or after shift start.");
-        return;
-    }
-
-    bool success = false;
-
-    if (isEditMode) {
-        success = userManager.updateUser(selectedUserId, email, firstName, lastName,
-                                         password, role, gender, salary, shiftStart, shiftEnd);
-    } else {
-        success = userManager.createUser(email, firstName, lastName, password, role, gender, salary, shiftStart, shiftEnd);
-    }
-
-    if (success) {
-        QMessageBox::information(this, "Success", isEditMode ? "User updated successfully!" : "User created successfully!");
-
-        // Clear the form
-        ui->email->clear();
-        ui->Fname->clear();
-        ui->Lname->clear();
-        ui->password->clear();
-        ui->role->setCurrentIndex(0);
-        ui->gender->setCurrentIndex(0);
-        ui->salary->clear();
-        ui->startShift->setDateTime(QDateTime::currentDateTime());
-        ui->endShift->setDateTime(QDateTime::currentDateTime());
-        ui->UPDUser->setText("Create User 💫");
-        selectedUserId = -1;
-        loadUsersTable();
-        if (isEditMode) {
-            ui->stackedWidget->setCurrentIndex(1);
-        }
-    } else {
-        QMessageBox::critical(this, "Error", isEditMode
-                                               ? "Failed to update user. Please check the database connection."
-                                               : "Failed to create user. Please check the database connection.");
-    }
-}
-
-
-
-
+// +++ Delete user ++++
 void appwindow::on_deleteUSERBtn_clicked()
 {
     QModelIndexList selected = ui->usersTable->selectionModel()->selectedRows();
@@ -1548,12 +1616,10 @@ void appwindow::on_deleteUSERBtn_clicked()
 
     int row = selected.first().row();
 
-    // USERID is column 0 in your SELECT
     int userId = ui->usersTable->model()->data(
                                             ui->usersTable->model()->index(row, 0)
                                             ).toInt();
 
-    // Optional confirmation
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirm Delete",
                                   "Are you sure you want to delete this user?",
@@ -1562,7 +1628,7 @@ void appwindow::on_deleteUSERBtn_clicked()
     if (reply == QMessageBox::No)
         return;
 
-    if (userManager.deleteUser(userId)) {
+    if (userManager.supprimer(userId)) {
         QMessageBox::information(this, "Success", "User deleted successfully!");
         selectedUserId = -1;
         loadUsersTable();
@@ -1571,6 +1637,7 @@ void appwindow::on_deleteUSERBtn_clicked()
     }
 }
 
+// +++ Clear user form +++ reset to create mode +++
 void appwindow::on_clear_3_clicked()
 {
     ui->email->clear();
@@ -1604,6 +1671,19 @@ void appwindow::on_editUSERBtn_clicked()
 
     fillUserForm(ui->usersTable->model()->index(row, 0));
 }
+
+
+
+
+
+
+// =====================================================================
+// ===================== END OF USER MODULE ============================
+// =====================================================================
+
+
+
+
 
 
 ///PRODUCT

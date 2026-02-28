@@ -7,6 +7,7 @@
 #include "boats.h"
 #include "company.h"
 #include "Docking.h"
+#include "manage.h"
 #include <QModelIndex>
 #include <QSqlQueryModel>
 #include <QTableWidgetItem>
@@ -28,11 +29,12 @@ class appwindow : public QDialog
     Q_OBJECT
 
 public:
-    explicit appwindow(QWidget *parent = nullptr);
+    explicit appwindow(QWidget *parent = nullptr, int currentUserId = -1, const QString &currentUserRole = "");
     ~appwindow();
 
 private slots:
-    // user CRUD
+    // ============================ START USER MODULE .h ============================
+    // User CRUD slots 
     void fillUserForm(const QModelIndex &index);
     void on_UPDUser_clicked();
     void on_deleteUSERBtn_clicked();
@@ -40,6 +42,7 @@ private slots:
     void on_usersTable_cellClicked(int row, int column);
     void on_usersTable_cellDoubleClicked(int row, int column);
     void on_clear_3_clicked();
+    // ============================ END USER MODULE .h ============================
 
     // docking CRUD
     void on_CreateDocking_clicked();
@@ -82,15 +85,19 @@ private:
 
     // docks
     Docking dockingManager;
+    Manage manageManager;
     int selectedDockingId = -1;
     void loadDockingTable();
     void populateDockingTable(const QList<DockingRecord> &records);
     QList<DockingRecord> allDockingRecords;
 
-    // users
+    // ============================ USER MODULE ============================
+    // User state + managers used by User module integration
     User userManager;
     QSqlQueryModel *usersModel;
     int selectedUserId = -1;
+    int connectedUserId = -1;
+    QString connectedUserRole;
     void loadUsersTable();
     Connection conn;
 

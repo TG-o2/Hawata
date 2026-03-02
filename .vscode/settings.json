@@ -1,0 +1,11 @@
+{
+  "cmake.configureEnvironment": {
+    "PATH": "C:\\Qt\\Tools\\mingw1120_64\\bin;C:\\Qt\\Tools\\Ninja;C:\\Qt\\6.7.3\\mingw_64\\bin;${env:PATH}"
+  },
+  "cmake.buildEnvironment": {
+    "PATH": "C:\\Qt\\Tools\\mingw1120_64\\bin;C:\\Qt\\Tools\\Ninja;C:\\Qt\\6.7.3\\mingw_64\\bin;${env:PATH}"
+  },
+  "cmake.ctestEnvironment": {
+    "PATH": "C:\\Qt\\Tools\\mingw1120_64\\bin;C:\\Qt\\Tools\\Ninja;C:\\Qt\\6.7.3\\mingw_64\\bin;${env:PATH}"
+  }
+}

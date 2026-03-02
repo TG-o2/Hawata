@@ -8,17 +8,11 @@
 #include "company.h"
 #include "Docking.h"
 #include "manage.h"
-#include <QModelIndex>
-#include <QSqlQueryModel>
-#include <QTableWidgetItem>
 #include <QDialog>
-#include <QFile>
-#include <QFontDatabase>
-#include <QDebug>
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
+
+class QModelIndex;
+class QSqlQueryModel;
+class QTableWidgetItem;
 
 namespace Ui {
 class appwindow;
@@ -64,6 +58,10 @@ private slots:
     void on_edit_company_6_clicked();
     void on_delete_company_6_clicked();
     void on_clear_6_clicked();
+    void on_searchbar_6_textChanged(const QString &text);
+    void on_comboBox_18_currentIndexChanged(int index);
+    void on_export_pdf_6_clicked();
+    void on_pushButton_12_clicked();
 
     // boats CRUD
     void on_addBoatButton_clicked();
@@ -105,6 +103,7 @@ private:
     Product productManager;
     int selectedProductId = -1;
     void loadProductTable();
+    QList<ProductRecord> allProductRecords;
 
     // boats
     void displayBoats();
@@ -117,6 +116,9 @@ private:
     void fillCompanyForm(int row);
     Company companyManager;
     int selectedCompanyId = -1;
+    
+    // product statistics
+    void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
 };
 
 #endif // APPWINDOW_H

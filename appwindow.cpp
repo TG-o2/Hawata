@@ -27,7 +27,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     ui->setupUi(this);
     loadDockingTable();
     loadUsersTable();
-    // loadProductTable();  // Temporarily disabled to debug build issues
+    loadProductTable();  // Load product table on startup
 
     //load boat table
     displayBoats();
@@ -1774,6 +1774,7 @@ void appwindow::on_checkProductButton_clicked()
 void appwindow::loadProductTable()
 {
     QList<ProductRecord> records = productManager.getAllProducts();
+    allProductRecords = records;  // Store all records for filtering
     qDebug() << "Product records fetched:" << records.size();
 
     QTableWidget *table = ui->tableWidget_10;
@@ -1968,6 +1969,339 @@ void appwindow::on_clear_6_clicked()
     
     // Reset button text to "Add Product"
     ui->checkProductButton_2->setText("Add Product");
+    
+    // Clear search and reload all products
+    ui->searchbar_6->blockSignals(true);
+    ui->searchbar_6->clear();
+    ui->searchbar_6->blockSignals(false);
+    ui->comboBox_18->setCurrentIndex(0);
+    loadProductTable();
+}
+
+void appwindow::on_searchbar_6_textChanged(const QString &text)
+{
+    QString searchText = text.trimmed();
+    QList<ProductRecord> filteredRecords;
+
+    if (searchText.isEmpty()) {
+        filteredRecords = allProductRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+        
+        // If search text is numeric, search by ID only
+        for (const ProductRecord &r : allProductRecords) {
+            if (isNumeric && QString::number(r.id).contains(searchText)) {
+                filteredRecords.append(r);
+            } else if (!isNumeric && (
+                r.type.contains(searchText, Qt::CaseInsensitive) ||
+                r.status.contains(searchText, Qt::CaseInsensitive) ||
+                r.location.contains(searchText, Qt::CaseInsensitive))) {
+                filteredRecords.append(r);
+            }
+        }
+    }
+
+    // Apply the current sort to the filtered results
+    int sortIndex = ui->comboBox_18->currentIndex();
+    on_comboBox_18_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_comboBox_18_currentIndexChanged(int index)
+{
+    // Get the current filtered records (or all if no filter)
+    QString searchText = ui->searchbar_6->text().trimmed();
+    QList<ProductRecord> recordsToDisplay;
+
+    if (searchText.isEmpty()) {
+        recordsToDisplay = allProductRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+        
+        // If search text is numeric, search by ID only
+        for (const ProductRecord &r : allProductRecords) {
+            if (isNumeric && QString::number(r.id).contains(searchText)) {
+                recordsToDisplay.append(r);
+            } else if (!isNumeric && (
+                r.type.contains(searchText, Qt::CaseInsensitive) ||
+                r.status.contains(searchText, Qt::CaseInsensitive) ||
+                r.location.contains(searchText, Qt::CaseInsensitive))) {
+                recordsToDisplay.append(r);
+            }
+        }
+    }
+
+    // Sort based on index
+    if (index == 1) {  // Sort by Price
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const ProductRecord &a, const ProductRecord &b) {
+            return a.price < b.price;
+        });
+    }
+    // index == 0 is Type (default, no sorting needed as they come in order)
+
+    // Update the table with filtered/sorted records
+    QTableWidget *table = ui->tableWidget_10;
+    table->setRowCount(0);
+
+    for (const ProductRecord &r : recordsToDisplay) {
+        int row = table->rowCount();
+        table->insertRow(row);
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id)));
+        table->setItem(row, 1, new QTableWidgetItem(r.status));
+        table->setItem(row, 2, new QTableWidgetItem(r.type));
+        table->setItem(row, 3, new QTableWidgetItem(r.fishCaught));
+        table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
+        table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
+        table->setItem(row, 6, new QTableWidgetItem(r.location));
+        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.price, 'f', 2)));
+    }
+
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // Update the count label
+    ui->labelResults_6->setText(QString("Showing %1 Products").arg(recordsToDisplay.size()));
+}
+
+void appwindow::on_export_pdf_6_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export Product Data to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Landscape);
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor darkBlue(0, 102, 204);
+    QColor veryLightBlue(230, 242, 255);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+
+    int marginLeft   = 0;
+    int marginTop    = 0;
+    int contentWidth = pageWidth;
+
+    int yPos = marginTop;
+
+    // ── TITLE BLOCK ──────────────────────────────────────────────────────────
+    int titleBlockHeight = 120;
+    painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
+
+    QFont titleFont("Arial", 32, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(Qt::white);
+    painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
+                     Qt::AlignCenter | Qt::AlignVCenter, "PRODUCT DATA REPORT");
+
+    yPos += titleBlockHeight + 30;
+
+    // ── DATE LINE ────────────────────────────────────────────────────────────
+    QFont dateFont("Arial", 11);
+    painter.setFont(dateFont);
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(marginLeft, yPos,
+                     QString("Generated: %1")
+                         .arg(QDateTime::currentDateTime()
+                                  .toString("yyyy-MM-dd  hh:mm:ss")));
+    yPos += 50;
+
+    // ── TABLE ─────────────────────────────────────────────────────────────────
+    QTableWidget *table = ui->tableWidget_10;
+    int rowCount    = table->rowCount();
+    int columnCount = table->columnCount();
+
+    if (rowCount == 0) {
+        painter.setFont(QFont("Arial", 14));
+        painter.setPen(textColor);
+        painter.drawText(marginLeft, yPos, "No data to export.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The table is empty. Nothing to export.");
+        return;
+    }
+
+    int columnWidth = contentWidth / columnCount;
+    int headerHeight = 80;
+
+    auto drawHeader = [&]() {
+        painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
+
+        QFont headerFont("Arial", 13, QFont::Bold);
+        painter.setFont(headerFont);
+        painter.setPen(Qt::white);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QString headerText = table->horizontalHeaderItem(col)
+            ? table->horizontalHeaderItem(col)->text()
+            : "";
+            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headerText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(Qt::white, 2));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + headerHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += columnWidth;
+        }
+    };
+
+    drawHeader();
+    yPos += headerHeight;
+
+    int rowHeight    = 75;
+    int footerHeight = 80;
+    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+
+    QFont cellFont("Arial", 11);
+    painter.setFont(cellFont);
+
+    for (int row = 0; row < rowCount; row++) {
+
+        // ── New page if needed ──
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            yPos = marginTop;
+            drawHeader();
+            yPos += headerHeight;
+            painter.setFont(cellFont);
+        }
+
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
+
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(marginLeft, yPos, contentWidth, rowHeight);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            QString cellText = item ? item->text() : "";
+
+            painter.setPen(textColor);
+            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             cellText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(borderColor, 1));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + rowHeight);
+            }
+            xPos += columnWidth;
+        }
+
+        yPos += rowHeight;
+    }
+
+    // ── FOOTER ───────────────────────────────────────────────────────────────
+    yPos += 30;
+
+    painter.setPen(QPen(darkBlue, 3));
+    painter.drawLine(marginLeft, yPos, marginLeft + contentWidth, yPos);
+    yPos += 20;
+
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Total Records: %1").arg(rowCount));
+
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Marina Management System"));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("PDF exported successfully to:\n%1").arg(fileName));
+}
+
+void appwindow::on_pushButton_12_clicked()
+{
+    // Get all products
+    QList<ProductRecord> allProducts = productManager.getAllProducts();
+    
+    if (allProducts.isEmpty()) {
+        QMessageBox::warning(this, "No Data", "No products in the system to analyze.");
+        return;
+    }
+    
+    // Determine which statistics to show
+    int selectedOption = ui->comboBox_20->currentIndex();
+    
+    if (selectedOption == 0) {
+        // Show statistics by Status
+        generateProductStatisticsByStatus(allProducts);
+    } else {
+        // Show statistics by Preferred Fish (for companies)
+        generateProductStatisticsByStatus(allProducts);
+    }
+}
+
+void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &products)
+{
+    // Group products by status and calculate totals
+    QMap<QString, int> statusCount;
+    QMap<QString, int> statusQuantity;
+    int totalQuantity = 0;
+    
+    for (const ProductRecord &product : products) {
+        statusCount[product.status]++;
+        statusQuantity[product.status] += product.quantity;
+        totalQuantity += product.quantity;
+    }
+    
+    if (totalQuantity == 0) {
+        QMessageBox::warning(this, "No Data", "No products with quantity data.");
+        return;
+    }
+    
+    // Calculate percentage of active/available products
+    int activeQuantity = statusQuantity.value("Available", 0) + 
+                         statusQuantity.value("In Stock", 0);
+    int percentage = (totalQuantity > 0) ? (activeQuantity * 100) / totalQuantity : 0;
+    
+    // Update progress bar
+    ui->progressBar_7->setValue(percentage);
+    
+    // Update label with statistics
+    QString statsText = QString("Percentage of Active Products in system: %1%\n").arg(percentage);
+    statsText += "---Status Breakdown---\n";
+    
+    for (auto it = statusQuantity.begin(); it != statusQuantity.end(); ++it) {
+        int count = statusCount[it.key()];
+        int qty = it.value();
+        int pct = (qty * 100) / totalQuantity;
+        statsText += QString("%1: %2 items, %3 units (%4%)\n")
+                        .arg(it.key())
+                        .arg(count)
+                        .arg(qty)
+                        .arg(pct);
+    }
+    
+    ui->label_79->setText(statsText);
+    
+    QMessageBox::information(this, "Product Statistics", statsText);
 }
 
 

@@ -1,4 +1,4 @@
-#include "Company.h"
+#include "company.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>

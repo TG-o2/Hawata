@@ -17,6 +17,13 @@
 #include <QSqlQuery>
 #include <QSqlDatabase>
 
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
 
 appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
     : QDialog(parent)
@@ -692,6 +699,9 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
             this, &appwindow::on_tabdocking_cellDoubleClicked);
     connect(ui->tabdocking, &QTableWidget::cellClicked,
             this, &appwindow::on_tabdocking_cellClicked);
+
+        ui->comboBox_12->setCurrentIndex(0);
+        loadUserStatistics(true);
 }
 
 //add docking
@@ -1531,43 +1541,33 @@ void appwindow::on_comboBox_11_currentIndexChanged(int index)
         }
     }
 
-    auto parseShiftDateTime = [](const QString &value) -> QDateTime {
-        QDateTime dateTime = QDateTime::fromString(value, "yyyy-MM-dd HH:mm:ss");
-        if (!dateTime.isValid()) {
-            dateTime = QDateTime::fromString(value, Qt::ISODate);
-        }
-        if (!dateTime.isValid()) {
-            dateTime = QDateTime::fromString(value, "MM/dd/yy");
-        }
-        if (!dateTime.isValid()) {
-            dateTime = QDateTime::fromString(value, "dd/MM/yy");
-        }
-        return dateTime;
-    };
-
-    auto statusRank = [&](const User &user) -> int {
-        const QDateTime now = QDateTime::currentDateTime();
-        const QDateTime shiftStart = parseShiftDateTime(user.getShiftStart());
-        const QDateTime shiftEnd = parseShiftDateTime(user.getShiftEnd());
-
-        const bool isActive = shiftStart.isValid() && shiftEnd.isValid() && now >= shiftStart && now <= shiftEnd;
-        return isActive ? 0 : 1;
-    };
-
-    if (index == 0) { // Sort by Status (Active first, then Inactive)
-        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [&](const User &a, const User &b) {
-            int statusA = statusRank(a);
-            int statusB = statusRank(b);
-
-            if (statusA != statusB) {
-                return statusA < statusB;
+    if (index == 0) { // Sort by Role
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const User &a, const User &b) {
+            const int roleComparison = a.getRole().compare(b.getRole(), Qt::CaseInsensitive);
+            if (roleComparison != 0) {
+                return roleComparison < 0;
             }
 
-            return a.getRole().compare(b.getRole(), Qt::CaseInsensitive) < 0;
+            const int genderComparison = a.getGender().compare(b.getGender(), Qt::CaseInsensitive);
+            if (genderComparison != 0) {
+                return genderComparison < 0;
+            }
+
+            return a.getUserId() < b.getUserId();
         });
-    } else if (index == 1) { // Sort by Role
+    } else if (index == 1) { // Sort by Gender
         std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const User &a, const User &b) {
-            return a.getRole().compare(b.getRole(), Qt::CaseInsensitive) < 0;
+            const int genderComparison = a.getGender().compare(b.getGender(), Qt::CaseInsensitive);
+            if (genderComparison != 0) {
+                return genderComparison < 0;
+            }
+
+            const int roleComparison = a.getRole().compare(b.getRole(), Qt::CaseInsensitive);
+            if (roleComparison != 0) {
+                return roleComparison < 0;
+            }
+
+            return a.getUserId() < b.getUserId();
         });
     }
 
@@ -1915,6 +1915,80 @@ void appwindow::on_export_pdf_user_clicked()
 
     QMessageBox::information(this, "Export Successful",
                              QString("PDF exported successfully to:\n%1").arg(fileName));
+}
+
+void appwindow::loadUserStatistics(bool byRole)
+{
+    while (QLayoutItem *item = ui->statsiticslayout->takeAt(0)) {
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        }
+        delete item;
+    }
+
+    QBarSeries *series = new QBarSeries();
+    QBarSet *set = new QBarSet("Users Count");
+    QStringList categories;
+
+    QSqlQuery query;
+    const QString sql = byRole
+                            ? "SELECT ROLE, COUNT(*) FROM USERS GROUP BY ROLE ORDER BY ROLE"
+                            : "SELECT GENDER, COUNT(*) FROM USERS GROUP BY GENDER ORDER BY GENDER";
+
+    if (!query.exec(sql)) {
+        QLabel *errorLabel = new QLabel("Failed to load statistics data.");
+        errorLabel->setAlignment(Qt::AlignCenter);
+        ui->statsiticslayout->addWidget(errorLabel);
+        return;
+    }
+
+    int maxCount = 0;
+    while (query.next()) {
+        const QString category = query.value(0).toString().trimmed().isEmpty()
+                                     ? "Unknown"
+                                     : query.value(0).toString().trimmed();
+        const int count = query.value(1).toInt();
+
+        *set << count;
+        categories << category;
+        if (count > maxCount) {
+            maxCount = count;
+        }
+    }
+
+    if (categories.isEmpty()) {
+        *set << 0;
+        categories << "No Data";
+    }
+
+    series->append(set);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle(byRole ? "Users Statistics by Role" : "Users Statistics by Gender");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->addAxis(axis, Qt::AlignBottom);
+    series->attachAxis(axis);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, qMax(1, maxCount));
+    axisY->setLabelFormat("%d");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    ui->statsiticslayout->addWidget(chartView);
+}
+
+void appwindow::on_pushButton_8_clicked()
+{
+    const bool byRole = (ui->comboBox_12->currentIndex() == 0);
+    loadUserStatistics(byRole);
 }
 
 

@@ -2,14 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QApplication>
-#include <QFile>
-#include <QFontDatabase>
-#include <QDebug>
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
+#include <QString>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,10 +14,9 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();  // <-- declared, so you must define it
+    ~MainWindow();
 
 public slots:
-
 private slots:
     void on_logo_linkActivated(const QString &link);
 

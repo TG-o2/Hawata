@@ -24,7 +24,7 @@ public:
     bool createDocking(const QString &location, const QString &length,
                        const QString &height, const QString &status,
                        const QString &capacity, const QString &startDate,
-                       const QString &endDate);
+                       const QString &endDate, int *createdDockId = nullptr);
 
     QList<DockingRecord> getAllDockings();
 

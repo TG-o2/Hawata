@@ -28,7 +28,11 @@
     </font>
    </property>
    <property name="currentIndex">
+<<<<<<< HEAD
     <number>2</number>
+=======
+    <number>4</number>
+>>>>>>> 1b1cd5493122bb876131594df48c28eb8d37e3bc
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -2068,7 +2072,7 @@ QPushButton:pressed {
            <string/>
           </property>
           <property name="placeholderText">
-           <string>Search by ID or Status</string>
+           <string>Search</string>
           </property>
          </widget>
         </item>
@@ -2083,15 +2087,20 @@ QPushButton:pressed {
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_13">
+         <widget class="QComboBox" name="docking_sort">
           <item>
            <property name="text">
-            <string>Status</string>
+            <string>Date</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Capacity</string>
+            <string>Ascending</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Descending</string>
            </property>
           </item>
          </widget>
@@ -2172,7 +2181,7 @@ QPushButton:pressed {
            <number>1</number>
           </property>
           <property name="text">
-           <string/>
+           <string>Showing 0 Docks</string>
           </property>
          </widget>
         </item>
@@ -4466,7 +4475,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -5397,7 +5406,7 @@ QPushButton:pressed {
           </item>
           <item>
            <property name="text">
-            <string>Price</string>
+            <string>id</string>
            </property>
           </item>
          </widget>
@@ -6091,14 +6100,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_5">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
+       <x>0</x>
+       <y>0</y>
        <width>1271</width>
        <height>791</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -6347,16 +6356,6 @@ QPushButton:pressed {
         <string>Email</string>
        </property>
       </widget>
-      <widget class="QDateTimeEdit" name="dateTimeEdit_10">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>340</y>
-         <width>221</width>
-         <height>41</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_51">
        <property name="geometry">
         <rect>
@@ -6381,17 +6380,12 @@ QPushButton:pressed {
        </property>
        <item>
         <property name="text">
-         <string>Admin</string>
+         <string>ACTIVE</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Manager</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Employee</string>
+         <string>INACTIVE</string>
         </property>
        </item>
       </widget>
@@ -6457,19 +6451,6 @@ font-size: 35px;
         <string>Name of Company</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_52">
-       <property name="geometry">
-        <rect>
-         <x>650</x>
-         <y>300</y>
-         <width>241</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Company Availability</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_12">
        <property name="geometry">
         <rect>
@@ -6487,7 +6468,7 @@ font-size: 35px;
        <property name="geometry">
         <rect>
          <x>650</x>
-         <y>420</y>
+         <y>310</y>
          <width>191</width>
          <height>51</height>
         </rect>

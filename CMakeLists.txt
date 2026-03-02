@@ -8,9 +8,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Charts PrintSupport)
+# Find Qt modules
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport)
 
+# List of project sources
 set(PROJECT_SOURCES
     main.cpp
     mainwindow.cpp
@@ -41,34 +42,24 @@ set(PROJECT_SOURCES
     style.qrc
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(Sign_up
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
-else()
-    if(ANDROID)
-        add_library(Sign_up SHARED
-            ${PROJECT_SOURCES}
-        )
-    else()
-        add_executable(Sign_up
-            ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
-
-target_link_libraries(Sign_up PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Sql
-    Qt${QT_VERSION_MAJOR}::Charts
-    Qt${QT_VERSION_MAJOR}::PrintSupport
+# Create executable
+qt_add_executable(Sign_up
+    MANUAL_FINALIZATION
+    ${PROJECT_SOURCES}
 )
 
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Sign_up)
-endif()
+# Link Qt libraries
+target_link_libraries(Sign_up PRIVATE
+    Qt6::Widgets
+    Qt6::Sql
+    Qt6::Charts
+    Qt6::PrintSupport
+)
 
+# macOS bundle settings
+# if(${QT_VERSION} VERSION_LESS 6.1.0)
+#   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Sign_up)
+# endif()
 set_target_properties(Sign_up PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
@@ -84,6 +75,5 @@ install(TARGETS Sign_up
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(Sign_up)
-endif()
+# Finalize executable (Qt6)
+qt_finalize_executable(Sign_up)

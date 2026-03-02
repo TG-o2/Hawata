@@ -28,11 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-<<<<<<< HEAD
-    <number>2</number>
-=======
-    <number>4</number>
->>>>>>> 1b1cd5493122bb876131594df48c28eb8d37e3bc
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -1081,12 +1077,12 @@ QPushButton:pressed {
          <widget class="QComboBox" name="comboBox_11">
           <item>
            <property name="text">
-            <string>Status</string>
+            <string>Role</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Role</string>
+            <string>Gender</string>
            </property>
           </item>
          </widget>

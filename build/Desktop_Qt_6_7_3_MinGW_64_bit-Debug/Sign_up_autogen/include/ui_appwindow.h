@@ -168,7 +168,7 @@ public:
     QHBoxLayout *horizontalLayout_7;
     QLineEdit *searchbar_docking;
     QLabel *label_81;
-    QComboBox *comboBox_13;
+    QComboBox *docking_sort;
     QPushButton *clear_4;
     QWidget *layoutWidget_9;
     QVBoxLayout *verticalLayout_7;
@@ -416,7 +416,6 @@ public:
     QLabel *label_53;
     QLineEdit *emailEdit_4;
     QLabel *label_49;
-    QDateTimeEdit *dateTimeEdit_10;
     QLabel *label_51;
     QComboBox *role_option_7;
     QLineEdit *lastNameEdit_7;
@@ -424,7 +423,6 @@ public:
     QLineEdit *lastNameEdit_8;
     QLabel *label_13;
     QLabel *label_42;
-    QLabel *label_52;
     QLabel *label_12;
     QPushButton *CreateUser_3;
     QLabel *label_41;
@@ -1513,12 +1511,13 @@ public:
 
         horizontalLayout_7->addWidget(label_81);
 
-        comboBox_13 = new QComboBox(layoutWidget_11);
-        comboBox_13->addItem(QString());
-        comboBox_13->addItem(QString());
-        comboBox_13->setObjectName("comboBox_13");
+        docking_sort = new QComboBox(layoutWidget_11);
+        docking_sort->addItem(QString());
+        docking_sort->addItem(QString());
+        docking_sort->addItem(QString());
+        docking_sort->setObjectName("docking_sort");
 
-        horizontalLayout_7->addWidget(comboBox_13);
+        horizontalLayout_7->addWidget(docking_sort);
 
         clear_4 = new QPushButton(layoutWidget_11);
         clear_4->setObjectName("clear_4");
@@ -3430,7 +3429,7 @@ public:
         tab_2->setObjectName("tab_2");
         stackedWidget_5 = new QStackedWidget(tab_2);
         stackedWidget_5->setObjectName("stackedWidget_5");
-        stackedWidget_5->setGeometry(QRect(20, 10, 1271, 791));
+        stackedWidget_5->setGeometry(QRect(0, 0, 1271, 791));
         user_page1_8 = new QWidget();
         user_page1_8->setObjectName("user_page1_8");
         BackFrame_30 = new QWidget(user_page1_8);
@@ -3549,14 +3548,10 @@ public:
         label_49 = new QLabel(user_page1_8);
         label_49->setObjectName("label_49");
         label_49->setGeometry(QRect(300, 360, 111, 20));
-        dateTimeEdit_10 = new QDateTimeEdit(user_page1_8);
-        dateTimeEdit_10->setObjectName("dateTimeEdit_10");
-        dateTimeEdit_10->setGeometry(QRect(650, 340, 221, 41));
         label_51 = new QLabel(user_page1_8);
         label_51->setObjectName("label_51");
         label_51->setGeometry(QRect(650, 200, 111, 20));
         role_option_7 = new QComboBox(user_page1_8);
-        role_option_7->addItem(QString());
         role_option_7->addItem(QString());
         role_option_7->addItem(QString());
         role_option_7->setObjectName("role_option_7");
@@ -3580,15 +3575,12 @@ public:
         label_42 = new QLabel(user_page1_8);
         label_42->setObjectName("label_42");
         label_42->setGeometry(QRect(300, 210, 221, 20));
-        label_52 = new QLabel(user_page1_8);
-        label_52->setObjectName("label_52");
-        label_52->setGeometry(QRect(650, 300, 241, 20));
         label_12 = new QLabel(user_page1_8);
         label_12->setObjectName("label_12");
         label_12->setGeometry(QRect(300, 440, 111, 20));
         CreateUser_3 = new QPushButton(user_page1_8);
         CreateUser_3->setObjectName("CreateUser_3");
-        CreateUser_3->setGeometry(QRect(650, 420, 191, 51));
+        CreateUser_3->setGeometry(QRect(650, 310, 191, 51));
         CreateUser_3->setStyleSheet(QString::fromUtf8("QPushButton {\n"
 "    background-color: #3498db;\n"
 "    color: white;\n"
@@ -4472,12 +4464,12 @@ public:
 
         retranslateUi(appwindow);
 
-        WebBrowsing->setCurrentIndex(2);
+        WebBrowsing->setCurrentIndex(1);
         stackedWidget->setCurrentIndex(1);
         stackedWidget_2->setCurrentIndex(3);
         boatPage->setCurrentIndex(0);
-        stackedWidget_4->setCurrentIndex(0);
-        stackedWidget_5->setCurrentIndex(3);
+        stackedWidget_4->setCurrentIndex(1);
+        stackedWidget_5->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(appwindow);
@@ -4533,8 +4525,8 @@ public:
         searchbar_3->setText(QString());
         searchbar_3->setPlaceholderText(QCoreApplication::translate("appwindow", "Search by ID or Email", nullptr));
         label_80->setText(QCoreApplication::translate("appwindow", "Sorted By", nullptr));
-        comboBox_11->setItemText(0, QCoreApplication::translate("appwindow", "Status", nullptr));
-        comboBox_11->setItemText(1, QCoreApplication::translate("appwindow", "Role", nullptr));
+        comboBox_11->setItemText(0, QCoreApplication::translate("appwindow", "Role", nullptr));
+        comboBox_11->setItemText(1, QCoreApplication::translate("appwindow", "Gender", nullptr));
 
         clear_3->setText(QCoreApplication::translate("appwindow", "Clear", nullptr));
         deluser_3->setText(QCoreApplication::translate("appwindow", "Manage User", nullptr));
@@ -4581,10 +4573,11 @@ public:
         forgetpwd_2->setText(QCoreApplication::translate("appwindow", "Calendar", nullptr));
         cal4->setText(QCoreApplication::translate("appwindow", "Add User", nullptr));
         searchbar_docking->setText(QString());
-        searchbar_docking->setPlaceholderText(QCoreApplication::translate("appwindow", "Search by ID or Status", nullptr));
+        searchbar_docking->setPlaceholderText(QCoreApplication::translate("appwindow", "Search", nullptr));
         label_81->setText(QCoreApplication::translate("appwindow", "Sorted By", nullptr));
-        comboBox_13->setItemText(0, QCoreApplication::translate("appwindow", "Status", nullptr));
-        comboBox_13->setItemText(1, QCoreApplication::translate("appwindow", "Capacity", nullptr));
+        docking_sort->setItemText(0, QCoreApplication::translate("appwindow", "Date", nullptr));
+        docking_sort->setItemText(1, QCoreApplication::translate("appwindow", "Ascending", nullptr));
+        docking_sort->setItemText(2, QCoreApplication::translate("appwindow", "Descending", nullptr));
 
         clear_4->setText(QCoreApplication::translate("appwindow", "Clear", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tabdocking->horizontalHeaderItem(0);
@@ -4601,7 +4594,7 @@ public:
         ___qtablewidgetitem5->setText(QCoreApplication::translate("appwindow", "Length", nullptr));
         QTableWidgetItem *___qtablewidgetitem6 = tabdocking->horizontalHeaderItem(6);
         ___qtablewidgetitem6->setText(QCoreApplication::translate("appwindow", "Height", nullptr));
-        labelResults_4->setText(QString());
+        labelResults_4->setText(QCoreApplication::translate("appwindow", "Showing 0 Docks", nullptr));
         selected_id->setText(QString());
         selected_id->setPlaceholderText(QCoreApplication::translate("appwindow", "Selected ID", nullptr));
         delete_docking->setText(QCoreApplication::translate("appwindow", "Delete", nullptr));
@@ -4776,7 +4769,7 @@ public:
         searchbar_6->setPlaceholderText(QCoreApplication::translate("appwindow", "Search by type or Status", nullptr));
         label_83->setText(QCoreApplication::translate("appwindow", "Sorted By", nullptr));
         comboBox_18->setItemText(0, QCoreApplication::translate("appwindow", "Type", nullptr));
-        comboBox_18->setItemText(1, QCoreApplication::translate("appwindow", "Price", nullptr));
+        comboBox_18->setItemText(1, QCoreApplication::translate("appwindow", "id", nullptr));
 
         clear_6->setText(QCoreApplication::translate("appwindow", "Clear", nullptr));
         Display_27->setText(QCoreApplication::translate("appwindow", "Statistics", nullptr));
@@ -4820,13 +4813,11 @@ public:
         label_53->setText(QCoreApplication::translate("appwindow", "Preferred Fish", nullptr));
         label_49->setText(QCoreApplication::translate("appwindow", "Email", nullptr));
         label_51->setText(QCoreApplication::translate("appwindow", "Status", nullptr));
-        role_option_7->setItemText(0, QCoreApplication::translate("appwindow", "Admin", nullptr));
-        role_option_7->setItemText(1, QCoreApplication::translate("appwindow", "Manager", nullptr));
-        role_option_7->setItemText(2, QCoreApplication::translate("appwindow", "Employee", nullptr));
+        role_option_7->setItemText(0, QCoreApplication::translate("appwindow", "ACTIVE", nullptr));
+        role_option_7->setItemText(1, QCoreApplication::translate("appwindow", "INACTIVE", nullptr));
 
         label_13->setText(QCoreApplication::translate("appwindow", "Create Company:", nullptr));
         label_42->setText(QCoreApplication::translate("appwindow", "Name of Company", nullptr));
-        label_52->setText(QCoreApplication::translate("appwindow", "Company Availability", nullptr));
         label_12->setText(QCoreApplication::translate("appwindow", "Phone", nullptr));
         CreateUser_3->setText(QCoreApplication::translate("appwindow", "Create Company", nullptr));
         label_41->setText(QCoreApplication::translate("appwindow", "Location", nullptr));

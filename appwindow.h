@@ -36,6 +36,9 @@ private slots:
     void on_usersTable_cellClicked(int row, int column);
     void on_usersTable_cellDoubleClicked(int row, int column);
     void on_clear_3_clicked();
+    void on_searchbar_3_textChanged(const QString &text);
+    void on_comboBox_11_currentIndexChanged(int index);
+    void on_export_pdf_user_clicked();
     // ============================ END USER MODULE .h ============================
 
     // docking CRUD
@@ -99,6 +102,7 @@ private:
     int connectedUserId = -1;
     QString connectedUserRole;
     void loadUsersTable();
+    QList<User> allUserRecords;
     Connection conn;
 
     // products
@@ -107,11 +111,9 @@ private:
     void loadProductTable();
     QList<ProductRecord> allProductRecords;
 
-<<<<<<< HEAD
     //boats
     enum class BoatMode { Add, Edit };
 
->>>>>>> 1b1cd5493122bb876131594df48c28eb8d37e3bc
     void displayBoats();
     void clearBoatInputs();
     void setBoatMode(BoatMode mode);

@@ -25,6 +25,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     , connectedUserRole(currentUserRole)
 {
     ui->setupUi(this);
+    currentlySelectedId = -1;
     loadDockingTable();
     loadUsersTable();
     loadProductTable();  // Load product table on startup
@@ -64,9 +65,6 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     //end of product picture code--------------
 
-    // ============================ USER MODULE ============================
-    // User UI assets + user management visuals
-    //chart for page 4 of window 1 (User management)
 
 
     ///----add manage display
@@ -1498,7 +1496,80 @@ void appwindow::on_UPDUser_clicked()
 
 void appwindow::loadUsersTable()
 {
-    QList<User> records = userManager.afficher_liste();
+    allUserRecords = userManager.afficher_liste();
+
+    int sortIndex = ui->comboBox_11->currentIndex();
+    on_comboBox_11_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_searchbar_3_textChanged(const QString &text)
+{
+    Q_UNUSED(text);
+    int sortIndex = ui->comboBox_11->currentIndex();
+    on_comboBox_11_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_comboBox_11_currentIndexChanged(int index)
+{
+    QString searchText = ui->searchbar_3->text().trimmed();
+    QList<User> recordsToDisplay;
+
+    if (searchText.isEmpty()) {
+        recordsToDisplay = allUserRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+
+        for (const User &r : allUserRecords) {
+            if (isNumeric) {
+                if (QString::number(r.getUserId()).contains(searchText)) {
+                    recordsToDisplay.append(r);
+                }
+            } else if (r.getEmail().contains(searchText, Qt::CaseInsensitive)) {
+                recordsToDisplay.append(r);
+            }
+        }
+    }
+
+    auto parseShiftDateTime = [](const QString &value) -> QDateTime {
+        QDateTime dateTime = QDateTime::fromString(value, "yyyy-MM-dd HH:mm:ss");
+        if (!dateTime.isValid()) {
+            dateTime = QDateTime::fromString(value, Qt::ISODate);
+        }
+        if (!dateTime.isValid()) {
+            dateTime = QDateTime::fromString(value, "MM/dd/yy");
+        }
+        if (!dateTime.isValid()) {
+            dateTime = QDateTime::fromString(value, "dd/MM/yy");
+        }
+        return dateTime;
+    };
+
+    auto statusRank = [&](const User &user) -> int {
+        const QDateTime now = QDateTime::currentDateTime();
+        const QDateTime shiftStart = parseShiftDateTime(user.getShiftStart());
+        const QDateTime shiftEnd = parseShiftDateTime(user.getShiftEnd());
+
+        const bool isActive = shiftStart.isValid() && shiftEnd.isValid() && now >= shiftStart && now <= shiftEnd;
+        return isActive ? 0 : 1;
+    };
+
+    if (index == 0) { // Sort by Status (Active first, then Inactive)
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [&](const User &a, const User &b) {
+            int statusA = statusRank(a);
+            int statusB = statusRank(b);
+
+            if (statusA != statusB) {
+                return statusA < statusB;
+            }
+
+            return a.getRole().compare(b.getRole(), Qt::CaseInsensitive) < 0;
+        });
+    } else if (index == 1) { // Sort by Role
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const User &a, const User &b) {
+            return a.getRole().compare(b.getRole(), Qt::CaseInsensitive) < 0;
+        });
+    }
 
     QTableWidget *table = ui->usersTable;
     table->setRowCount(0);
@@ -1510,7 +1581,7 @@ void appwindow::loadUsersTable()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setAlternatingRowColors(true);
 
-    for (const User &r : records) {
+    for (const User &r : recordsToDisplay) {
         int row = table->rowCount();
         table->insertRow(row);
         table->setItem(row, 0, new QTableWidgetItem(QString::number(r.getUserId())));
@@ -1525,7 +1596,7 @@ void appwindow::loadUsersTable()
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->labelResults_3->setText(QString("Showing %1 Users").arg(records.size()));
+    ui->labelResults_3->setText(QString("Showing %1 Users").arg(recordsToDisplay.size()));
 }
 
 
@@ -1662,6 +1733,8 @@ void appwindow::on_clear_3_clicked()
     if (ui->usersTable->selectionModel()) {
         ui->usersTable->selectionModel()->clearSelection();
     }
+
+    loadUsersTable();
 }
 
 void appwindow::on_editUSERBtn_clicked()
@@ -1674,6 +1747,174 @@ void appwindow::on_editUSERBtn_clicked()
     }
 
     fillUserForm(ui->usersTable->model()->index(row, 0));
+}
+
+void appwindow::on_export_pdf_user_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export User Data to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Landscape);
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor darkBlue(0, 102, 204);
+    QColor veryLightBlue(230, 242, 255);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+
+    int marginLeft   = 0;
+    int marginTop    = 0;
+    int contentWidth = pageWidth;
+
+    int yPos = marginTop;
+
+    int titleBlockHeight = 120;
+    painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
+
+    QFont titleFont("Arial", 32, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(Qt::white);
+    painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
+                     Qt::AlignCenter | Qt::AlignVCenter, "USER DATA REPORT");
+
+    yPos += titleBlockHeight + 30;
+
+    QFont dateFont("Arial", 11);
+    painter.setFont(dateFont);
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(marginLeft, yPos,
+                     QString("Generated: %1")
+                         .arg(QDateTime::currentDateTime()
+                                  .toString("yyyy-MM-dd  hh:mm:ss")));
+    yPos += 50;
+
+    QTableWidget *table = ui->usersTable;
+    int rowCount    = table->rowCount();
+    int columnCount = table->columnCount();
+
+    if (rowCount == 0 || columnCount == 0) {
+        painter.setFont(QFont("Arial", 14));
+        painter.setPen(textColor);
+        painter.drawText(marginLeft, yPos, "No data to export.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The user table is empty. Nothing to export.");
+        return;
+    }
+
+    int columnWidth  = contentWidth / columnCount;
+    int headerHeight = 80;
+
+    auto drawHeader = [&]() {
+        painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
+
+        QFont headerFont("Arial", 13, QFont::Bold);
+        painter.setFont(headerFont);
+        painter.setPen(Qt::white);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QString headerText = table->horizontalHeaderItem(col)
+                                     ? table->horizontalHeaderItem(col)->text()
+                                     : "";
+
+            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headerText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(Qt::white, 2));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + headerHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += columnWidth;
+        }
+    };
+
+    drawHeader();
+    yPos += headerHeight;
+
+    int rowHeight    = 75;
+    int footerHeight = 80;
+    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+
+    QFont cellFont("Arial", 11);
+    painter.setFont(cellFont);
+
+    for (int row = 0; row < rowCount; row++) {
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            yPos = marginTop;
+            drawHeader();
+            yPos += headerHeight;
+            painter.setFont(cellFont);
+        }
+
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
+
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(marginLeft, yPos, contentWidth, rowHeight);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            QString cellText = item ? item->text() : "";
+
+            painter.setPen(textColor);
+            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             cellText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(borderColor, 1));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + rowHeight);
+            }
+            xPos += columnWidth;
+        }
+
+        yPos += rowHeight;
+    }
+
+    yPos += 30;
+
+    painter.setPen(QPen(darkBlue, 3));
+    painter.drawLine(marginLeft, yPos, marginLeft + contentWidth, yPos);
+    yPos += 20;
+
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Total Records: %1").arg(rowCount));
+
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Marina Management System"));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("PDF exported successfully to:\n%1").arg(fileName));
 }
 
 

@@ -36,6 +36,8 @@ set(PROJECT_SOURCES
     company.cpp
     manage.h
     manage.cpp
+    fancyui.qrc
+    images.qrc
     style.qrc
 )
 

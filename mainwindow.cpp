@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "createacc.h"
 #include "appwindow.h"
-//#include "connection.h"
 
 
 //libraries
@@ -18,8 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-
     //logo
     QPixmap pix("icons/try2.png");
     ui->logo->setPixmap(pix);
@@ -77,45 +74,33 @@ void MainWindow::on_create_acc_linkActivated(const QString &link)
 
 void MainWindow::on_Sign_in_clicked()
 {
-    QString firstName = ui->firstName_input->text();
-    QString password = ui->password_input->text();
 
-    if (firstName.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "Error", "Please enter username and password.");
-        return;
-    }
+    QSqlQuery query;
+    query.prepare("SELECT USERID, EMAIL, ROLE FROM USERS WHERE EMAIL = :email AND PASSWORD = :password");
 
-    QFile file("users.txt");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, "Error", "Cannot open users file!");
-        return;
-    }
+    query.bindValue(":email", ui->firstName_input->text());
+    query.bindValue(":password", ui->password_input->text());
 
-    bool found = false;
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QStringList parts = line.split(";");
-        if (parts.size() == 5) {
-            QString fileUser = parts[3].trimmed();
-            QString filePass = parts[4].trimmed();
-            if (fileUser == firstName && filePass == password) {
-                found = true;
-                break;
-            }
+    if(query.exec())
+    {
+        if(query.next())
+        {
+            int connectedUserId = query.value(0).toInt();
+            QString connectedEmail = query.value(1).toString();
+            QString connectedUserRole = query.value(2).toString();
+            qDebug() << "Connected user:" << connectedEmail << "ID:" << connectedUserId << "Role:" << connectedUserRole;
+            appwindow *app = new appwindow(this, connectedUserId, connectedUserRole);
+            app->show();
+            this->hide();
+        }
+        else
+        {
+            QMessageBox::warning(this, "Login", "Invalid Login or Password");
         }
     }
-
-    file.close();
-
-    if (found) {
-        appwindow *app = new appwindow();
-        app->show();
-
-        // Close login window
-        this->close();
-    } else {
-        QMessageBox::warning(this, "Error", "Username or password is incorrect.");
+    else
+    {
+        qDebug() << query.lastError();
     }
-}
 
+}

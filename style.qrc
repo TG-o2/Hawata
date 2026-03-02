@@ -1,68 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>marine_theme.qss</file>
-        <file>fonts/Arteks Black.otf</file>
-        <file>fonts/Arteks-Bold-Italic.otf</file>
-        <file>fonts/Arteks-Bold.otf</file>
-        <file>fonts/Arteks Compact.otf</file>
-        <file>fonts/Arteks Contour.otf</file>
-        <file>fonts/Arteks Creative.otf</file>
-        <file>fonts/Arteks Italic.otf</file>
-        <file>fonts/Arteks Light Italic.otf</file>
-        <file>fonts/Arteks Light.otf</file>
-        <file>fonts/Arteks Medium Italic.otf</file>
-        <file>fonts/Arteks Regular.otf</file>
-        <file>fonts/Arteks Shadow.otf</file>
-        <file>fonts/Arteks Version Italic.otf</file>
-        <file>fonts/Arteks.txt</file>
-        <file>fonts/Behove.otf</file>
         <file>fonts/Behove.ttf</file>
-        <file>fonts/Bion-Bold.otf</file>
-        <file>fonts/Bion-Bold.ttf</file>
         <file>fonts/Bion-BoldCond.otf</file>
-        <file>fonts/Bion-BoldCond.ttf</file>
-        <file>fonts/Bion-Book.otf</file>
-        <file>fonts/Bion-Book.ttf</file>
-        <file>fonts/Bion-BookCond.otf</file>
-        <file>fonts/Bion-BookCond.ttf</file>
-        <file>fonts/JustFreeFonts.txt</file>
-        <file>fonts/JustFreeFonts.url</file>
-        <file>fonts/Type-Forward_Free_EULA.pdf</file>
-        <file>fonts/Comic Book Bold Italic.otf</file>
-        <file>fonts/Comic Book Bold.otf</file>
-        <file>fonts/Comic Book Italic.otf</file>
-        <file>fonts/Comic Book.otf</file>
-        <file>fonts/Happy School.otf</file>
-        <file>fonts/Happy School.ttf</file>
         <file>fonts/Hey Comic.otf</file>
-        <file>fonts/Hey Comic.ttf</file>
-        <file>fonts/Wigglye.ttf</file>
-        <file>icons/add-user1.png</file>
-        <file>icons/add-user2.png</file>
-        <file>icons/boat.png</file>
-        <file>icons/chart.png</file>
-        <file>icons/companies.png</file>
-        <file>icons/dashboard.png</file>
-        <file>icons/delete.png</file>
-        <file>icons/display.png</file>
-        <file>icons/dock.png</file>
-        <file>icons/Email.png</file>
-        <file>icons/fishicon.png</file>
-        <file>icons/FullLogoQT.png</file>
-        <file>icons/HOW_TO_SETTUP.txt</file>
-        <file>icons/live.png</file>
-        <file>icons/loading-arrow.png</file>
-        <file>icons/logoQT.jpg</file>
-        <file>icons/logoQT.png</file>
-        <file>icons/Ports.jpg</file>
-        <file>icons/Ports1.jpg</file>
-        <file>icons/prod.png</file>
-        <file>icons/stats.png</file>
-        <file>icons/trash.png</file>
-        <file>icons/try1.png</file>
-        <file>icons/try2.png</file>
-        <file>icons/update.png</file>
-        <file>icons/user.png</file>
-        <file>icons/wave.jpg</file>
     </qresource>
 </RCC>

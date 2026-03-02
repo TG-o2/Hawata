@@ -1,18 +1,19 @@
-// connection.h
 #ifndef CONNECTION_H
 #define CONNECTION_H
-
-#include <QtSql>
-#include <QDebug>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QString>
 
 class Connection
 {
 public:
     Connection();
-    ~Connection();
-    bool openConnection();
+    bool createconnect();
+    QString lastError() const;
+
 private:
-    QSqlDatabase db;
+    QString m_lastError;
 };
 
 #endif // CONNECTION_H

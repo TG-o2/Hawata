@@ -55,7 +55,7 @@ void CreateAcc::on_signup_clicked()
         QMessageBox::warning(this, "Error", "All fields are required");
         return;
     }
-    QFile file("users.txt");
+    QFile file("C:/Users/USER/Downloads/Project (1)/Sign_up/users.txt");
 
     //check my user's data files exist
     if (!file.open(QIODevice::Append | QIODevice::Text)) {

@@ -35,7 +35,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     currentlySelectedId = -1;
     loadDockingTable();
     loadUsersTable();
-    loadProductTable();  // Load product table on startup
+    loadProductTable();    // Load product table on startup
+    loadCompaniesTable();
 
     //load boat table
     displayBoats();
@@ -2083,6 +2084,28 @@ void appwindow::on_checkProductButton_2_clicked()
     // Refresh the table on manage page
     loadProductTable();
 }
+void appwindow::on_pushButton_11_clicked()
+{
+    // Get all products
+    QList<ProductRecord> allProducts = productManager.getAllProducts();
+
+    if (allProducts.isEmpty()) {
+        QMessageBox::warning(this, "No Data", "No products in the system to analyze.");
+        return;
+    }
+
+    // Determine which statistics to show
+    int selectedOption = ui->comboBox_20->currentIndex();
+
+    if (selectedOption == 0) {
+        // Show statistics by Status
+        generateProductStatisticsByStatus(allProducts);
+    } else {
+        // Show statistics by Preferred Fish (for companies)
+        generateProductStatisticsByStatus(allProducts);
+    }
+}
+
 
 void appwindow::on_checkProductButton_clicked()
 {
@@ -2555,27 +2578,7 @@ void appwindow::on_export_pdf_6_clicked()
                              QString("PDF exported successfully to:\n%1").arg(fileName));
 }
 
-void appwindow::on_pushButton_12_clicked()
-{
-    // Get all products
-    QList<ProductRecord> allProducts = productManager.getAllProducts();
-    
-    if (allProducts.isEmpty()) {
-        QMessageBox::warning(this, "No Data", "No products in the system to analyze.");
-        return;
-    }
-    
-    // Determine which statistics to show
-    int selectedOption = ui->comboBox_20->currentIndex();
-    
-    if (selectedOption == 0) {
-        // Show statistics by Status
-        generateProductStatisticsByStatus(allProducts);
-    } else {
-        // Show statistics by Preferred Fish (for companies)
-        generateProductStatisticsByStatus(allProducts);
-    }
-}
+
 
 void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &products)
 {
@@ -3463,8 +3466,7 @@ void appwindow::on_comboBox_19_currentTextChanged(const QString &arg1)
 
     loadCompaniesTableFromList(records);
 }
-
-void appwindow::on_generate_clicked()
+void appwindow::on_pushButton_12_clicked()
 {
     QString filterType = ui->comboBox_20->currentText();
 
@@ -3525,3 +3527,4 @@ void appwindow::on_generate_clicked()
     ui->chartView_6->setChart(chart);
     ui->chartView_6->setRenderHint(QPainter::Antialiasing);
 }
+

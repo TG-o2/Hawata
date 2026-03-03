@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -4453,7 +4453,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -6085,7 +6085,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -7213,7 +7213,7 @@ border: none;
 </string>
        </property>
        <property name="text">
-        <string>Product Acitivity</string>
+        <string>Company Acitivity</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -7910,7 +7910,7 @@ QPushButton:pressed {
        <property name="geometry">
         <rect>
          <x>60</x>
-         <y>40</y>
+         <y>30</y>
          <width>1111</width>
          <height>561</height>
         </rect>

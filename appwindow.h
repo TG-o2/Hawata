@@ -36,6 +36,7 @@ private slots:
     void on_usersTable_cellClicked(int row, int column);
     void on_usersTable_cellDoubleClicked(int row, int column);
     void on_clear_3_clicked();
+    void on_pushButton_8_clicked();
     void on_searchbar_3_textChanged(const QString &text);
     void on_comboBox_11_currentIndexChanged(int index);
     void on_export_pdf_user_clicked();
@@ -64,7 +65,8 @@ private slots:
     void on_searchbar_6_textChanged(const QString &text);
     void on_comboBox_18_currentIndexChanged(int index);
     void on_export_pdf_6_clicked();
-    void on_pushButton_12_clicked();
+    void on_pushButton_11_clicked();
+
 
     // boats CRUD
     void on_addBoatButton_clicked();
@@ -82,15 +84,10 @@ private slots:
     void on_edit_company_7_clicked();
     void on_delete_company_7_clicked();
     void on_clear_7_clicked();
-
     void on_searchbar_7_textChanged(const QString &arg1);
-
     void on_export_pdf_7_clicked();
-
+    void on_pushButton_12_clicked();
     void on_comboBox_19_currentTextChanged(const QString &arg1);
-
-    void on_generate_clicked();
-
 
 private:
     Ui::appwindow *ui;
@@ -111,6 +108,7 @@ private:
     int connectedUserId = -1;
     QString connectedUserRole;
     void loadUsersTable();
+    void loadUserStatistics(bool byRole);
     QList<User> allUserRecords;
     Connection conn;
 

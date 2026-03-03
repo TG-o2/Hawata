@@ -41,13 +41,14 @@ private:
     QString m_email;
     QString m_phone;
     QString m_preferredFish;
-    QString m_status; // "active" or "inactive"
+    QString m_status; // "ACTIVE" or "INACTIVE"
 };
 
 class Company
 {
 private:
     QSqlQueryModel* companiesModel;
+
 public:
     Company();
     ~Company() {
@@ -72,6 +73,8 @@ public:
                        const QString &phone,
                        const QString &preferredFish,
                        const QString &status);
+    QList<CompanyRecord> searchCompanies(const QString &keyword);
+    QList<CompanyRecord> sortCompaniesBy(const QString &column);
 };
 
 #endif // COMPANY_H

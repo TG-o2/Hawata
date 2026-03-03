@@ -76,12 +76,21 @@ private slots:
     void on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item);
 
     // companies CRUD
-    void on_tableWidget_11_cellClicked(int row, int column);
+   void on_tableWidget_11_cellClicked(int row, int column);
     void on_tableWidget_11_cellDoubleClicked(int row, int column);
     void on_CreateUser_3_clicked();
     void on_edit_company_7_clicked();
     void on_delete_company_7_clicked();
     void on_clear_7_clicked();
+
+    void on_searchbar_7_textChanged(const QString &arg1);
+
+    void on_export_pdf_7_clicked();
+
+    void on_comboBox_19_currentTextChanged(const QString &arg1);
+
+    void on_generate_clicked();
+
 
 private:
     Ui::appwindow *ui;
@@ -125,6 +134,7 @@ private:
 
     // companies
     void loadCompaniesTable();
+    void loadCompaniesTableFromList(const QList<CompanyRecord> &records);
     void fillCompanyForm(int row);
     Company companyManager;
     int selectedCompanyId = -1;

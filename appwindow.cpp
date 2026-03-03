@@ -3032,7 +3032,6 @@ void appwindow::on_searchBoatButton_3_clicked()
 }
 ///=============COMPANY SECTION=============
 
-
 void appwindow::loadCompaniesTable()
 {
     QList<CompanyRecord> records = companyManager.getAllCompanies();
@@ -3069,18 +3068,21 @@ void appwindow::fillCompanyForm(int row)
 
     QTableWidget *table = ui->tableWidget_11;
 
+    if (!table->item(row, 0)) return; // safety
+
     selectedCompanyId = table->item(row, 0)->text().toInt();
 
-    ui->firstNameEdit_8->setText(table->item(row, 1)->text());   // Name
-    ui->lastNameEdit_7->setText(table->item(row, 2)->text());    // Location
-    ui->emailEdit_4->setText(table->item(row, 3)->text());       // Email
-    ui->passwordEdit_3->setText(table->item(row, 4)->text());    // Phone
-    ui->lastNameEdit_8->setText(table->item(row, 5)->text());    // Preferred Fish
+    ui->firstNameEdit_8->setText(table->item(row, 1) ? table->item(row, 1)->text() : "");
+    ui->lastNameEdit_7->setText(table->item(row, 2) ? table->item(row, 2)->text() : "");
+    ui->emailEdit_4->setText(table->item(row, 3) ? table->item(row, 3)->text() : "");
+    ui->passwordEdit_3->setText(table->item(row, 4) ? table->item(row, 4)->text() : "");
+    ui->lastNameEdit_8->setText(table->item(row, 5) ? table->item(row, 5)->text() : "");
 
-    int statusIdx = ui->role_option_7->findText(table->item(row, 6)->text());
-    if (statusIdx >= 0) ui->role_option_7->setCurrentIndex(statusIdx);
+    QString statusText = table->item(row, 6) ? table->item(row, 6)->text() : "";
+    int statusIdx = ui->role_option_7->findText(statusText);
+    if (statusIdx >= 0)
+        ui->role_option_7->setCurrentIndex(statusIdx);
 
-    // Switch to Add page and update button label
     ui->stackedWidget_5->setCurrentIndex(0);
     ui->CreateUser_3->setText("Update Company");
 }
@@ -3100,76 +3102,76 @@ void appwindow::on_tableWidget_11_cellDoubleClicked(int row, int column)
 ///CREATE / UPDATE
 void appwindow::on_CreateUser_3_clicked()
 {
-    QString name         = ui->firstNameEdit_8->text().trimmed();
-    QString location     = ui->lastNameEdit_7->text().trimmed();
-    QString email        = ui->emailEdit_4->text().trimmed();
-    QString phone        = ui->passwordEdit_3->text().trimmed();
-    QString preferredFish= ui->lastNameEdit_8->text().trimmed();
-    QString status       = ui->role_option_7->currentText();
+    QString name          = ui->firstNameEdit_8->text().trimmed();
+    QString location      = ui->lastNameEdit_7->text().trimmed();
+    QString email         = ui->emailEdit_4->text().trimmed();
+    QString phone         = ui->passwordEdit_3->text().trimmed();
+    QString preferredFish = ui->lastNameEdit_8->text().trimmed();
+    QString status        = ui->role_option_7->currentText().trimmed().toUpper();
 
     // ===== VALIDATION =====
-    if (name.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Company name is required.");
+    QRegularExpression nameRegex("^[A-Za-z\\s]{8,}$");
+    if (!nameRegex.match(name).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error",
+                             "Name must contain only letters and be at least 8 characters.");
         return;
     }
-    if (location.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Location is required.");
-        return;
-    }
-    if (email.isEmpty() || !email.contains('@')) {
-        QMessageBox::warning(this, "Validation Error", "A valid email is required.");
-        return;
-    }
-    if (phone.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Phone number is required.");
-        return;
-    }
-    // Phone: digits only
-    for (QChar c : phone) {
-        if (!c.isDigit() && c != '+' && c != '-' && c != ' ') {
-            QMessageBox::warning(this, "Validation Error", "Phone must contain only digits.");
-            return;
-        }
-    }
+
     if (preferredFish.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Preferred fish is required.");
         return;
     }
 
-    // ===== ALL VALIDATIONS PASSED =====
-    bool isEditMode = (selectedCompanyId != -1);
+    QRegularExpression emailRegex("^[\\w\\.]+@[\\w\\.]+\\.[a-zA-Z]{2,}$");
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error", "Invalid email format.");
+        return;
+    }
+
+    QRegularExpression phoneRegex("^[0-9]{8}$");
+    if (!phoneRegex.match(phone).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error",
+                             "Phone number must contain exactly 8 digits.");
+        return;
+    }
+
+    if (status != "ACTIVE" && status != "INACTIVE") {
+        QMessageBox::warning(this, "Validation Error", "Status must be ACTIVE or INACTIVE.");
+        return;
+    }
+
     bool success = false;
 
-    if (isEditMode) {
-        success = companyManager.updateCompany(selectedCompanyId, name, location,
-                                               email, phone, preferredFish, status);
-    } else {
-        success = companyManager.createCompany(name, location, email,
-                                               phone, preferredFish, status);
-    }
+    // ===== CREATE OR UPDATE =====
+    if (selectedCompanyId == -1) {
+        // CREATE
+        success = companyManager.createCompany(
+            name, location, email, phone, preferredFish, status);
 
-    if (success) {
-        QMessageBox::information(this, "Success",
-                                 isEditMode ? "Company updated successfully!" : "Company created successfully!");
-
-        // Clear form
-        ui->firstNameEdit_8->clear();
-        ui->lastNameEdit_7->clear();
-        ui->emailEdit_4->clear();
-        ui->passwordEdit_3->clear();
-        ui->lastNameEdit_8->clear();
-        ui->role_option_7->setCurrentIndex(0);
-        ui->CreateUser_3->setText("Create Company");
-        selectedCompanyId = -1;
-
-        loadCompaniesTable();
-        if (isEditMode) {
-            ui->stackedWidget_5->setCurrentIndex(1); // go back to manage page
+        if (success) {
+            QMessageBox::information(this, "Success", "Company created successfully.");
         }
     } else {
-        QMessageBox::critical(this, "Error",
-                              isEditMode ? "Failed to update company." : "Failed to create company.");
+        // UPDATE
+        success = companyManager.updateCompany(
+            selectedCompanyId,
+            name, location, email, phone, preferredFish, status);
+
+        if (success) {
+            QMessageBox::information(this, "Success", "Company updated successfully.");
+        }
     }
+
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Operation failed.");
+        return;
+    }
+
+    // Refresh table
+    loadCompaniesTable();
+
+    // Clear form
+    on_clear_7_clicked();
 }
 
 ///EDIT
@@ -3195,7 +3197,10 @@ void appwindow::on_delete_company_7_clicked()
     int row = selected.first().row();
     int id  = ui->tableWidget_11->item(row, 0)->text().toInt();
     QString name = ui->tableWidget_11->item(row, 1)->text();
-
+    if (id <= 0) {
+        QMessageBox::warning(this, "Error", "Invalid company ID.");
+        return;
+    }
     QMessageBox::StandardButton reply = QMessageBox::question(
         this, "Confirm Delete",
         QString("Are you sure you want to delete \"%1\" (ID: %2)?").arg(name).arg(id),
@@ -3211,23 +3216,312 @@ void appwindow::on_delete_company_7_clicked()
         }
     }
 }
+// search
+void appwindow::on_searchbar_7_textChanged(const QString &text)
+{
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row) {
+        bool match = false;
+
+        for (int col = 0; col < ui->tableWidget_11->columnCount(); ++col) {
+            QTableWidgetItem *item = ui->tableWidget_11->item(row, col);
+            if (item && item->text().contains(text, Qt::CaseInsensitive)) {
+                match = true;
+                break;
+            }
+        }
+
+        ui->tableWidget_11->setRowHidden(row, !match);
+    }
+}
 
 ///CLEAR
 void appwindow::on_clear_7_clicked()
 {
+    selectedCompanyId = -1;
+
     ui->firstNameEdit_8->clear();
     ui->lastNameEdit_7->clear();
     ui->emailEdit_4->clear();
     ui->passwordEdit_3->clear();
     ui->lastNameEdit_8->clear();
     ui->role_option_7->setCurrentIndex(0);
-    ui->searchbar_7->clear();
-    ui->comboBox_19->setCurrentIndex(0);
+
     ui->CreateUser_3->setText("Create Company");
-    selectedCompanyId = -1;
 
     if (ui->tableWidget_11->selectionModel())
-        ui->tableWidget_11->selectionModel()->clearSelection();
+        ui->tableWidget_11->clearSelection();
 }
 
 
+void appwindow::on_export_pdf_7_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        this, "Export PDF", "", "PDF Files (*.pdf)");
+
+    if (fileName.isEmpty())
+        return;
+
+    QTextDocument document;
+
+    int total = ui->tableWidget_11->rowCount();
+
+    QString html = R"(
+    <html>
+    <head>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(to right, #003E7E, #005CBF);
+            color: white;
+            padding: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* ===== SECTION TITLE ===== */
+        .section-title {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #003E7E;
+            border-left: 6px solid #005CBF;
+            padding-left: 10px;
+        }
+
+        /* ===== KPI CARD ===== */
+        .card-container {
+            margin-top: 15px;
+        }
+
+        .card {
+            background-color: #F4F6F9;
+            border-radius: 6px;
+            padding: 15px;
+            width: 250px;
+            display: inline-block;
+            margin-right: 15px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .card-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #003E7E;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #003E7E;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F4F6F9;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 40px;
+            font-size: 10px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+    </style>
+    </head>
+    <body>
+    )";
+
+    // ===== HEADER =====
+    html += "<div class='header'>";
+    html += "<h1>COMPANY PERFORMANCE REPORT</h1>";
+    html += "<div class='subtitle'>Marina Management System | Generated on "
+            + QDate::currentDate().toString("dd MMM yyyy") + "</div>";
+    html += "</div>";
+
+    // ===== EXECUTIVE SUMMARY =====
+    html += "<div class='section-title'>EXECUTIVE SUMMARY</div>";
+
+    html += "<div class='card-container'>";
+    html += "<div class='card'>";
+    html += "<div class='card-title'>Total Companies</div>";
+    html += "<div class='card-value'>" + QString::number(total) + "</div>";
+    html += "</div>";
+    html += "</div>";
+
+    // ===== TABLE SECTION =====
+    html += "<div class='section-title'>COMPANY REGISTRY</div>";
+
+    html += "<table>";
+    html += "<tr>"
+            "<th>ID</th>"
+            "<th>Name</th>"
+            "<th>Location</th>"
+            "<th>Email</th>"
+            "<th>Phone</th>"
+            "<th>Preferred Fish</th>"
+            "<th>Status</th>"
+            "</tr>";
+
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row)
+    {
+        html += "<tr>";
+
+        for (int col = 0; col < ui->tableWidget_11->columnCount(); ++col)
+        {
+            QString text = ui->tableWidget_11->item(row, col)->text();
+            html += "<td>" + text + "</td>";
+        }
+
+        html += "</tr>";
+    }
+
+    html += "</table>";
+
+    // ===== FOOTER =====
+    html += "<div class='footer'>";
+    html += "Marina Management System - Company Report - CONFIDENTIAL";
+    html += "</div>";
+
+    html += "</body></html>";
+
+    document.setHtml(html);
+
+    QPdfWriter writer(fileName);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+
+    document.print(&writer);
+
+    QMessageBox::information(this, "Success", "PDF exported successfully!");
+}
+void appwindow::loadCompaniesTableFromList(const QList<CompanyRecord> &records)
+{
+    QTableWidget *table = ui->tableWidget_11;
+    table->setRowCount(0);
+
+    for (const CompanyRecord &r : records) {
+        int row = table->rowCount();
+        table->insertRow(row);
+
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
+        table->setItem(row, 1, new QTableWidgetItem(r.name()));
+        table->setItem(row, 2, new QTableWidgetItem(r.location()));
+        table->setItem(row, 3, new QTableWidgetItem(r.email()));
+        table->setItem(row, 4, new QTableWidgetItem(r.phone()));
+        table->setItem(row, 5, new QTableWidgetItem(r.preferredFish()));
+        table->setItem(row, 6, new QTableWidgetItem(r.status()));
+    }
+
+    ui->labelResults_7->setText(QString("Showing %1 Companies").arg(records.size()));
+}
+void appwindow::on_comboBox_19_currentTextChanged(const QString &arg1)
+{
+    QList<CompanyRecord> records;
+
+    if (arg1 == "Name")
+        records = companyManager.sortCompaniesBy("NAME");
+    else if (arg1 == "Preferred Fish")
+        records = companyManager.sortCompaniesBy("PREFERRED_FISH");
+    else
+        records = companyManager.getAllCompanies();
+
+    loadCompaniesTableFromList(records);
+}
+
+void appwindow::on_generate_clicked()
+{
+    QString filterType = ui->comboBox_20->currentText();
+
+    QMap<QString, int> stats;
+
+    // Loop through tableWidget_11 (Companies table)
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row)
+    {
+        QString key;
+
+        if (filterType == "Status")
+        {
+            // Assuming Status column index = 6
+            key = ui->tableWidget_11->item(row, 6)->text();
+        }
+        else if (filterType == "Preferred Fish")
+        {
+            // Assuming Preferred Fish column index = 5
+            key = ui->tableWidget_11->item(row, 5)->text();
+        }
+
+        stats[key]++;
+    }
+
+    // ===== Create Bar Series =====
+    QBarSeries *series = new QBarSeries();
+    QBarSet *set = new QBarSet(filterType);
+
+    QStringList categories;
+
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        *set << it.value();
+        categories << it.key();
+    }
+
+    series->append(set);
+
+    // ===== Create Chart =====
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Company Distribution by " + filterType);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText("Number of Companies");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    chart->legend()->setVisible(true);
+
+    // ===== Display in chartView_6 =====
+    ui->chartView_6->setChart(chart);
+    ui->chartView_6->setRenderHint(QPainter::Antialiasing);
+}

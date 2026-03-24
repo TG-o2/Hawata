@@ -74,7 +74,7 @@ private slots:
     void on_deleteBoatButton_clicked();
     void on_updateBoatButton_clicked();
     void on_searchBoatButton_3_clicked();
-    void on_Boatwidget_2_clicked(QTableWidgetItem *item);
+    void on_Boatwidget_2_itemSelectionChanged();
     void on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item);
 
     // companies CRUD
@@ -88,6 +88,10 @@ private slots:
     void on_export_pdf_7_clicked();
     void on_pushButton_12_clicked();
     void on_comboBox_19_currentTextChanged(const QString &arg1);
+
+    void on_clearBoatButton_clicked();
+
+    void on_comboBox_15_currentIndexChanged(int index);
 
 private:
     Ui::appwindow *ui;

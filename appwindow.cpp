@@ -40,6 +40,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     //load boat table
     displayBoats();
+    connect(ui->Boatwidget_2, &QTableWidget::itemSelectionChanged,
+            this, &appwindow::on_Boatwidget_2_itemSelectionChanged);
 
     //photo logo set up
 
@@ -180,7 +182,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     ui->cal4->setPixmap(Calendar);
     ui->cal4->setScaledContents(true);
-    //PRODUCT pages
+    //BOATS
 
     ui->Addboat1->setPixmap(Boat);
     ui->Addboat1->setScaledContents(true);
@@ -219,7 +221,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     ui->Live3->setScaledContents(true);
     ui->Live4->setPixmap(live);
     ui->Live4->setScaledContents(true);
-    //COMPANIES
+    //product
     ui->Prod1->setPixmap(Prod);
     ui->Prod1->setScaledContents(true);
     ui->Prod2->setPixmap(Prod);
@@ -2680,11 +2682,39 @@ void appwindow::populateBoatForm(int boatId)
     ui->boatStatusComboBox->setCurrentIndex(boatsTmp.getStatus());
     ui->boatTypeLineEdit->setText(boatsTmp.getType());
 
-    QDate date = QDate::fromString(boatsTmp.getLastMaintenanceDate(), "yyyy-MM-dd");
-    ui->boatMaintenanceDateEdit->setDate(date.isValid() ? date : QDate::currentDate());
+    // ── DATE PARSING ──────────────────────────────────────────
+    QString rawDate = boatsTmp.getLastMaintenanceDate();
+    QDate date;
+
+    // Oracle returns month in all-caps (e.g. "23/MAR/17") — normalize to "23/Mar/17"
+    QStringList parts = rawDate.split('/');
+    QString normalizedDate = rawDate;
+    if (parts.size() == 3) {
+        QString month = parts[1];
+        month = month[0].toUpper() + month.mid(1).toLower();
+        normalizedDate = parts[0] + "/" + month + "/" + parts[2];
+    }
+
+    for (const QString &fmt : {"dd/MMM/yy", "dd/MMM/yyyy", "yyyy-MM-dd", "dd-MMM-yyyy"}) {
+        date = QDate::fromString(normalizedDate, fmt);
+        if (date.isValid()) break;
+    }
+
+    if (date.isValid()) {
+        // Fix two-digit year: Qt may interpret "17" as 1917 instead of 2017
+        if (date.year() < 2000) {
+            date = date.addYears(100);
+        }
+        ui->boatMaintenanceDateEdit->setDate(date);
+    } else {
+        qDebug() << "Could not parse date:" << rawDate;
+        ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+    }
+    // ── END DATE PARSING ──────────────────────────────────────
 
     ui->boatTripsSpinBox->setValue(boatsTmp.getTotalTrips());
     ui->boatFishSpinBox->setValue(boatsTmp.getTotalFish());
+
 }
 
 void appwindow::displayBoats()
@@ -2760,19 +2790,20 @@ void appwindow::clearBoatInputs()
 }
 
 
-void appwindow::on_Boatwidget_2_clicked(QTableWidgetItem *item)
+void appwindow::on_Boatwidget_2_itemSelectionChanged()
 {
-    if (!item) return;
-
     int currentRow = ui->Boatwidget_2->currentRow();
-    if (currentRow < 0) return;
+    if (currentRow < 0) {
+        currentlySelectedId = -1;
+        ui->deleteBoatButton->setEnabled(false);
+        ui->updateBoatButton->setEnabled(false);
+        return;
+    }
 
     QTableWidgetItem *idItem = ui->Boatwidget_2->item(currentRow, 0);
     if (idItem) {
         currentlySelectedId = idItem->data(Qt::UserRole).toInt();
         qDebug() << "Selected boat ID:" << currentlySelectedId;
-
-        // Enable action buttons on the list page
         ui->deleteBoatButton->setEnabled(true);
         ui->updateBoatButton->setEnabled(true);
     }
@@ -3526,5 +3557,56 @@ void appwindow::on_pushButton_12_clicked()
     // ===== Display in chartView_6 =====
     ui->chartView_6->setChart(chart);
     ui->chartView_6->setRenderHint(QPainter::Antialiasing);
+}
+
+//boat new functionalities
+void appwindow::on_clearBoatButton_clicked()
+{
+
+    ui->boatSizeLineEdit->clear();
+    ui->boatLocationLineEdit->clear();
+    ui->boatOwnerNameLineEdit->clear();
+    ui->boatOwnerEmailLineEdit->clear();
+    ui->boatTypeLineEdit->clear();
+    ui->boatStatusComboBox->setCurrentIndex(1);
+    ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+    ui->boatTripsSpinBox->setValue(0);
+    ui->boatFishSpinBox->setValue(0);
+
+    // If we're in Edit mode, switch back to Add mode
+    if (currentBoatMode == BoatMode::Edit) {
+        setBoatMode(BoatMode::Add);
+    }
+}
+
+
+void appwindow::on_comboBox_15_currentIndexChanged(int index)
+{
+    ui->Boatwidget_2->setSortingEnabled(false); // disable while we sort to avoid interference
+
+    switch (index) {
+    case 0:
+        // Default — reload from DB in original order (by BOATID)
+        displayBoats();
+        break;
+    case 1:
+        // Sort by Last Maintenance Date ascending
+        ui->Boatwidget_2->sortItems(7, Qt::AscendingOrder);
+        break;
+    case 2:
+        // Sort by Last Maintenance Date descending
+        ui->Boatwidget_2->sortItems(7, Qt::DescendingOrder);
+        break;
+    case 3:
+        // Sort by Size ascending
+        ui->Boatwidget_2->sortItems(1, Qt::AscendingOrder);
+        break;
+    case 4:
+        // Sort by Size descending
+        ui->Boatwidget_2->sortItems(1, Qt::DescendingOrder);
+        break;
+    default:
+        break;
+    }
 }
 

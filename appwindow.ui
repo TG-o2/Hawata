@@ -3585,6 +3585,11 @@ QPushButton:pressed {
          <widget class="QComboBox" name="comboBox_15">
           <item>
            <property name="text">
+            <string>Default</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
             <string>Size</string>
            </property>
           </item>
@@ -4453,7 +4458,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">

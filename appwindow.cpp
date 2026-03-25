@@ -40,8 +40,11 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     //load boat table
     displayBoats();
-    connect(ui->Boatwidget_2, &QTableWidget::itemSelectionChanged,
-            this, &appwindow::on_Boatwidget_2_itemSelectionChanged);
+    connect(ui->comboBox_15, &QComboBox::currentIndexChanged,
+            this, &appwindow::on_comboBox_15_currentIndexChanged);
+    //ui->comboBox_15->insertItem(0, "Default");
+    //connect(ui->Boatwidget_2, &QTableWidget::itemSelectionChanged,
+    //      this, &appwindow::on_Boatwidget_2_itemSelectionChanged);
 
     //photo logo set up
 
@@ -703,8 +706,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->tabdocking, &QTableWidget::cellClicked,
             this, &appwindow::on_tabdocking_cellClicked);
 
-        ui->comboBox_12->setCurrentIndex(0);
-        loadUserStatistics(true);
+    ui->comboBox_12->setCurrentIndex(0);
+    loadUserStatistics(true);
 }
 
 //add docking
@@ -718,15 +721,15 @@ void appwindow::on_CreateDocking_clicked()
     QString capacity = ui->capacity->text().trimmed();
     QDateTime startDate = ui->startDate->dateTime();
     QDateTime endDate = ui->endDate->dateTime();
-    
+
     // ===== VALIDATION CONTROLS =====
-    
+
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-    
+
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -734,78 +737,78 @@ void appwindow::on_CreateDocking_clicked()
             return;
         }
     }
-    
+
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-    
+
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-    
+
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-    
+
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-    
+
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-    
+
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-    
+
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-    
+
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-    
+
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-    
+
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-    
+
     // ===== ALL VALIDATIONS PASSED =====
-    
+
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
-    
+
     // Call create docking + create manage relation in one transaction
     QSqlDatabase db = QSqlDatabase::database();
     if (!db.isOpen()) {
@@ -859,16 +862,16 @@ void appwindow::loadDockingTable()
 {
     allDockingRecords = dockingManager.getAllDockings();
     qDebug() << "Records fetched:" << allDockingRecords.size();  // verify in output
-    
+
     // Clear search and reset sort to default
     ui->searchbar_docking->blockSignals(true);
     ui->searchbar_docking->clear();
     ui->searchbar_docking->blockSignals(false);
-    
+
     ui->docking_sort->blockSignals(true);
     ui->docking_sort->setCurrentIndex(0);  // Set to "Date" (default)
     ui->docking_sort->blockSignals(false);
-    
+
     // Populate table with all records
     populateDockingTable(allDockingRecords);
 }
@@ -928,7 +931,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     // Parse dates - try multiple formats since database may store in different format
     QString startDateStr = table->item(row, 2)->text();
     QString endDateStr = table->item(row, 3)->text();
-    
+
     QDateTime startDt = QDateTime::fromString(startDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!startDt.isValid()) {
         startDt = QDateTime::fromString(startDateStr, "MM/dd/yy");
@@ -947,7 +950,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     if (startDt.isValid()) {
         ui->startDate->setDateTime(startDt);
     }
-    
+
     QDateTime endDt = QDateTime::fromString(endDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!endDt.isValid()) {
         endDt = QDateTime::fromString(endDateStr, "MM/dd/yy");
@@ -996,13 +999,13 @@ void appwindow::on_edit_Docking_clicked()
     QDateTime endDate = ui->endDate->dateTime();
 
     // ===== VALIDATION CONTROLS =====
-    
+
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-    
+
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -1010,75 +1013,75 @@ void appwindow::on_edit_Docking_clicked()
             return;
         }
     }
-    
+
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-    
+
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-    
+
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-    
+
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-    
+
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-    
+
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-    
+
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-    
+
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-    
+
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-    
+
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-    
+
     // ===== ALL VALIDATIONS PASSED =====
-    
+
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
 
@@ -1499,8 +1502,8 @@ void appwindow::on_UPDUser_clicked()
         }
     } else {
         QMessageBox::critical(this, "Error", isEditMode
-                                               ? "Failed to update user. Please check the database connection."
-                                               : "Failed to create user. Please check the database connection.");
+                                                 ? "Failed to update user. Please check the database connection."
+                                                 : "Failed to create user. Please check the database connection.");
     }
 }
 
@@ -1833,8 +1836,8 @@ void appwindow::on_export_pdf_user_clicked()
         int xPos = marginLeft;
         for (int col = 0; col < columnCount; col++) {
             QString headerText = table->horizontalHeaderItem(col)
-                                     ? table->horizontalHeaderItem(col)->text()
-                                     : "";
+            ? table->horizontalHeaderItem(col)->text()
+            : "";
 
             painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
                              Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
@@ -1948,8 +1951,8 @@ void appwindow::loadUserStatistics(bool byRole)
     int maxCount = 0;
     while (query.next()) {
         const QString category = query.value(0).toString().trimmed().isEmpty()
-                                     ? "Unknown"
-                                     : query.value(0).toString().trimmed();
+        ? "Unknown"
+        : query.value(0).toString().trimmed();
         const int count = query.value(1).toInt();
 
         *set << count;
@@ -2041,13 +2044,13 @@ void appwindow::on_checkProductButton_2_clicked()
     if (selectedProductId > 0) {
         // Update existing product
         if (productManager.updateProduct(selectedProductId,
-                                        type,
-                                        location,
-                                        status,
-                                        qty,
-                                        pr,
-                                        ui->fishdate1->dateTime(),
-                                        ui->fishdate2->dateTime())) {
+                                         type,
+                                         location,
+                                         status,
+                                         qty,
+                                         pr,
+                                         ui->fishdate1->dateTime(),
+                                         ui->fishdate2->dateTime())) {
             QMessageBox::information(this, "Success", "Product updated successfully!");
             selectedProductId = -1;  // Reset for next operation
         } else {
@@ -2057,12 +2060,12 @@ void appwindow::on_checkProductButton_2_clicked()
     } else {
         // Create new product
         if (!productManager.createProduct(type,
-                                         location,
-                                         status,
-                                         qty,
-                                         pr,
-                                         ui->fishdate1->dateTime(),
-                                         ui->fishdate2->dateTime())) {
+                                          location,
+                                          status,
+                                          qty,
+                                          pr,
+                                          ui->fishdate1->dateTime(),
+                                          ui->fishdate2->dateTime())) {
             QMessageBox::critical(this, "Error", "Failed to add product. Please check the database connection.");
             return;
         }
@@ -2079,10 +2082,10 @@ void appwindow::on_checkProductButton_2_clicked()
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->locationfish->clear();
     selectedProductId = -1;
-    
+
     // Reset button text back to "Add Product"
     ui->checkProductButton_2->setText("Add Product");
-    
+
     // Refresh the table on manage page
     loadProductTable();
 }
@@ -2201,7 +2204,7 @@ void appwindow::on_tableWidget_10_cellDoubleClicked(int row, int /*column*/)
 
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
-    
+
     // Navigate to the Add Product page to edit
     ui->stackedWidget_4->setCurrentIndex(0);
 }
@@ -2260,7 +2263,7 @@ void appwindow::on_edit_company_6_clicked()
 
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
-    
+
     // Navigate to the Add Product page to edit
     ui->stackedWidget_4->setCurrentIndex(0);
 }
@@ -2273,8 +2276,8 @@ void appwindow::on_delete_company_6_clicked()
     }
 
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Confirm Delete",
-                                                             "Are you sure you want to delete this product?",
-                                                             QMessageBox::Yes | QMessageBox::No);
+                                                              "Are you sure you want to delete this product?",
+                                                              QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
         if (productManager.deleteProduct(selectedProductId)) {
@@ -2290,7 +2293,7 @@ void appwindow::on_delete_company_6_clicked()
             ui->fishdate1->setDateTime(QDateTime::currentDateTime());
             ui->fishdate2->setDateTime(QDateTime::currentDateTime());
             selectedProductId = -1;
-            
+
             // Reset button text
             ui->checkProductButton_2->setText("Add Product");
         } else {
@@ -2310,10 +2313,10 @@ void appwindow::on_clear_6_clicked()
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->prodcode->clear();
     selectedProductId = -1;
-    
+
     // Reset button text to "Add Product"
     ui->checkProductButton_2->setText("Add Product");
-    
+
     // Clear search and reload all products
     ui->searchbar_6->blockSignals(true);
     ui->searchbar_6->clear();
@@ -2332,15 +2335,15 @@ void appwindow::on_searchbar_6_textChanged(const QString &text)
     } else {
         bool isNumeric;
         searchText.toInt(&isNumeric);
-        
+
         // If search text is numeric, search by ID only
         for (const ProductRecord &r : allProductRecords) {
             if (isNumeric && QString::number(r.id).contains(searchText)) {
                 filteredRecords.append(r);
             } else if (!isNumeric && (
-                r.type.contains(searchText, Qt::CaseInsensitive) ||
-                r.status.contains(searchText, Qt::CaseInsensitive) ||
-                r.location.contains(searchText, Qt::CaseInsensitive))) {
+                           r.type.contains(searchText, Qt::CaseInsensitive) ||
+                           r.status.contains(searchText, Qt::CaseInsensitive) ||
+                           r.location.contains(searchText, Qt::CaseInsensitive))) {
                 filteredRecords.append(r);
             }
         }
@@ -2362,15 +2365,15 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
     } else {
         bool isNumeric;
         searchText.toInt(&isNumeric);
-        
+
         // If search text is numeric, search by ID only
         for (const ProductRecord &r : allProductRecords) {
             if (isNumeric && QString::number(r.id).contains(searchText)) {
                 recordsToDisplay.append(r);
             } else if (!isNumeric && (
-                r.type.contains(searchText, Qt::CaseInsensitive) ||
-                r.status.contains(searchText, Qt::CaseInsensitive) ||
-                r.location.contains(searchText, Qt::CaseInsensitive))) {
+                           r.type.contains(searchText, Qt::CaseInsensitive) ||
+                           r.status.contains(searchText, Qt::CaseInsensitive) ||
+                           r.location.contains(searchText, Qt::CaseInsensitive))) {
                 recordsToDisplay.append(r);
             }
         }
@@ -2588,43 +2591,43 @@ void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &pr
     QMap<QString, int> statusCount;
     QMap<QString, int> statusQuantity;
     int totalQuantity = 0;
-    
+
     for (const ProductRecord &product : products) {
         statusCount[product.status]++;
         statusQuantity[product.status] += product.quantity;
         totalQuantity += product.quantity;
     }
-    
+
     if (totalQuantity == 0) {
         QMessageBox::warning(this, "No Data", "No products with quantity data.");
         return;
     }
-    
+
     // Calculate percentage of active/available products
-    int activeQuantity = statusQuantity.value("Available", 0) + 
+    int activeQuantity = statusQuantity.value("Available", 0) +
                          statusQuantity.value("In Stock", 0);
     int percentage = (totalQuantity > 0) ? (activeQuantity * 100) / totalQuantity : 0;
-    
+
     // Update progress bar
     ui->progressBar_7->setValue(percentage);
-    
+
     // Update label with statistics
     QString statsText = QString("Percentage of Active Products in system: %1%\n").arg(percentage);
     statsText += "---Status Breakdown---\n";
-    
+
     for (auto it = statusQuantity.begin(); it != statusQuantity.end(); ++it) {
         int count = statusCount[it.key()];
         int qty = it.value();
         int pct = (qty * 100) / totalQuantity;
         statsText += QString("%1: %2 items, %3 units (%4%)\n")
-                        .arg(it.key())
-                        .arg(count)
-                        .arg(qty)
-                        .arg(pct);
+                         .arg(it.key())
+                         .arg(count)
+                         .arg(qty)
+                         .arg(pct);
     }
-    
+
     ui->label_79->setText(statsText);
-    
+
     QMessageBox::information(this, "Product Statistics", statsText);
 }
 
@@ -2934,7 +2937,7 @@ void appwindow::on_editBoatButton_clicked()
         "  TOTALTRIPS          = :trips,   "
         "  TOTALFISH           = :fish     "
         "WHERE BOATID = :boatId"
-    );
+        );
     q.bindValue(":size",    size);
     q.bindValue(":loc",     loc);
     q.bindValue(":oName",   oName);
@@ -2951,15 +2954,15 @@ void appwindow::on_editBoatButton_clicked()
         qDebug() << "EDIT FAILED:" << err;
         QMessageBox::critical(this, "Update Failed",
                               "Oracle error:\n\n" + err +
-                              "\n\nBoat ID: " + QString::number(boatId) +
-                              "\nDate sent: " + dateStr);
+                                  "\n\nBoat ID: " + QString::number(boatId) +
+                                  "\nDate sent: " + dateStr);
         return;
     }
 
     if (q.numRowsAffected() == 0) {
         QMessageBox::warning(this, "Not Updated",
                              "No row was changed. Boat ID " +
-                             QString::number(boatId) + " may not exist.");
+                                 QString::number(boatId) + " may not exist.");
         return;
     }
 
@@ -3021,47 +3024,66 @@ void appwindow::on_updateBoatButton_clicked()
 
 void appwindow::on_searchBoatButton_3_clicked()
 {
-    // Search by ID
-    if (ui->boatSearchLineEdit->text().isEmpty()) {
-        displayBoats(); // Show all if search is empty
+    QString searchText = ui->boatSearchLineEdit->text().trimmed();
+
+    if (searchText.isEmpty()) {
+        displayBoats();
         return;
     }
 
-    bool ok;
-    int id = ui->boatSearchLineEdit->text().toInt(&ok);
-    if (!ok) {
-        QMessageBox::warning(this, "Validation Error", "Search ID must be a number!");
-        return;
-    }
-
-    // Clear table and show only the searched boat
+    ui->Boatwidget_2->blockSignals(true);
     ui->Boatwidget_2->setRowCount(0);
 
-    // Set ID in temporary boats and read from database
-    boatsTmp.setId(id);
-    boatsTmp.read();
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "DB Error", "Database is not open!");
+        ui->Boatwidget_2->blockSignals(false);
+        return;
+    }
 
-    if (boatsTmp.getLastError().isEmpty()) {
-        ui->Boatwidget_2->insertRow(0);
-        ui->Boatwidget_2->setItem(0, 0, new QTableWidgetItem(QString::number(boatsTmp.getId())));
-        ui->Boatwidget_2->setItem(0, 1, new QTableWidgetItem(boatsTmp.getSize()));
-        ui->Boatwidget_2->setItem(0, 2, new QTableWidgetItem(boatsTmp.getLocation()));
-        ui->Boatwidget_2->setItem(0, 3, new QTableWidgetItem(boatsTmp.getOwnerName()));
-        ui->Boatwidget_2->setItem(0, 4, new QTableWidgetItem(boatsTmp.getOwnerEmail()));
+    QSqlQuery query(db);
+    query.prepare(
+        "SELECT BOATID, SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
+        "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
+        "FROM BOAT "
+        "WHERE CAST(BOATID AS VARCHAR2(20)) LIKE :search "
+        "OR UPPER(OWNERNAME) LIKE UPPER(:search2) "
+        "ORDER BY BOATID"
+        );
+    query.bindValue(":search",  "%" + searchText + "%");
+    query.bindValue(":search2", "%" + searchText + "%");
 
-        QString statusText = boatsTmp.getStatus() == 1 ? "IN PORT" : "OUT";
-        ui->Boatwidget_2->setItem(0, 5, new QTableWidgetItem(statusText));
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Search Error", query.lastError().text());
+        ui->Boatwidget_2->blockSignals(false);
+        return;
+    }
 
-        ui->Boatwidget_2->setItem(0, 6, new QTableWidgetItem(boatsTmp.getType()));
-        ui->Boatwidget_2->setItem(0, 7, new QTableWidgetItem(boatsTmp.getLastMaintenanceDate()));
-        ui->Boatwidget_2->setItem(0, 8, new QTableWidgetItem(QString::number(boatsTmp.getTotalTrips())));
-        ui->Boatwidget_2->setItem(0, 9, new QTableWidgetItem(QString::number(boatsTmp.getTotalFish())));
+    int row = 0;
+    while (query.next()) {
+        ui->Boatwidget_2->insertRow(row);
 
-        // Store the boat ID in the first column item
-        ui->Boatwidget_2->item(0, 0)->setData(Qt::UserRole, boatsTmp.getId());
-    } else {
-        QMessageBox::information(this, "Not Found", "No boat found with ID: " + QString::number(id));
-        displayBoats(); // Show all boats
+        for (int col = 0; col < 10; col++) {
+            QTableWidgetItem *item;
+            if (col == 5) {
+                QString statusText = query.value(col).toInt() == 1 ? "IN PORT" : "OUT";
+                item = new QTableWidgetItem(statusText);
+            } else {
+                item = new QTableWidgetItem(query.value(col).toString());
+            }
+            if (col == 0)
+                item->setData(Qt::UserRole, query.value("BOATID").toInt());
+            ui->Boatwidget_2->setItem(row, col, item);
+        }
+        row++;
+    }
+
+    ui->Boatwidget_2->blockSignals(false);
+
+    if (row == 0) {
+        QMessageBox::information(this, "Not Found",
+                                 "No boat found matching: " + searchText);
+        displayBoats();
     }
 }
 ///=============COMPANY SECTION=============
@@ -3582,31 +3604,13 @@ void appwindow::on_clearBoatButton_clicked()
 
 void appwindow::on_comboBox_15_currentIndexChanged(int index)
 {
-    ui->Boatwidget_2->setSortingEnabled(false); // disable while we sort to avoid interference
-
-    switch (index) {
-    case 0:
-        // Default — reload from DB in original order (by BOATID)
-        displayBoats();
-        break;
-    case 1:
-        // Sort by Last Maintenance Date ascending
-        ui->Boatwidget_2->sortItems(7, Qt::AscendingOrder);
-        break;
-    case 2:
-        // Sort by Last Maintenance Date descending
-        ui->Boatwidget_2->sortItems(7, Qt::DescendingOrder);
-        break;
-    case 3:
-        // Sort by Size ascending
-        ui->Boatwidget_2->sortItems(1, Qt::AscendingOrder);
-        break;
-    case 4:
-        // Sort by Size descending
-        ui->Boatwidget_2->sortItems(1, Qt::DescendingOrder);
-        break;
-    default:
-        break;
+    switch (index) {                                                              break; // Sort by...
+    case 1: ui->Boatwidget_2->setSortingEnabled(true);
+        ui->Boatwidget_2->sortByColumn(1, Qt::AscendingOrder);
+        ui->Boatwidget_2->setSortingEnabled(false);                                       break; // Size
+    case 2: ui->Boatwidget_2->setSortingEnabled(true);
+        ui->Boatwidget_2->sortByColumn(7, Qt::AscendingOrder);
+        ui->Boatwidget_2->setSortingEnabled(false);                                       break; // Last Maintenance Date
+    default: break;
     }
 }
-

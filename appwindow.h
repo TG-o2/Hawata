@@ -132,6 +132,8 @@ private:
     int currentlySelectedId;
     BoatMode currentBoatMode = BoatMode::Add;
 
+
+
     Boats boatsTmp;
 
     // companies
@@ -143,6 +145,8 @@ private:
     
     // product statistics
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
+    void createBoatChart(const QStringList &categories, const QList<int> &values,const QString &title, const QString &yAxisLabel);
+    void on_pushButton_10_clicked();
 };
 
 #endif // APPWINDOW_H

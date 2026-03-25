@@ -42,10 +42,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     displayBoats();
     connect(ui->comboBox_15, &QComboBox::currentIndexChanged,
             this, &appwindow::on_comboBox_15_currentIndexChanged);
-    //ui->comboBox_15->insertItem(0, "Default");
-    //connect(ui->Boatwidget_2, &QTableWidget::itemSelectionChanged,
-    //      this, &appwindow::on_Boatwidget_2_itemSelectionChanged);
-
+    // In the constructor, after all other connections, add this:
+    connect(ui->pushButton_10, &QPushButton::clicked, this, &appwindow::on_pushButton_10_clicked);
     //photo logo set up
 
     QPixmap logo("icons/try1.png");
@@ -3086,6 +3084,169 @@ void appwindow::on_searchBoatButton_3_clicked()
         displayBoats();
     }
 }
+
+void appwindow::on_pushButton_10_clicked()
+{
+    qDebug() << "=== PushButton_10 clicked ===";
+    qDebug() << "ComboBox current index:" << ui->comboBox_16->currentIndex();
+
+    // Get all boats
+    QSqlQuery allBoats = Boats::getAll();
+
+    if (!allBoats.isActive()) {
+        qDebug() << "Query failed:" << allBoats.lastError().text();
+        QMessageBox::warning(this, "Error", "Failed to retrieve boat data from database.");
+        return;
+    }
+
+    qDebug() << "Query active, checking for boats...";
+
+    int rowCount = 0;
+    while (allBoats.next()) {
+        rowCount++;
+        qDebug() << "Boat ID:" << allBoats.value(0).toInt();
+    }
+
+    qDebug() << "Total boats found:" << rowCount;
+
+    if (rowCount == 0) {
+        QMessageBox::warning(this, "No Data", "No boats found in the system to analyze.");
+        return;
+    }
+
+    // Reset the query to get data again
+    allBoats = Boats::getAll();
+
+    // Determine which chart to show based on comboBox selection
+    int selectedOption = ui->comboBox_16->currentIndex();
+    qDebug() << "Selected option:" << selectedOption << "(0=Fish, 1=Trips)";
+
+    // Prepare data containers
+    QStringList boatLabels;
+    QList<int> values;
+
+    // Collect data based on selection
+    if (selectedOption == 0) {
+        // Show Total Fish by Boat
+        while (allBoats.next()) {
+            int boatId = allBoats.value(0).toInt();
+            int totalFish = allBoats.value(9).toInt(); // TOTALFISH is column 9
+
+            // Create a label for each boat
+            QString boatLabel = QString("Boat %1").arg(boatId);
+
+            boatLabels.append(boatLabel);
+            values.append(totalFish);
+
+            qDebug() << "Boat" << boatId << "Fish:" << totalFish;
+        }
+
+        // Check if there's data
+        if (boatLabels.isEmpty()) {
+            QMessageBox::warning(this, "No Data", "No boat data available.");
+            return;
+        }
+
+        qDebug() << "Creating Fish chart with" << boatLabels.size() << "boats";
+        // Create the chart
+        createBoatChart(boatLabels, values, "Total Fish Captured by Boat", "Fish Count");
+
+    } else if (selectedOption == 1) {
+        // Show Total Trips by Boat
+        while (allBoats.next()) {
+            int boatId = allBoats.value(0).toInt();
+            int totalTrips = allBoats.value(8).toInt(); // TOTALTRIPS is column 8
+
+            QString boatLabel = QString("Boat %1").arg(boatId);
+
+            boatLabels.append(boatLabel);
+            values.append(totalTrips);
+
+            qDebug() << "Boat" << boatId << "Trips:" << totalTrips;
+        }
+
+        // Check if there's data
+        if (boatLabels.isEmpty()) {
+            QMessageBox::warning(this, "No Data", "No boat data available.");
+            return;
+        }
+
+        qDebug() << "Creating Trips chart with" << boatLabels.size() << "boats";
+        // Create the chart
+        createBoatChart(boatLabels, values, "Total Trips by Boat", "Number of Trips");
+    }
+}
+
+void appwindow::createBoatChart(const QStringList &categories, const QList<int> &values,
+                                const QString &title, const QString &yAxisLabel)
+{
+    qDebug() << "Creating chart with" << categories.size() << "categories";
+
+    // Clear any existing chart
+    if (ui->chartView_4->chart()) {
+        ui->chartView_4->chart()->deleteLater();
+    }
+
+    // Create bar series
+    QBarSeries *series = new QBarSeries();
+    QBarSet *barSet = new QBarSet(yAxisLabel);
+
+    // Add all values to the bar set
+    for (int value : values) {
+        *barSet << value;
+        qDebug() << "Adding value:" << value;
+    }
+
+    series->append(barSet);
+
+    // Create chart
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle(title);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    // Create category axis for X-axis
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    axisX->setTitleText("Boats");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    // Create value axis for Y-axis
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText(yAxisLabel);
+
+    // Find max value for proper scaling
+    int maxValue = 0;
+    for (int value : values) {
+        if (value > maxValue) maxValue = value;
+    }
+
+    // Add some padding to the top
+    double maxRange = maxValue > 0 ? maxValue + (maxValue * 0.2) : 10;
+    axisY->setRange(0, maxRange);
+    axisY->setLabelFormat("%d");
+    axisY->setTickCount(6);
+
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    // Enable legend
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    // Set the chart to the chartView_4
+    ui->chartView_4->setChart(chart);
+    ui->chartView_4->setRenderHint(QPainter::Antialiasing);
+
+    // Force an update
+    ui->chartView_4->update();
+    ui->chartView_4->repaint();
+
+    qDebug() << "Chart created successfully";
+}
+
+
 ///=============COMPANY SECTION=============
 
 void appwindow::loadCompaniesTable()

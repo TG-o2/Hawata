@@ -2828,7 +2828,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="user_page1_5">
       <widget class="QWidget" name="BackFrame_19" native="true">

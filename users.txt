@@ -4,3 +4,4 @@ Sarra;Trabelsi;User;sarra@gmail.com;abcd1234
 test;TestUser;User;test@example.com;test123
 q;q;Admin;q;q
 jihene;jridi;Admin;jihene@gmail.com;jihene@gmail.com
+jihene;jeridi;Admin;jihenejeridi@gmail.com;jihene939

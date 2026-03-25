@@ -48,16 +48,19 @@ int main(int argc, char *argv[])
         qDebug() << "FAILED TO LOAD STYLESHEET";
     }
 
-    MainWindow w;
-    w.show();
-
-    // Test database connection
     Connection conn;
     if (conn.createconnect()) {
         QMessageBox::information(nullptr, "Database Connection", "Database connection succeeded!");
     } else {
-        QMessageBox::critical(nullptr, "Database Connection", "Database connection failed!\nPlease check your credentials and database setup.");
+        QMessageBox::critical(nullptr,
+                              "Database Connection",
+                              QString("Database connection failed!\n%1")
+                                  .arg(conn.lastError()));
+        return 1;
     }
+
+    MainWindow w;
+    w.show();
 
     return app.exec();
 }

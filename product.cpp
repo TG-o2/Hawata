@@ -96,6 +96,26 @@ QList<ProductRecord> Product::getAllProducts()
     return records;
 }
 
+QList<ProductRecord> Product::searchProducts(const QString &searchText)
+{
+    QList<ProductRecord> allRecords = getAllProducts();
+    QList<ProductRecord> filteredRecords;
+    
+    QString searchLower = searchText.toLower().trimmed();
+    
+    // Filter records based on search text (search in type and status)
+    for (const ProductRecord &r : allRecords) {
+        if (r.type.contains(searchLower, Qt::CaseInsensitive) ||
+            r.status.contains(searchLower, Qt::CaseInsensitive) ||
+            QString::number(r.id).contains(searchLower, Qt::CaseInsensitive) ||
+            r.location.contains(searchLower, Qt::CaseInsensitive)) {
+            filteredRecords.append(r);
+        }
+    }
+    
+    return filteredRecords;
+}
+
 bool Product::updateProduct(int id,
                             const QString &type,
                             const QString &location,

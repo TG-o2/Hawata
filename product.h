@@ -46,6 +46,8 @@ public:
 
     QList<ProductRecord> getAllProducts();
 
+    QList<ProductRecord> searchProducts(const QString &searchText);
+
     bool updateProduct(int id,
                        const QString &type,
                        const QString &location,

@@ -14,19 +14,37 @@
 #include <QPainter>
 #include <QFileDialog>
 #include <QPageLayout>
+#include <QSqlQuery>
+#include <QSqlDatabase>
 
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QBarSeries>
+#include <QtCharts/QBarSet>
+#include <QtCharts/QBarCategoryAxis>
+#include <QtCharts/QValueAxis>
 
-appwindow::appwindow(QWidget *parent)
+appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
     : QDialog(parent)
     , ui(new Ui::appwindow)
+    , connectedUserId(currentUserId)
+    , connectedUserRole(currentUserRole)
 {
     ui->setupUi(this);
+    currentlySelectedId = -1;
     loadDockingTable();
     loadUsersTable();
-    // loadProductTable();  // Temporarily disabled to debug build issues
+    loadProductTable();    // Load product table on startup
+    loadCompaniesTable();
 
     //load boat table
     displayBoats();
+    connect(ui->comboBox_15, &QComboBox::currentIndexChanged,
+            this, &appwindow::on_comboBox_15_currentIndexChanged);
+    //ui->comboBox_15->insertItem(0, "Default");
+    //connect(ui->Boatwidget_2, &QTableWidget::itemSelectionChanged,
+    //      this, &appwindow::on_Boatwidget_2_itemSelectionChanged);
 
     //photo logo set up
 
@@ -60,7 +78,6 @@ appwindow::appwindow(QWidget *parent)
 
     //end of product picture code--------------
 
-    //chart for page 4 of window 1 (User management)
 
 
     ///----add manage display
@@ -168,7 +185,7 @@ appwindow::appwindow(QWidget *parent)
 
     ui->cal4->setPixmap(Calendar);
     ui->cal4->setScaledContents(true);
-    //PRODUCT pages
+    //BOATS
 
     ui->Addboat1->setPixmap(Boat);
     ui->Addboat1->setScaledContents(true);
@@ -207,7 +224,7 @@ appwindow::appwindow(QWidget *parent)
     ui->Live3->setScaledContents(true);
     ui->Live4->setPixmap(live);
     ui->Live4->setScaledContents(true);
-    //COMPANIES
+    //product
     ui->Prod1->setPixmap(Prod);
     ui->Prod1->setScaledContents(true);
     ui->Prod2->setPixmap(Prod);
@@ -512,15 +529,19 @@ appwindow::appwindow(QWidget *parent)
 
     //page BOAT :,D
     connect(ui->add_user_22  , &QPushButton::clicked, this, [=]() {
+        setBoatMode(BoatMode::Add);
         ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->add_user_21  , &QPushButton::clicked, this, [=]() {
+        setBoatMode(BoatMode::Add);
         ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->add_user_20  , &QPushButton::clicked, this, [=]() {
+        setBoatMode(BoatMode::Add);
         ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->add_user_19  , &QPushButton::clicked, this, [=]() {
+        setBoatMode(BoatMode::Add);
         ui->boatPage->setCurrentIndex(0);
     });
     connect(ui->Manage_22 , &QPushButton::clicked, this, [=]() {
@@ -684,6 +705,9 @@ appwindow::appwindow(QWidget *parent)
             this, &appwindow::on_tabdocking_cellDoubleClicked);
     connect(ui->tabdocking, &QTableWidget::cellClicked,
             this, &appwindow::on_tabdocking_cellClicked);
+
+    ui->comboBox_12->setCurrentIndex(0);
+    loadUserStatistics(true);
 }
 
 //add docking
@@ -697,15 +721,15 @@ void appwindow::on_CreateDocking_clicked()
     QString capacity = ui->capacity->text().trimmed();
     QDateTime startDate = ui->startDate->dateTime();
     QDateTime endDate = ui->endDate->dateTime();
-    
+
     // ===== VALIDATION CONTROLS =====
-    
+
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-    
+
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -713,80 +737,110 @@ void appwindow::on_CreateDocking_clicked()
             return;
         }
     }
-    
+
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-    
+
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-    
+
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-    
+
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-    
+
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-    
+
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-    
+
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-    
+
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-    
+
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-    
+
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-    
+
     // ===== ALL VALIDATIONS PASSED =====
-    
+
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
-    
-    // Call the create function
-    if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr)) {
+
+    // Call create docking + create manage relation in one transaction
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "Error", "Database is not open.");
+        return;
+    }
+
+    if (!db.transaction()) {
+        QMessageBox::critical(this, "Error", "Failed to start database transaction.");
+        return;
+    }
+
+    int createdDockId = -1;
+    if (dockingManager.createDocking(location, length, height, status, capacity, startDateStr, endDateStr, &createdDockId)) {
+        if (connectedUserId <= 0 || createdDockId <= 0) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Failed to resolve UserID or DockID for MANAGE relation.");
+            return;
+        }
+
+        if (!manageManager.ajouter_manage(connectedUserId, createdDockId)) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Docking was created but MANAGE relation failed. Transaction rolled back.");
+            return;
+        }
+
+        if (!db.commit()) {
+            db.rollback();
+            QMessageBox::critical(this, "Error", "Failed to commit docking transaction.");
+            return;
+        }
+
         QMessageBox::information(this, "Success", "Docking created successfully!");
         // Clear the form
         ui->location->clear();
@@ -797,7 +851,9 @@ void appwindow::on_CreateDocking_clicked()
         ui->endDate->setDateTime(QDateTime::currentDateTime());
         // Reset to first index of status combo
         ui->status->setCurrentIndex(0);
+        loadDockingTable();
     } else {
+        db.rollback();
         QMessageBox::critical(this, "Error", "Failed to create docking. Please check the database connection.");
     }
 }
@@ -806,16 +862,16 @@ void appwindow::loadDockingTable()
 {
     allDockingRecords = dockingManager.getAllDockings();
     qDebug() << "Records fetched:" << allDockingRecords.size();  // verify in output
-    
+
     // Clear search and reset sort to default
     ui->searchbar_docking->blockSignals(true);
     ui->searchbar_docking->clear();
     ui->searchbar_docking->blockSignals(false);
-    
+
     ui->docking_sort->blockSignals(true);
     ui->docking_sort->setCurrentIndex(0);  // Set to "Date" (default)
     ui->docking_sort->blockSignals(false);
-    
+
     // Populate table with all records
     populateDockingTable(allDockingRecords);
 }
@@ -875,7 +931,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     // Parse dates - try multiple formats since database may store in different format
     QString startDateStr = table->item(row, 2)->text();
     QString endDateStr = table->item(row, 3)->text();
-    
+
     QDateTime startDt = QDateTime::fromString(startDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!startDt.isValid()) {
         startDt = QDateTime::fromString(startDateStr, "MM/dd/yy");
@@ -894,7 +950,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     if (startDt.isValid()) {
         ui->startDate->setDateTime(startDt);
     }
-    
+
     QDateTime endDt = QDateTime::fromString(endDateStr, "yyyy-MM-dd hh:mm:ss");
     if (!endDt.isValid()) {
         endDt = QDateTime::fromString(endDateStr, "MM/dd/yy");
@@ -943,13 +999,13 @@ void appwindow::on_edit_Docking_clicked()
     QDateTime endDate = ui->endDate->dateTime();
 
     // ===== VALIDATION CONTROLS =====
-    
+
     // 1. Check all fields are not empty
     if (location.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Location is required. Please enter a location.");
         return;
     }
-    
+
     // Check Location contains only letters and spaces (no numbers)
     for (QChar c : location) {
         if (c.isDigit()) {
@@ -957,75 +1013,75 @@ void appwindow::on_edit_Docking_clicked()
             return;
         }
     }
-    
+
     if (length.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Length is required. Please enter a length value.");
         return;
     }
-    
+
     if (height.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Height is required. Please enter a height value.");
         return;
     }
-    
+
     if (capacity.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Capacity is required. Please enter a capacity value.");
         return;
     }
-    
+
     if (status.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Status is required. Please select a status.");
         return;
     }
-    
+
     // 2. Validate numeric fields (Length, Height, Capacity)
     bool lengthOk, heightOk, capacityOk;
     double lengthVal = length.toDouble(&lengthOk);
     double heightVal = height.toDouble(&heightOk);
     double capacityVal = capacity.toDouble(&capacityOk);
-    
+
     if (!lengthOk || lengthVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Length must be a positive number.");
         return;
     }
-    
+
     if (!heightOk || heightVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Height must be a positive number.");
         return;
     }
-    
+
     if (!capacityOk || capacityVal <= 0) {
         QMessageBox::warning(this, "Validation Error", "Capacity must be a positive number.");
         return;
     }
-    
+
     // 3. Validate dates are in the future (tomorrow or later)
     QDateTime tomorrow = QDateTime(QDate::currentDate().addDays(1), QTime(0, 0));
-    
+
     if (startDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("Start Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     if (endDate < tomorrow) {
-        QMessageBox::warning(this, "Validation Error", 
-                           QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
-                           .arg(QDate::currentDate().toString("MM/dd/yy"))
-                           .arg(tomorrow.date().toString("MM/dd/yy")));
+        QMessageBox::warning(this, "Validation Error",
+                             QString("End Date must be in the future (tomorrow or later).\nCurrent date: %1\nMinimum date: %2")
+                                 .arg(QDate::currentDate().toString("MM/dd/yy"))
+                                 .arg(tomorrow.date().toString("MM/dd/yy")));
         return;
     }
-    
+
     // 4. Validate End Date >= Start Date
     if (endDate < startDate) {
         QMessageBox::warning(this, "Validation Error", "End Date must be on or after the Start Date.");
         return;
     }
-    
+
     // ===== ALL VALIDATIONS PASSED =====
-    
+
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
 
@@ -1358,9 +1414,168 @@ void appwindow::on_export_docking_clicked()
                              QString("PDF exported successfully to:\n%1").arg(fileName));
 }
 
+
+
+// =====================================================================
+// =================== START OF USER MODULE ============================
+// =====================================================================
+
+
+/// Add / Update user  --> not really
+
+void appwindow::on_UPDUser_clicked()
+{
+    QString email = ui->email->text().trimmed();
+    QString firstName = ui->Fname->text().trimmed();
+    QString lastName = ui->Lname->text().trimmed();
+    QString password = ui->password->text().trimmed();
+    QString role = ui->role->currentText();
+    QString gender = ui->gender->currentText().left(1).toUpper(); // M/F
+
+    bool ok;
+    double salary = ui->salary->text().toDouble(&ok);
+    if (!ok || salary <= 0) {
+        QMessageBox::warning(this, "Error", "Salary must be a positive number!");
+        return;
+    }
+
+    QString shiftStart = ui->startShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+    QString shiftEnd = ui->endShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    bool isEditMode = (selectedUserId != -1);
+
+    if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || (!isEditMode && password.isEmpty())) {
+        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
+        return;
+    }
+
+    if (ui->endShift->dateTime() < ui->startShift->dateTime()) {
+        QMessageBox::warning(this, "Error", "Shift end must be on or after shift start.");
+        return;
+    }
+
+    bool success = false;
+
+    int supervisorId = 0;
+
+    if (!isEditMode && connectedUserRole.compare("ADMIN", Qt::CaseInsensitive) == 0 && connectedUserId > 0) {
+        supervisorId = connectedUserId;
+    }
+
+    if (isEditMode) {
+        QSqlQuery supervisorQuery;
+        supervisorQuery.prepare("SELECT SUPERVISORID FROM USERS WHERE USERID = :id");
+        supervisorQuery.bindValue(":id", selectedUserId);
+        if (supervisorQuery.exec() && supervisorQuery.next()) {
+            supervisorId = supervisorQuery.value(0).toInt();
+        }
+    }
+
+    if (isEditMode) {
+        User editedUser(selectedUserId, email, firstName, lastName, password,
+                        role, gender, salary, shiftStart, shiftEnd, supervisorId);
+        success = editedUser.modifier_user();
+    } else {
+        User newUser(0, email, firstName, lastName, password,
+                     role, gender, salary, shiftStart, shiftEnd, supervisorId);
+        success = newUser.ajouter_user();
+    }
+
+    if (success) {
+        QMessageBox::information(this, "Success", isEditMode ? "User updated successfully!" : "User created successfully!");
+
+        // Clear the form
+        ui->email->clear();
+        ui->Fname->clear();
+        ui->Lname->clear();
+        ui->password->clear();
+        ui->role->setCurrentIndex(0);
+        ui->gender->setCurrentIndex(0);
+        ui->salary->clear();
+        ui->startShift->setDateTime(QDateTime::currentDateTime());
+        ui->endShift->setDateTime(QDateTime::currentDateTime());
+        ui->UPDUser->setText("Create User 💫");
+        selectedUserId = -1;
+        loadUsersTable();
+        if (isEditMode) {
+            ui->stackedWidget->setCurrentIndex(1);
+        }
+    } else {
+        QMessageBox::critical(this, "Error", isEditMode
+                                                 ? "Failed to update user. Please check the database connection."
+                                                 : "Failed to create user. Please check the database connection.");
+    }
+}
+
+
+// Load users table from database +++
+
 void appwindow::loadUsersTable()
 {
-    QList<UserRecord> records = userManager.getAllUsers();
+    allUserRecords = userManager.afficher_liste();
+
+    int sortIndex = ui->comboBox_11->currentIndex();
+    on_comboBox_11_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_searchbar_3_textChanged(const QString &text)
+{
+    Q_UNUSED(text);
+    int sortIndex = ui->comboBox_11->currentIndex();
+    on_comboBox_11_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_comboBox_11_currentIndexChanged(int index)
+{
+    QString searchText = ui->searchbar_3->text().trimmed();
+    QList<User> recordsToDisplay;
+
+    if (searchText.isEmpty()) {
+        recordsToDisplay = allUserRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+
+        for (const User &r : allUserRecords) {
+            if (isNumeric) {
+                if (QString::number(r.getUserId()).contains(searchText)) {
+                    recordsToDisplay.append(r);
+                }
+            } else if (r.getEmail().contains(searchText, Qt::CaseInsensitive)) {
+                recordsToDisplay.append(r);
+            }
+        }
+    }
+
+    if (index == 0) { // Sort by Role
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const User &a, const User &b) {
+            const int roleComparison = a.getRole().compare(b.getRole(), Qt::CaseInsensitive);
+            if (roleComparison != 0) {
+                return roleComparison < 0;
+            }
+
+            const int genderComparison = a.getGender().compare(b.getGender(), Qt::CaseInsensitive);
+            if (genderComparison != 0) {
+                return genderComparison < 0;
+            }
+
+            return a.getUserId() < b.getUserId();
+        });
+    } else if (index == 1) { // Sort by Gender
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const User &a, const User &b) {
+            const int genderComparison = a.getGender().compare(b.getGender(), Qt::CaseInsensitive);
+            if (genderComparison != 0) {
+                return genderComparison < 0;
+            }
+
+            const int roleComparison = a.getRole().compare(b.getRole(), Qt::CaseInsensitive);
+            if (roleComparison != 0) {
+                return roleComparison < 0;
+            }
+
+            return a.getUserId() < b.getUserId();
+        });
+    }
 
     QTableWidget *table = ui->usersTable;
     table->setRowCount(0);
@@ -1372,23 +1587,27 @@ void appwindow::loadUsersTable()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setAlternatingRowColors(true);
 
-    for (const UserRecord &r : records) {
+    for (const User &r : recordsToDisplay) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
-        table->setItem(row, 1, new QTableWidgetItem(r.email()));
-        table->setItem(row, 2, new QTableWidgetItem(r.firstName()));
-        table->setItem(row, 3, new QTableWidgetItem(r.lastName()));
-        table->setItem(row, 4, new QTableWidgetItem(r.role()));
-        table->setItem(row, 5, new QTableWidgetItem(r.gender()));
-        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.salary())));
-        table->setItem(row, 7, new QTableWidgetItem(r.shiftStart()));
-        table->setItem(row, 8, new QTableWidgetItem(r.shiftEnd()));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.getUserId())));
+        table->setItem(row, 1, new QTableWidgetItem(r.getEmail()));
+        table->setItem(row, 2, new QTableWidgetItem(r.getFirstName()));
+        table->setItem(row, 3, new QTableWidgetItem(r.getLastName()));
+        table->setItem(row, 4, new QTableWidgetItem(r.getRole()));
+        table->setItem(row, 5, new QTableWidgetItem(r.getGender()));
+        table->setItem(row, 6, new QTableWidgetItem(QString::number(r.getSalary())));
+        table->setItem(row, 7, new QTableWidgetItem(r.getShiftStart()));
+        table->setItem(row, 8, new QTableWidgetItem(r.getShiftEnd()));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->labelResults_3->setText(QString("Showing %1 Users").arg(records.size()));
+    ui->labelResults_3->setText(QString("Showing %1 Users").arg(recordsToDisplay.size()));
 }
+
+
+
+// +++ Table logic for Display & Edit user ++++
 
 void appwindow::fillUserForm(const QModelIndex &index)
 {
@@ -1446,6 +1665,7 @@ void appwindow::fillUserForm(const QModelIndex &index)
     ui->UPDUser->setText("Update User");
 }
 
+
 void appwindow::on_usersTable_cellClicked(int row, int /*column*/)
 {
     if (row < 0 || !ui->usersTable->item(row, 0)) {
@@ -1454,6 +1674,7 @@ void appwindow::on_usersTable_cellClicked(int row, int /*column*/)
 
     selectedUserId = ui->usersTable->item(row, 0)->text().toInt();
 }
+
 
 void appwindow::on_usersTable_cellDoubleClicked(int row, int column)
 {
@@ -1464,79 +1685,7 @@ void appwindow::on_usersTable_cellDoubleClicked(int row, int column)
     fillUserForm(ui->usersTable->model()->index(row, column));
 }
 
-///USER
-//add user
-void appwindow::on_UPDUser_clicked()
-{
-    // Get values from UI widgets
-    QString email = ui->email->text().trimmed();
-    QString firstName = ui->Fname->text().trimmed();
-    QString lastName = ui->Lname->text().trimmed();
-    QString password = ui->password->text().trimmed();
-    QString role = ui->role->currentText();
-    QString gender = ui->gender->currentText().left(1).toUpper(); // M/F
-
-    bool ok;
-    double salary = ui->salary->text().toDouble(&ok);
-    if (!ok || salary <= 0) {
-        QMessageBox::warning(this, "Error", "Salary must be a positive number!");
-        return;
-    }
-
-    QString shiftStart = ui->startShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
-    QString shiftEnd = ui->endShift->dateTime().toString("yyyy-MM-dd HH:mm:ss");
-
-    bool isEditMode = (selectedUserId != -1);
-
-    // Validate required fields
-    if (email.isEmpty() || firstName.isEmpty() || lastName.isEmpty() || (!isEditMode && password.isEmpty())) {
-        QMessageBox::warning(this, "Error", "Please fill in all required fields!");
-        return;
-    }
-
-    if (ui->endShift->dateTime() < ui->startShift->dateTime()) {
-        QMessageBox::warning(this, "Error", "Shift end must be on or after shift start.");
-        return;
-    }
-
-    bool success = false;
-
-    if (isEditMode) {
-        success = userManager.updateUser(selectedUserId, email, firstName, lastName,
-                                         password, role, gender, salary, shiftStart, shiftEnd);
-    } else {
-        success = userManager.createUser(email, firstName, lastName, password, role, gender, salary, shiftStart, shiftEnd);
-    }
-
-    if (success) {
-        QMessageBox::information(this, "Success", isEditMode ? "User updated successfully!" : "User created successfully!");
-
-        // Clear the form
-        ui->email->clear();
-        ui->Fname->clear();
-        ui->Lname->clear();
-        ui->password->clear();
-        ui->role->setCurrentIndex(0);
-        ui->gender->setCurrentIndex(0);
-        ui->salary->clear();
-        ui->startShift->setDateTime(QDateTime::currentDateTime());
-        ui->endShift->setDateTime(QDateTime::currentDateTime());
-        ui->UPDUser->setText("Create User 💫");
-        selectedUserId = -1;
-        loadUsersTable();
-        if (isEditMode) {
-            ui->stackedWidget->setCurrentIndex(1);
-        }
-    } else {
-        QMessageBox::critical(this, "Error", isEditMode
-                                               ? "Failed to update user. Please check the database connection."
-                                               : "Failed to create user. Please check the database connection.");
-    }
-}
-
-
-
-
+// +++ Delete user ++++
 void appwindow::on_deleteUSERBtn_clicked()
 {
     QModelIndexList selected = ui->usersTable->selectionModel()->selectedRows();
@@ -1548,12 +1697,10 @@ void appwindow::on_deleteUSERBtn_clicked()
 
     int row = selected.first().row();
 
-    // USERID is column 0 in your SELECT
     int userId = ui->usersTable->model()->data(
                                             ui->usersTable->model()->index(row, 0)
                                             ).toInt();
 
-    // Optional confirmation
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirm Delete",
                                   "Are you sure you want to delete this user?",
@@ -1562,7 +1709,7 @@ void appwindow::on_deleteUSERBtn_clicked()
     if (reply == QMessageBox::No)
         return;
 
-    if (userManager.deleteUser(userId)) {
+    if (userManager.supprimer(userId)) {
         QMessageBox::information(this, "Success", "User deleted successfully!");
         selectedUserId = -1;
         loadUsersTable();
@@ -1571,6 +1718,7 @@ void appwindow::on_deleteUSERBtn_clicked()
     }
 }
 
+// +++ Clear user form +++ reset to create mode +++
 void appwindow::on_clear_3_clicked()
 {
     ui->email->clear();
@@ -1591,6 +1739,8 @@ void appwindow::on_clear_3_clicked()
     if (ui->usersTable->selectionModel()) {
         ui->usersTable->selectionModel()->clearSelection();
     }
+
+    loadUsersTable();
 }
 
 void appwindow::on_editUSERBtn_clicked()
@@ -1604,6 +1754,261 @@ void appwindow::on_editUSERBtn_clicked()
 
     fillUserForm(ui->usersTable->model()->index(row, 0));
 }
+
+void appwindow::on_export_pdf_user_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export User Data to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Landscape);
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor darkBlue(0, 102, 204);
+    QColor veryLightBlue(230, 242, 255);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+
+    int marginLeft   = 0;
+    int marginTop    = 0;
+    int contentWidth = pageWidth;
+
+    int yPos = marginTop;
+
+    int titleBlockHeight = 120;
+    painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
+
+    QFont titleFont("Arial", 32, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(Qt::white);
+    painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
+                     Qt::AlignCenter | Qt::AlignVCenter, "USER DATA REPORT");
+
+    yPos += titleBlockHeight + 30;
+
+    QFont dateFont("Arial", 11);
+    painter.setFont(dateFont);
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(marginLeft, yPos,
+                     QString("Generated: %1")
+                         .arg(QDateTime::currentDateTime()
+                                  .toString("yyyy-MM-dd  hh:mm:ss")));
+    yPos += 50;
+
+    QTableWidget *table = ui->usersTable;
+    int rowCount    = table->rowCount();
+    int columnCount = table->columnCount();
+
+    if (rowCount == 0 || columnCount == 0) {
+        painter.setFont(QFont("Arial", 14));
+        painter.setPen(textColor);
+        painter.drawText(marginLeft, yPos, "No data to export.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The user table is empty. Nothing to export.");
+        return;
+    }
+
+    int columnWidth  = contentWidth / columnCount;
+    int headerHeight = 80;
+
+    auto drawHeader = [&]() {
+        painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
+
+        QFont headerFont("Arial", 13, QFont::Bold);
+        painter.setFont(headerFont);
+        painter.setPen(Qt::white);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QString headerText = table->horizontalHeaderItem(col)
+            ? table->horizontalHeaderItem(col)->text()
+            : "";
+
+            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headerText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(Qt::white, 2));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + headerHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += columnWidth;
+        }
+    };
+
+    drawHeader();
+    yPos += headerHeight;
+
+    int rowHeight    = 75;
+    int footerHeight = 80;
+    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+
+    QFont cellFont("Arial", 11);
+    painter.setFont(cellFont);
+
+    for (int row = 0; row < rowCount; row++) {
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            yPos = marginTop;
+            drawHeader();
+            yPos += headerHeight;
+            painter.setFont(cellFont);
+        }
+
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
+
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(marginLeft, yPos, contentWidth, rowHeight);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            QString cellText = item ? item->text() : "";
+
+            painter.setPen(textColor);
+            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             cellText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(borderColor, 1));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + rowHeight);
+            }
+            xPos += columnWidth;
+        }
+
+        yPos += rowHeight;
+    }
+
+    yPos += 30;
+
+    painter.setPen(QPen(darkBlue, 3));
+    painter.drawLine(marginLeft, yPos, marginLeft + contentWidth, yPos);
+    yPos += 20;
+
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Total Records: %1").arg(rowCount));
+
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Marina Management System"));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("PDF exported successfully to:\n%1").arg(fileName));
+}
+
+void appwindow::loadUserStatistics(bool byRole)
+{
+    while (QLayoutItem *item = ui->statsiticslayout->takeAt(0)) {
+        if (item->widget()) {
+            item->widget()->deleteLater();
+        }
+        delete item;
+    }
+
+    QBarSeries *series = new QBarSeries();
+    QBarSet *set = new QBarSet("Users Count");
+    QStringList categories;
+
+    QSqlQuery query;
+    const QString sql = byRole
+                            ? "SELECT ROLE, COUNT(*) FROM USERS GROUP BY ROLE ORDER BY ROLE"
+                            : "SELECT GENDER, COUNT(*) FROM USERS GROUP BY GENDER ORDER BY GENDER";
+
+    if (!query.exec(sql)) {
+        QLabel *errorLabel = new QLabel("Failed to load statistics data.");
+        errorLabel->setAlignment(Qt::AlignCenter);
+        ui->statsiticslayout->addWidget(errorLabel);
+        return;
+    }
+
+    int maxCount = 0;
+    while (query.next()) {
+        const QString category = query.value(0).toString().trimmed().isEmpty()
+        ? "Unknown"
+        : query.value(0).toString().trimmed();
+        const int count = query.value(1).toInt();
+
+        *set << count;
+        categories << category;
+        if (count > maxCount) {
+            maxCount = count;
+        }
+    }
+
+    if (categories.isEmpty()) {
+        *set << 0;
+        categories << "No Data";
+    }
+
+    series->append(set);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle(byRole ? "Users Statistics by Role" : "Users Statistics by Gender");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axis = new QBarCategoryAxis();
+    axis->append(categories);
+    chart->addAxis(axis, Qt::AlignBottom);
+    series->attachAxis(axis);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, qMax(1, maxCount));
+    axisY->setLabelFormat("%d");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    ui->statsiticslayout->addWidget(chartView);
+}
+
+void appwindow::on_pushButton_8_clicked()
+{
+    const bool byRole = (ui->comboBox_12->currentIndex() == 0);
+    loadUserStatistics(byRole);
+}
+
+
+
+
+
+
+// =====================================================================
+// ===================== END OF USER MODULE ============================
+// =====================================================================
+
+
+
+
 
 
 ///PRODUCT
@@ -1639,13 +2044,13 @@ void appwindow::on_checkProductButton_2_clicked()
     if (selectedProductId > 0) {
         // Update existing product
         if (productManager.updateProduct(selectedProductId,
-                                        type,
-                                        location,
-                                        status,
-                                        qty,
-                                        pr,
-                                        ui->fishdate1->dateTime(),
-                                        ui->fishdate2->dateTime())) {
+                                         type,
+                                         location,
+                                         status,
+                                         qty,
+                                         pr,
+                                         ui->fishdate1->dateTime(),
+                                         ui->fishdate2->dateTime())) {
             QMessageBox::information(this, "Success", "Product updated successfully!");
             selectedProductId = -1;  // Reset for next operation
         } else {
@@ -1655,12 +2060,12 @@ void appwindow::on_checkProductButton_2_clicked()
     } else {
         // Create new product
         if (!productManager.createProduct(type,
-                                         location,
-                                         status,
-                                         qty,
-                                         pr,
-                                         ui->fishdate1->dateTime(),
-                                         ui->fishdate2->dateTime())) {
+                                          location,
+                                          status,
+                                          qty,
+                                          pr,
+                                          ui->fishdate1->dateTime(),
+                                          ui->fishdate2->dateTime())) {
             QMessageBox::critical(this, "Error", "Failed to add product. Please check the database connection.");
             return;
         }
@@ -1677,13 +2082,35 @@ void appwindow::on_checkProductButton_2_clicked()
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->locationfish->clear();
     selectedProductId = -1;
-    
+
     // Reset button text back to "Add Product"
     ui->checkProductButton_2->setText("Add Product");
-    
+
     // Refresh the table on manage page
     loadProductTable();
 }
+void appwindow::on_pushButton_11_clicked()
+{
+    // Get all products
+    QList<ProductRecord> allProducts = productManager.getAllProducts();
+
+    if (allProducts.isEmpty()) {
+        QMessageBox::warning(this, "No Data", "No products in the system to analyze.");
+        return;
+    }
+
+    // Determine which statistics to show
+    int selectedOption = ui->comboBox_20->currentIndex();
+
+    if (selectedOption == 0) {
+        // Show statistics by Status
+        generateProductStatisticsByStatus(allProducts);
+    } else {
+        // Show statistics by Preferred Fish (for companies)
+        generateProductStatisticsByStatus(allProducts);
+    }
+}
+
 
 void appwindow::on_checkProductButton_clicked()
 {
@@ -1694,6 +2121,7 @@ void appwindow::on_checkProductButton_clicked()
 void appwindow::loadProductTable()
 {
     QList<ProductRecord> records = productManager.getAllProducts();
+    allProductRecords = records;  // Store all records for filtering
     qDebug() << "Product records fetched:" << records.size();
 
     QTableWidget *table = ui->tableWidget_10;
@@ -1776,7 +2204,7 @@ void appwindow::on_tableWidget_10_cellDoubleClicked(int row, int /*column*/)
 
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
-    
+
     // Navigate to the Add Product page to edit
     ui->stackedWidget_4->setCurrentIndex(0);
 }
@@ -1835,7 +2263,7 @@ void appwindow::on_edit_company_6_clicked()
 
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
-    
+
     // Navigate to the Add Product page to edit
     ui->stackedWidget_4->setCurrentIndex(0);
 }
@@ -1848,8 +2276,8 @@ void appwindow::on_delete_company_6_clicked()
     }
 
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Confirm Delete",
-                                                             "Are you sure you want to delete this product?",
-                                                             QMessageBox::Yes | QMessageBox::No);
+                                                              "Are you sure you want to delete this product?",
+                                                              QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
         if (productManager.deleteProduct(selectedProductId)) {
@@ -1865,7 +2293,7 @@ void appwindow::on_delete_company_6_clicked()
             ui->fishdate1->setDateTime(QDateTime::currentDateTime());
             ui->fishdate2->setDateTime(QDateTime::currentDateTime());
             selectedProductId = -1;
-            
+
             // Reset button text
             ui->checkProductButton_2->setText("Add Product");
         } else {
@@ -1885,9 +2313,322 @@ void appwindow::on_clear_6_clicked()
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->prodcode->clear();
     selectedProductId = -1;
-    
+
     // Reset button text to "Add Product"
     ui->checkProductButton_2->setText("Add Product");
+
+    // Clear search and reload all products
+    ui->searchbar_6->blockSignals(true);
+    ui->searchbar_6->clear();
+    ui->searchbar_6->blockSignals(false);
+    ui->comboBox_18->setCurrentIndex(0);
+    loadProductTable();
+}
+
+void appwindow::on_searchbar_6_textChanged(const QString &text)
+{
+    QString searchText = text.trimmed();
+    QList<ProductRecord> filteredRecords;
+
+    if (searchText.isEmpty()) {
+        filteredRecords = allProductRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+
+        // If search text is numeric, search by ID only
+        for (const ProductRecord &r : allProductRecords) {
+            if (isNumeric && QString::number(r.id).contains(searchText)) {
+                filteredRecords.append(r);
+            } else if (!isNumeric && (
+                           r.type.contains(searchText, Qt::CaseInsensitive) ||
+                           r.status.contains(searchText, Qt::CaseInsensitive) ||
+                           r.location.contains(searchText, Qt::CaseInsensitive))) {
+                filteredRecords.append(r);
+            }
+        }
+    }
+
+    // Apply the current sort to the filtered results
+    int sortIndex = ui->comboBox_18->currentIndex();
+    on_comboBox_18_currentIndexChanged(sortIndex);
+}
+
+void appwindow::on_comboBox_18_currentIndexChanged(int index)
+{
+    // Get the current filtered records (or all if no filter)
+    QString searchText = ui->searchbar_6->text().trimmed();
+    QList<ProductRecord> recordsToDisplay;
+
+    if (searchText.isEmpty()) {
+        recordsToDisplay = allProductRecords;
+    } else {
+        bool isNumeric;
+        searchText.toInt(&isNumeric);
+
+        // If search text is numeric, search by ID only
+        for (const ProductRecord &r : allProductRecords) {
+            if (isNumeric && QString::number(r.id).contains(searchText)) {
+                recordsToDisplay.append(r);
+            } else if (!isNumeric && (
+                           r.type.contains(searchText, Qt::CaseInsensitive) ||
+                           r.status.contains(searchText, Qt::CaseInsensitive) ||
+                           r.location.contains(searchText, Qt::CaseInsensitive))) {
+                recordsToDisplay.append(r);
+            }
+        }
+    }
+
+    // Sort based on index
+    if (index == 1) {  // Sort by Price
+        std::sort(recordsToDisplay.begin(), recordsToDisplay.end(), [](const ProductRecord &a, const ProductRecord &b) {
+            return a.price < b.price;
+        });
+    }
+    // index == 0 is Type (default, no sorting needed as they come in order)
+
+    // Update the table with filtered/sorted records
+    QTableWidget *table = ui->tableWidget_10;
+    table->setRowCount(0);
+
+    for (const ProductRecord &r : recordsToDisplay) {
+        int row = table->rowCount();
+        table->insertRow(row);
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id)));
+        table->setItem(row, 1, new QTableWidgetItem(r.status));
+        table->setItem(row, 2, new QTableWidgetItem(r.type));
+        table->setItem(row, 3, new QTableWidgetItem(r.fishCaught));
+        table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
+        table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
+        table->setItem(row, 6, new QTableWidgetItem(r.location));
+        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.price, 'f', 2)));
+    }
+
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    // Update the count label
+    ui->labelResults_6->setText(QString("Showing %1 Products").arg(recordsToDisplay.size()));
+}
+
+void appwindow::on_export_pdf_6_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export Product Data to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Landscape);
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(15, 15, 15, 15), QPageLayout::Millimeter);
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    QColor darkBlue(0, 102, 204);
+    QColor veryLightBlue(230, 242, 255);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+
+    int marginLeft   = 0;
+    int marginTop    = 0;
+    int contentWidth = pageWidth;
+
+    int yPos = marginTop;
+
+    // ── TITLE BLOCK ──────────────────────────────────────────────────────────
+    int titleBlockHeight = 120;
+    painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
+
+    QFont titleFont("Arial", 32, QFont::Bold);
+    painter.setFont(titleFont);
+    painter.setPen(Qt::white);
+    painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
+                     Qt::AlignCenter | Qt::AlignVCenter, "PRODUCT DATA REPORT");
+
+    yPos += titleBlockHeight + 30;
+
+    // ── DATE LINE ────────────────────────────────────────────────────────────
+    QFont dateFont("Arial", 11);
+    painter.setFont(dateFont);
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(marginLeft, yPos,
+                     QString("Generated: %1")
+                         .arg(QDateTime::currentDateTime()
+                                  .toString("yyyy-MM-dd  hh:mm:ss")));
+    yPos += 50;
+
+    // ── TABLE ─────────────────────────────────────────────────────────────────
+    QTableWidget *table = ui->tableWidget_10;
+    int rowCount    = table->rowCount();
+    int columnCount = table->columnCount();
+
+    if (rowCount == 0) {
+        painter.setFont(QFont("Arial", 14));
+        painter.setPen(textColor);
+        painter.drawText(marginLeft, yPos, "No data to export.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The table is empty. Nothing to export.");
+        return;
+    }
+
+    int columnWidth = contentWidth / columnCount;
+    int headerHeight = 80;
+
+    auto drawHeader = [&]() {
+        painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
+
+        QFont headerFont("Arial", 13, QFont::Bold);
+        painter.setFont(headerFont);
+        painter.setPen(Qt::white);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QString headerText = table->horizontalHeaderItem(col)
+            ? table->horizontalHeaderItem(col)->text()
+            : "";
+            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headerText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(Qt::white, 2));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + headerHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += columnWidth;
+        }
+    };
+
+    drawHeader();
+    yPos += headerHeight;
+
+    int rowHeight    = 75;
+    int footerHeight = 80;
+    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+
+    QFont cellFont("Arial", 11);
+    painter.setFont(cellFont);
+
+    for (int row = 0; row < rowCount; row++) {
+
+        // ── New page if needed ──
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            yPos = marginTop;
+            drawHeader();
+            yPos += headerHeight;
+            painter.setFont(cellFont);
+        }
+
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
+
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(marginLeft, yPos, contentWidth, rowHeight);
+
+        int xPos = marginLeft;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            QString cellText = item ? item->text() : "";
+
+            painter.setPen(textColor);
+            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+                             cellText);
+
+            if (col < columnCount - 1) {
+                painter.setPen(QPen(borderColor, 1));
+                painter.drawLine(xPos + columnWidth, yPos,
+                                 xPos + columnWidth, yPos + rowHeight);
+            }
+            xPos += columnWidth;
+        }
+
+        yPos += rowHeight;
+    }
+
+    // ── FOOTER ───────────────────────────────────────────────────────────────
+    yPos += 30;
+
+    painter.setPen(QPen(darkBlue, 3));
+    painter.drawLine(marginLeft, yPos, marginLeft + contentWidth, yPos);
+    yPos += 20;
+
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Total Records: %1").arg(rowCount));
+
+    painter.drawText(marginLeft, yPos,
+                     contentWidth, 50,
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Marina Management System"));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("PDF exported successfully to:\n%1").arg(fileName));
+}
+
+
+
+void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &products)
+{
+    // Group products by status and calculate totals
+    QMap<QString, int> statusCount;
+    QMap<QString, int> statusQuantity;
+    int totalQuantity = 0;
+
+    for (const ProductRecord &product : products) {
+        statusCount[product.status]++;
+        statusQuantity[product.status] += product.quantity;
+        totalQuantity += product.quantity;
+    }
+
+    if (totalQuantity == 0) {
+        QMessageBox::warning(this, "No Data", "No products with quantity data.");
+        return;
+    }
+
+    // Calculate percentage of active/available products
+    int activeQuantity = statusQuantity.value("Available", 0) +
+                         statusQuantity.value("In Stock", 0);
+    int percentage = (totalQuantity > 0) ? (activeQuantity * 100) / totalQuantity : 0;
+
+    // Update progress bar
+    ui->progressBar_7->setValue(percentage);
+
+    // Update label with statistics
+    QString statsText = QString("Percentage of Active Products in system: %1%\n").arg(percentage);
+    statsText += "---Status Breakdown---\n";
+
+    for (auto it = statusQuantity.begin(); it != statusQuantity.end(); ++it) {
+        int count = statusCount[it.key()];
+        int qty = it.value();
+        int pct = (qty * 100) / totalQuantity;
+        statsText += QString("%1: %2 items, %3 units (%4%)\n")
+                         .arg(it.key())
+                         .arg(count)
+                         .arg(qty)
+                         .arg(pct);
+    }
+
+    ui->label_79->setText(statsText);
+
+    QMessageBox::information(this, "Product Statistics", statsText);
 }
 
 
@@ -1901,6 +2642,83 @@ appwindow::~appwindow()
 
 
 //boat section
+
+// ─────────────────────────────────────────────
+//  Mode helper — switches label, shows/hides buttons
+// ─────────────────────────────────────────────
+void appwindow::setBoatMode(BoatMode mode)
+{
+    currentBoatMode = mode;
+
+    if (mode == BoatMode::Add) {
+        ui->label_99->setText("Create Boat:");
+        ui->addBoatButton->setVisible(true);
+        ui->editBoatButton->setVisible(false);
+        clearBoatInputs();
+    } else {
+        ui->label_99->setText("Edit Boat:");
+        ui->addBoatButton->setVisible(false);
+        ui->editBoatButton->setVisible(true);
+    }
+}
+
+// ─────────────────────────────────────────────
+//  Shared helper — loads a boat into the form fields
+// ─────────────────────────────────────────────
+void appwindow::populateBoatForm(int boatId)
+{
+    boatsTmp.setId(boatId);
+    boatsTmp.read();
+
+    if (!boatsTmp.getLastError().isEmpty()) {
+        QMessageBox::warning(this, "Load Error",
+                             "Could not load boat: " + boatsTmp.getLastError());
+        return;
+    }
+
+    currentlySelectedId = boatId;
+
+    ui->boatSizeLineEdit->setText(boatsTmp.getSize());
+    ui->boatLocationLineEdit->setText(boatsTmp.getLocation());
+    ui->boatOwnerNameLineEdit->setText(boatsTmp.getOwnerName());
+    ui->boatOwnerEmailLineEdit->setText(boatsTmp.getOwnerEmail());
+    ui->boatStatusComboBox->setCurrentIndex(boatsTmp.getStatus());
+    ui->boatTypeLineEdit->setText(boatsTmp.getType());
+
+    // ── DATE PARSING ──────────────────────────────────────────
+    QString rawDate = boatsTmp.getLastMaintenanceDate();
+    QDate date;
+
+    // Oracle returns month in all-caps (e.g. "23/MAR/17") — normalize to "23/Mar/17"
+    QStringList parts = rawDate.split('/');
+    QString normalizedDate = rawDate;
+    if (parts.size() == 3) {
+        QString month = parts[1];
+        month = month[0].toUpper() + month.mid(1).toLower();
+        normalizedDate = parts[0] + "/" + month + "/" + parts[2];
+    }
+
+    for (const QString &fmt : {"dd/MMM/yy", "dd/MMM/yyyy", "yyyy-MM-dd", "dd-MMM-yyyy"}) {
+        date = QDate::fromString(normalizedDate, fmt);
+        if (date.isValid()) break;
+    }
+
+    if (date.isValid()) {
+        // Fix two-digit year: Qt may interpret "17" as 1917 instead of 2017
+        if (date.year() < 2000) {
+            date = date.addYears(100);
+        }
+        ui->boatMaintenanceDateEdit->setDate(date);
+    } else {
+        qDebug() << "Could not parse date:" << rawDate;
+        ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+    }
+    // ── END DATE PARSING ──────────────────────────────────────
+
+    ui->boatTripsSpinBox->setValue(boatsTmp.getTotalTrips());
+    ui->boatFishSpinBox->setValue(boatsTmp.getTotalFish());
+
+}
 
 void appwindow::displayBoats()
 {
@@ -1958,8 +2776,6 @@ void appwindow::displayBoats()
 
 void appwindow::clearBoatInputs()
 {
-    //ui->boatPage->clear();
-    //ui->boatPage->setReadOnly(false);
     ui->boatSizeLineEdit->clear();
     ui->boatLocationLineEdit->clear();
     ui->boatOwnerNameLineEdit->clear();
@@ -1977,54 +2793,46 @@ void appwindow::clearBoatInputs()
 }
 
 
-void appwindow::on_Boatwidget_2_clicked(QTableWidgetItem *item)
+void appwindow::on_Boatwidget_2_itemSelectionChanged()
 {
-    if (!item) return;
-
     int currentRow = ui->Boatwidget_2->currentRow();
     if (currentRow < 0) {
+        currentlySelectedId = -1;
+        ui->deleteBoatButton->setEnabled(false);
+        ui->updateBoatButton->setEnabled(false);
         return;
     }
 
-    // Get the boat ID from the first column's UserRole
     QTableWidgetItem *idItem = ui->Boatwidget_2->item(currentRow, 0);
     if (idItem) {
         currentlySelectedId = idItem->data(Qt::UserRole).toInt();
         qDebug() << "Selected boat ID:" << currentlySelectedId;
-
-        // Load the boat data into boatsTmp
-        boatsTmp.setId(currentlySelectedId);
-        boatsTmp.read();
-
-        // Populate input fields
-        if (boatsTmp.getLastError().isEmpty()) {
-            // ID field is display-only since it's auto-generated
-            //ui->boatPage->setText(QString::number(boatsTmp.getId()));
-            //ui->boatPage->setReadOnly(true);
-
-            ui->boatSizeLineEdit->setText(boatsTmp.getSize());
-            ui->boatLocationLineEdit->setText(boatsTmp.getLocation());
-            ui->boatOwnerNameLineEdit->setText(boatsTmp.getOwnerName());
-            ui->boatOwnerEmailLineEdit->setText(boatsTmp.getOwnerEmail());
-            ui->boatStatusComboBox->setCurrentIndex(boatsTmp.getStatus());
-            ui->boatTypeLineEdit->setText(boatsTmp.getType());
-
-            // Handle date parsing
-            QDate date = QDate::fromString(boatsTmp.getLastMaintenanceDate(), "yyyy-MM-dd");
-            if (date.isValid()) {
-                ui->boatMaintenanceDateEdit->setDate(date);
-            } else {
-                ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
-            }
-
-            ui->boatTripsSpinBox->setValue(boatsTmp.getTotalTrips());
-            ui->boatFishSpinBox->setValue(boatsTmp.getTotalFish());
-
-            // Enable delete and update buttons
-            ui->deleteBoatButton->setEnabled(true);
-            ui->updateBoatButton->setEnabled(true);
-        }
+        ui->deleteBoatButton->setEnabled(true);
+        ui->updateBoatButton->setEnabled(true);
     }
+}
+
+// ─────────────────────────────────────────────
+//  Double-click → populate form and switch to Edit mode
+// ─────────────────────────────────────────────
+void appwindow::on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item)
+{
+    if (!item) return;
+
+    int currentRow = ui->Boatwidget_2->currentRow();
+    if (currentRow < 0) return;
+
+    QTableWidgetItem *idItem = ui->Boatwidget_2->item(currentRow, 0);
+    if (!idItem) return;
+
+    int boatId = idItem->data(Qt::UserRole).toInt();
+
+    // Load data into the form
+    populateBoatForm(boatId);
+
+    // Switch to Edit mode and navigate to the form page
+    setBoatMode(BoatMode::Edit);
+    ui->boatPage->setCurrentIndex(0);
 }
 
 
@@ -2073,10 +2881,104 @@ void appwindow::on_addBoatButton_clicked()
     }
 }
 
+// ─────────────────────────────────────────────
+//  "Save Changes" button on the form (Edit mode only)
+// ─────────────────────────────────────────────
+void appwindow::on_editBoatButton_clicked()
+{
+    if (currentlySelectedId <= 0) {
+        QMessageBox::warning(this, "Selection Error", "No boat selected for editing.");
+        return;
+    }
+
+    // Validation
+    if (ui->boatSizeLineEdit->text().trimmed().isEmpty() ||
+        ui->boatLocationLineEdit->text().trimmed().isEmpty() ||
+        ui->boatOwnerNameLineEdit->text().trimmed().isEmpty() ||
+        ui->boatOwnerEmailLineEdit->text().trimmed().isEmpty() ||
+        ui->boatTypeLineEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "All fields must be filled!");
+        return;
+    }
+    if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
+        QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
+        return;
+    }
+
+    int     boatId  = currentlySelectedId;
+    QString size    = ui->boatSizeLineEdit->text().trimmed();
+    QString loc     = ui->boatLocationLineEdit->text().trimmed();
+    QString oName   = ui->boatOwnerNameLineEdit->text().trimmed();
+    QString oEmail  = ui->boatOwnerEmailLineEdit->text().trimmed();
+    int     status  = ui->boatStatusComboBox->currentIndex();
+    QString type    = ui->boatTypeLineEdit->text().trimmed();
+    QString dateStr = ui->boatMaintenanceDateEdit->date().toString("dd-MMM-yyyy").toUpper();
+    int     trips   = ui->boatTripsSpinBox->value();
+    int     fish    = ui->boatFishSpinBox->value();
+
+    qDebug() << "=== EDIT BOAT ATTEMPT ===" << "ID:" << boatId << "Date:" << dateStr;
+
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "DB Error", "Database is not open!");
+        return;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(
+        "UPDATE BOAT SET "
+        "  SIZEBOAT            = :size,    "
+        "  LOCATION            = :loc,     "
+        "  OWNERNAME           = :oName,   "
+        "  OWNERMAIL           = :oEmail,  "
+        "  STATUS              = :status,  "
+        "  TYPE                = :type,    "
+        "  LASTMAINTENANCEDATE = TO_DATE(:dateStr, 'DD-MON-YYYY'), "
+        "  TOTALTRIPS          = :trips,   "
+        "  TOTALFISH           = :fish     "
+        "WHERE BOATID = :boatId"
+        );
+    q.bindValue(":size",    size);
+    q.bindValue(":loc",     loc);
+    q.bindValue(":oName",   oName);
+    q.bindValue(":oEmail",  oEmail);
+    q.bindValue(":status",  status);
+    q.bindValue(":type",    type);
+    q.bindValue(":dateStr", dateStr);
+    q.bindValue(":trips",   trips);
+    q.bindValue(":fish",    fish);
+    q.bindValue(":boatId",  boatId);
+
+    if (!q.exec()) {
+        QString err = q.lastError().text();
+        qDebug() << "EDIT FAILED:" << err;
+        QMessageBox::critical(this, "Update Failed",
+                              "Oracle error:\n\n" + err +
+                                  "\n\nBoat ID: " + QString::number(boatId) +
+                                  "\nDate sent: " + dateStr);
+        return;
+    }
+
+    if (q.numRowsAffected() == 0) {
+        QMessageBox::warning(this, "Not Updated",
+                             "No row was changed. Boat ID " +
+                                 QString::number(boatId) + " may not exist.");
+        return;
+    }
+
+    QMessageBox::information(this, "Success", "Boat updated successfully!");
+    displayBoats();
+
+    // Return to list page and reset back to Add mode
+    setBoatMode(BoatMode::Add);
+    ui->boatPage->setCurrentIndex(1);
+}
+
+// FIXED
 void appwindow::on_deleteBoatButton_clicked()
 {
-    if (currentlySelectedId == -1) {
-        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");
+    if (currentlySelectedId <= 0) {
+        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");
         return;
     }
 
@@ -2102,154 +3004,89 @@ void appwindow::on_deleteBoatButton_clicked()
     }
 }
 
+// ─────────────────────────────────────────────
+//  "Edit" button on the list page → navigate to form in Edit mode
+// ─────────────────────────────────────────────
 void appwindow::on_updateBoatButton_clicked()
 {
-    // Guard: must have a row selected
     if (currentlySelectedId <= 0) {
         QMessageBox::warning(this, "Selection Error",
                              "Please click a row in the table first to select a boat.");
         return;
     }
 
-    // Validation
-    if (ui->boatSizeLineEdit->text().trimmed().isEmpty() ||
-        ui->boatLocationLineEdit->text().trimmed().isEmpty() ||
-        ui->boatOwnerNameLineEdit->text().trimmed().isEmpty() ||
-        ui->boatOwnerEmailLineEdit->text().trimmed().isEmpty() ||
-        ui->boatTypeLineEdit->text().trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "All fields must be filled!");
-        return;
-    }
-    if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
-        QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
-        return;
-    }
-
-    // Collect values
-    int     boatId  = currentlySelectedId;
-    QString size    = ui->boatSizeLineEdit->text().trimmed();
-    QString loc     = ui->boatLocationLineEdit->text().trimmed();
-    QString oName   = ui->boatOwnerNameLineEdit->text().trimmed();
-    QString oEmail  = ui->boatOwnerEmailLineEdit->text().trimmed();
-    int     status  = ui->boatStatusComboBox->currentIndex();
-    QString type    = ui->boatTypeLineEdit->text().trimmed();
-    QString dateStr = ui->boatMaintenanceDateEdit->date().toString("dd-MMM-yyyy").toUpper();
-    int     trips   = ui->boatTripsSpinBox->value();
-    int     fish    = ui->boatFishSpinBox->value();
-
-    qDebug() << "=== UPDATE ATTEMPT ===";
-    qDebug() << "ID:" << boatId << "Size:" << size << "Loc:" << loc;
-    qDebug() << "Owner:" << oName << "Email:" << oEmail;
-    qDebug() << "Status:" << status << "Type:" << type;
-    qDebug() << "Date:" << dateStr << "Trips:" << trips << "Fish:" << fish;
-
-    // Check DB is open
-    QSqlDatabase db = QSqlDatabase::database();
-    if (!db.isOpen()) {
-        QMessageBox::critical(this, "DB Error", "Database is not open!");
-        return;
-    }
-
-    // Execute directly - no Boats wrapper, so we can see the raw Oracle error
-    QSqlQuery q(db);
-    q.prepare(
-        "UPDATE BOAT SET "
-        "  SIZEBOAT            = :size,    "
-        "  LOCATION            = :loc,     "
-        "  OWNERNAME           = :oName,   "
-        "  OWNERMAIL           = :oEmail,  "
-        "  STATUS              = :status,  "
-        "  TYPE                = :type,    "
-        "  LASTMAINTENANCEDATE = TO_DATE(:dateStr, 'DD-MON-YYYY'), "
-        "  TOTALTRIPS          = :trips,   "
-        "  TOTALFISH           = :fish     "
-        "WHERE BOATID = :boatId"
-    );
-    q.bindValue(":size",    size);
-    q.bindValue(":loc",     loc);
-    q.bindValue(":oName",   oName);
-    q.bindValue(":oEmail",  oEmail);
-    q.bindValue(":status",  status);
-    q.bindValue(":type",    type);
-    q.bindValue(":dateStr", dateStr);
-    q.bindValue(":trips",   trips);
-    q.bindValue(":fish",    fish);
-    q.bindValue(":boatId",  boatId);
-
-    if (!q.exec()) {
-        QString err = q.lastError().text();
-        qDebug() << "UPDATE FAILED:" << err;
-        QMessageBox::critical(this, "Update Failed",
-                              "Oracle error:\n\n" + err +
-                              "\n\nBoat ID attempted: " + QString::number(boatId) +
-                              "\nDate string sent: " + dateStr);
-        return;
-    }
-
-    int rows = q.numRowsAffected();
-    qDebug() << "Rows affected:" << rows;
-
-    if (rows == 0) {
-        QMessageBox::warning(this, "Not Updated",
-                             "Query ran without error but no row was changed.\n"
-                             "Boat ID " + QString::number(boatId) + " may not exist.");
-        return;
-    }
-
-    QMessageBox::information(this, "Success", "Boat updated successfully!");
-    displayBoats();
-    clearBoatInputs();
-    ui->Boatwidget_2->clearSelection();
+    // Load data into the form and switch to Edit mode
+    populateBoatForm(currentlySelectedId);
+    setBoatMode(BoatMode::Edit);
+    ui->boatPage->setCurrentIndex(0);
 }
 
 
 void appwindow::on_searchBoatButton_3_clicked()
 {
-    // Search by ID
-    if (ui->boatSearchLineEdit->text().isEmpty()) {
-        displayBoats(); // Show all if search is empty
+    QString searchText = ui->boatSearchLineEdit->text().trimmed();
+
+    if (searchText.isEmpty()) {
+        displayBoats();
         return;
     }
 
-    bool ok;
-    int id = ui->boatSearchLineEdit->text().toInt(&ok);
-    if (!ok) {
-        QMessageBox::warning(this, "Validation Error", "Search ID must be a number!");
-        return;
-    }
-
-    // Clear table and show only the searched boat
+    ui->Boatwidget_2->blockSignals(true);
     ui->Boatwidget_2->setRowCount(0);
 
-    // Set ID in temporary boats and read from database
-    boatsTmp.setId(id);
-    boatsTmp.read();
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        QMessageBox::critical(this, "DB Error", "Database is not open!");
+        ui->Boatwidget_2->blockSignals(false);
+        return;
+    }
 
-    if (boatsTmp.getLastError().isEmpty()) {
-        ui->Boatwidget_2->insertRow(0);
-        ui->Boatwidget_2->setItem(0, 0, new QTableWidgetItem(QString::number(boatsTmp.getId())));
-        ui->Boatwidget_2->setItem(0, 1, new QTableWidgetItem(boatsTmp.getSize()));
-        ui->Boatwidget_2->setItem(0, 2, new QTableWidgetItem(boatsTmp.getLocation()));
-        ui->Boatwidget_2->setItem(0, 3, new QTableWidgetItem(boatsTmp.getOwnerName()));
-        ui->Boatwidget_2->setItem(0, 4, new QTableWidgetItem(boatsTmp.getOwnerEmail()));
+    QSqlQuery query(db);
+    query.prepare(
+        "SELECT BOATID, SIZEBOAT, LOCATION, OWNERNAME, OWNERMAIL, "
+        "STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH "
+        "FROM BOAT "
+        "WHERE CAST(BOATID AS VARCHAR2(20)) LIKE :search "
+        "OR UPPER(OWNERNAME) LIKE UPPER(:search2) "
+        "ORDER BY BOATID"
+        );
+    query.bindValue(":search",  "%" + searchText + "%");
+    query.bindValue(":search2", "%" + searchText + "%");
 
-        QString statusText = boatsTmp.getStatus() == 1 ? "IN PORT" : "OUT";
-        ui->Boatwidget_2->setItem(0, 5, new QTableWidgetItem(statusText));
+    if (!query.exec()) {
+        QMessageBox::critical(this, "Search Error", query.lastError().text());
+        ui->Boatwidget_2->blockSignals(false);
+        return;
+    }
 
-        ui->Boatwidget_2->setItem(0, 6, new QTableWidgetItem(boatsTmp.getType()));
-        ui->Boatwidget_2->setItem(0, 7, new QTableWidgetItem(boatsTmp.getLastMaintenanceDate()));
-        ui->Boatwidget_2->setItem(0, 8, new QTableWidgetItem(QString::number(boatsTmp.getTotalTrips())));
-        ui->Boatwidget_2->setItem(0, 9, new QTableWidgetItem(QString::number(boatsTmp.getTotalFish())));
+    int row = 0;
+    while (query.next()) {
+        ui->Boatwidget_2->insertRow(row);
 
-        // Store the boat ID in the first column item
-        ui->Boatwidget_2->item(0, 0)->setData(Qt::UserRole, boatsTmp.getId());
-    } else {
-        QMessageBox::information(this, "Not Found", "No boat found with ID: " + QString::number(id));
-        displayBoats(); // Show all boats
+        for (int col = 0; col < 10; col++) {
+            QTableWidgetItem *item;
+            if (col == 5) {
+                QString statusText = query.value(col).toInt() == 1 ? "IN PORT" : "OUT";
+                item = new QTableWidgetItem(statusText);
+            } else {
+                item = new QTableWidgetItem(query.value(col).toString());
+            }
+            if (col == 0)
+                item->setData(Qt::UserRole, query.value("BOATID").toInt());
+            ui->Boatwidget_2->setItem(row, col, item);
+        }
+        row++;
+    }
+
+    ui->Boatwidget_2->blockSignals(false);
+
+    if (row == 0) {
+        QMessageBox::information(this, "Not Found",
+                                 "No boat found matching: " + searchText);
+        displayBoats();
     }
 }
 ///=============COMPANY SECTION=============
-
 
 void appwindow::loadCompaniesTable()
 {
@@ -2287,18 +3124,21 @@ void appwindow::fillCompanyForm(int row)
 
     QTableWidget *table = ui->tableWidget_11;
 
+    if (!table->item(row, 0)) return; // safety
+
     selectedCompanyId = table->item(row, 0)->text().toInt();
 
-    ui->firstNameEdit_8->setText(table->item(row, 1)->text());   // Name
-    ui->lastNameEdit_7->setText(table->item(row, 2)->text());    // Location
-    ui->emailEdit_4->setText(table->item(row, 3)->text());       // Email
-    ui->passwordEdit_3->setText(table->item(row, 4)->text());    // Phone
-    ui->lastNameEdit_8->setText(table->item(row, 5)->text());    // Preferred Fish
+    ui->firstNameEdit_8->setText(table->item(row, 1) ? table->item(row, 1)->text() : "");
+    ui->lastNameEdit_7->setText(table->item(row, 2) ? table->item(row, 2)->text() : "");
+    ui->emailEdit_4->setText(table->item(row, 3) ? table->item(row, 3)->text() : "");
+    ui->passwordEdit_3->setText(table->item(row, 4) ? table->item(row, 4)->text() : "");
+    ui->lastNameEdit_8->setText(table->item(row, 5) ? table->item(row, 5)->text() : "");
 
-    int statusIdx = ui->role_option_7->findText(table->item(row, 6)->text());
-    if (statusIdx >= 0) ui->role_option_7->setCurrentIndex(statusIdx);
+    QString statusText = table->item(row, 6) ? table->item(row, 6)->text() : "";
+    int statusIdx = ui->role_option_7->findText(statusText);
+    if (statusIdx >= 0)
+        ui->role_option_7->setCurrentIndex(statusIdx);
 
-    // Switch to Add page and update button label
     ui->stackedWidget_5->setCurrentIndex(0);
     ui->CreateUser_3->setText("Update Company");
 }
@@ -2318,76 +3158,76 @@ void appwindow::on_tableWidget_11_cellDoubleClicked(int row, int column)
 ///CREATE / UPDATE
 void appwindow::on_CreateUser_3_clicked()
 {
-    QString name         = ui->firstNameEdit_8->text().trimmed();
-    QString location     = ui->lastNameEdit_7->text().trimmed();
-    QString email        = ui->emailEdit_4->text().trimmed();
-    QString phone        = ui->passwordEdit_3->text().trimmed();
-    QString preferredFish= ui->lastNameEdit_8->text().trimmed();
-    QString status       = ui->role_option_7->currentText();
+    QString name          = ui->firstNameEdit_8->text().trimmed();
+    QString location      = ui->lastNameEdit_7->text().trimmed();
+    QString email         = ui->emailEdit_4->text().trimmed();
+    QString phone         = ui->passwordEdit_3->text().trimmed();
+    QString preferredFish = ui->lastNameEdit_8->text().trimmed();
+    QString status        = ui->role_option_7->currentText().trimmed().toUpper();
 
     // ===== VALIDATION =====
-    if (name.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Company name is required.");
+    QRegularExpression nameRegex("^[A-Za-z\\s]{8,}$");
+    if (!nameRegex.match(name).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error",
+                             "Name must contain only letters and be at least 8 characters.");
         return;
     }
-    if (location.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Location is required.");
-        return;
-    }
-    if (email.isEmpty() || !email.contains('@')) {
-        QMessageBox::warning(this, "Validation Error", "A valid email is required.");
-        return;
-    }
-    if (phone.isEmpty()) {
-        QMessageBox::warning(this, "Validation Error", "Phone number is required.");
-        return;
-    }
-    // Phone: digits only
-    for (QChar c : phone) {
-        if (!c.isDigit() && c != '+' && c != '-' && c != ' ') {
-            QMessageBox::warning(this, "Validation Error", "Phone must contain only digits.");
-            return;
-        }
-    }
+
     if (preferredFish.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "Preferred fish is required.");
         return;
     }
 
-    // ===== ALL VALIDATIONS PASSED =====
-    bool isEditMode = (selectedCompanyId != -1);
+    QRegularExpression emailRegex("^[\\w\\.]+@[\\w\\.]+\\.[a-zA-Z]{2,}$");
+    if (!emailRegex.match(email).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error", "Invalid email format.");
+        return;
+    }
+
+    QRegularExpression phoneRegex("^[0-9]{8}$");
+    if (!phoneRegex.match(phone).hasMatch()) {
+        QMessageBox::warning(this, "Validation Error",
+                             "Phone number must contain exactly 8 digits.");
+        return;
+    }
+
+    if (status != "ACTIVE" && status != "INACTIVE") {
+        QMessageBox::warning(this, "Validation Error", "Status must be ACTIVE or INACTIVE.");
+        return;
+    }
+
     bool success = false;
 
-    if (isEditMode) {
-        success = companyManager.updateCompany(selectedCompanyId, name, location,
-                                               email, phone, preferredFish, status);
-    } else {
-        success = companyManager.createCompany(name, location, email,
-                                               phone, preferredFish, status);
-    }
+    // ===== CREATE OR UPDATE =====
+    if (selectedCompanyId == -1) {
+        // CREATE
+        success = companyManager.createCompany(
+            name, location, email, phone, preferredFish, status);
 
-    if (success) {
-        QMessageBox::information(this, "Success",
-                                 isEditMode ? "Company updated successfully!" : "Company created successfully!");
-
-        // Clear form
-        ui->firstNameEdit_8->clear();
-        ui->lastNameEdit_7->clear();
-        ui->emailEdit_4->clear();
-        ui->passwordEdit_3->clear();
-        ui->lastNameEdit_8->clear();
-        ui->role_option_7->setCurrentIndex(0);
-        ui->CreateUser_3->setText("Create Company");
-        selectedCompanyId = -1;
-
-        loadCompaniesTable();
-        if (isEditMode) {
-            ui->stackedWidget_5->setCurrentIndex(1); // go back to manage page
+        if (success) {
+            QMessageBox::information(this, "Success", "Company created successfully.");
         }
     } else {
-        QMessageBox::critical(this, "Error",
-                              isEditMode ? "Failed to update company." : "Failed to create company.");
+        // UPDATE
+        success = companyManager.updateCompany(
+            selectedCompanyId,
+            name, location, email, phone, preferredFish, status);
+
+        if (success) {
+            QMessageBox::information(this, "Success", "Company updated successfully.");
+        }
     }
+
+    if (!success) {
+        QMessageBox::critical(this, "Error", "Operation failed.");
+        return;
+    }
+
+    // Refresh table
+    loadCompaniesTable();
+
+    // Clear form
+    on_clear_7_clicked();
 }
 
 ///EDIT
@@ -2413,7 +3253,10 @@ void appwindow::on_delete_company_7_clicked()
     int row = selected.first().row();
     int id  = ui->tableWidget_11->item(row, 0)->text().toInt();
     QString name = ui->tableWidget_11->item(row, 1)->text();
-
+    if (id <= 0) {
+        QMessageBox::warning(this, "Error", "Invalid company ID.");
+        return;
+    }
     QMessageBox::StandardButton reply = QMessageBox::question(
         this, "Confirm Delete",
         QString("Are you sure you want to delete \"%1\" (ID: %2)?").arg(name).arg(id),
@@ -2429,23 +3272,345 @@ void appwindow::on_delete_company_7_clicked()
         }
     }
 }
+// search
+void appwindow::on_searchbar_7_textChanged(const QString &text)
+{
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row) {
+        bool match = false;
+
+        for (int col = 0; col < ui->tableWidget_11->columnCount(); ++col) {
+            QTableWidgetItem *item = ui->tableWidget_11->item(row, col);
+            if (item && item->text().contains(text, Qt::CaseInsensitive)) {
+                match = true;
+                break;
+            }
+        }
+
+        ui->tableWidget_11->setRowHidden(row, !match);
+    }
+}
 
 ///CLEAR
 void appwindow::on_clear_7_clicked()
 {
+    selectedCompanyId = -1;
+
     ui->firstNameEdit_8->clear();
     ui->lastNameEdit_7->clear();
     ui->emailEdit_4->clear();
     ui->passwordEdit_3->clear();
     ui->lastNameEdit_8->clear();
     ui->role_option_7->setCurrentIndex(0);
-    ui->searchbar_7->clear();
-    ui->comboBox_19->setCurrentIndex(0);
+
     ui->CreateUser_3->setText("Create Company");
-    selectedCompanyId = -1;
 
     if (ui->tableWidget_11->selectionModel())
-        ui->tableWidget_11->selectionModel()->clearSelection();
+        ui->tableWidget_11->clearSelection();
 }
 
 
+void appwindow::on_export_pdf_7_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+        this, "Export PDF", "", "PDF Files (*.pdf)");
+
+    if (fileName.isEmpty())
+        return;
+
+    QTextDocument document;
+
+    int total = ui->tableWidget_11->rowCount();
+
+    QString html = R"(
+    <html>
+    <head>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(to right, #003E7E, #005CBF);
+            color: white;
+            padding: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* ===== SECTION TITLE ===== */
+        .section-title {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #003E7E;
+            border-left: 6px solid #005CBF;
+            padding-left: 10px;
+        }
+
+        /* ===== KPI CARD ===== */
+        .card-container {
+            margin-top: 15px;
+        }
+
+        .card {
+            background-color: #F4F6F9;
+            border-radius: 6px;
+            padding: 15px;
+            width: 250px;
+            display: inline-block;
+            margin-right: 15px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .card-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #003E7E;
+        }
+
+        /* ===== TABLE ===== */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+
+        th {
+            background-color: #003E7E;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F4F6F9;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            margin-top: 40px;
+            font-size: 10px;
+            color: #777;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+
+    </style>
+    </head>
+    <body>
+    )";
+
+    // ===== HEADER =====
+    html += "<div class='header'>";
+    html += "<h1>COMPANY PERFORMANCE REPORT</h1>";
+    html += "<div class='subtitle'>Marina Management System | Generated on "
+            + QDate::currentDate().toString("dd MMM yyyy") + "</div>";
+    html += "</div>";
+
+    // ===== EXECUTIVE SUMMARY =====
+    html += "<div class='section-title'>EXECUTIVE SUMMARY</div>";
+
+    html += "<div class='card-container'>";
+    html += "<div class='card'>";
+    html += "<div class='card-title'>Total Companies</div>";
+    html += "<div class='card-value'>" + QString::number(total) + "</div>";
+    html += "</div>";
+    html += "</div>";
+
+    // ===== TABLE SECTION =====
+    html += "<div class='section-title'>COMPANY REGISTRY</div>";
+
+    html += "<table>";
+    html += "<tr>"
+            "<th>ID</th>"
+            "<th>Name</th>"
+            "<th>Location</th>"
+            "<th>Email</th>"
+            "<th>Phone</th>"
+            "<th>Preferred Fish</th>"
+            "<th>Status</th>"
+            "</tr>";
+
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row)
+    {
+        html += "<tr>";
+
+        for (int col = 0; col < ui->tableWidget_11->columnCount(); ++col)
+        {
+            QString text = ui->tableWidget_11->item(row, col)->text();
+            html += "<td>" + text + "</td>";
+        }
+
+        html += "</tr>";
+    }
+
+    html += "</table>";
+
+    // ===== FOOTER =====
+    html += "<div class='footer'>";
+    html += "Marina Management System - Company Report - CONFIDENTIAL";
+    html += "</div>";
+
+    html += "</body></html>";
+
+    document.setHtml(html);
+
+    QPdfWriter writer(fileName);
+    writer.setPageSize(QPageSize(QPageSize::A4));
+    writer.setResolution(300);
+
+    document.print(&writer);
+
+    QMessageBox::information(this, "Success", "PDF exported successfully!");
+}
+void appwindow::loadCompaniesTableFromList(const QList<CompanyRecord> &records)
+{
+    QTableWidget *table = ui->tableWidget_11;
+    table->setRowCount(0);
+
+    for (const CompanyRecord &r : records) {
+        int row = table->rowCount();
+        table->insertRow(row);
+
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
+        table->setItem(row, 1, new QTableWidgetItem(r.name()));
+        table->setItem(row, 2, new QTableWidgetItem(r.location()));
+        table->setItem(row, 3, new QTableWidgetItem(r.email()));
+        table->setItem(row, 4, new QTableWidgetItem(r.phone()));
+        table->setItem(row, 5, new QTableWidgetItem(r.preferredFish()));
+        table->setItem(row, 6, new QTableWidgetItem(r.status()));
+    }
+
+    ui->labelResults_7->setText(QString("Showing %1 Companies").arg(records.size()));
+}
+void appwindow::on_comboBox_19_currentTextChanged(const QString &arg1)
+{
+    QList<CompanyRecord> records;
+
+    if (arg1 == "Name")
+        records = companyManager.sortCompaniesBy("NAME");
+    else if (arg1 == "Preferred Fish")
+        records = companyManager.sortCompaniesBy("PREFERRED_FISH");
+    else
+        records = companyManager.getAllCompanies();
+
+    loadCompaniesTableFromList(records);
+}
+void appwindow::on_pushButton_12_clicked()
+{
+    QString filterType = ui->comboBox_20->currentText();
+
+    QMap<QString, int> stats;
+
+    // Loop through tableWidget_11 (Companies table)
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row)
+    {
+        QString key;
+
+        if (filterType == "Status")
+        {
+            // Assuming Status column index = 6
+            key = ui->tableWidget_11->item(row, 6)->text();
+        }
+        else if (filterType == "Preferred Fish")
+        {
+            // Assuming Preferred Fish column index = 5
+            key = ui->tableWidget_11->item(row, 5)->text();
+        }
+
+        stats[key]++;
+    }
+
+    // ===== Create Bar Series =====
+    QBarSeries *series = new QBarSeries();
+    QBarSet *set = new QBarSet(filterType);
+
+    QStringList categories;
+
+    for (auto it = stats.begin(); it != stats.end(); ++it)
+    {
+        *set << it.value();
+        categories << it.key();
+    }
+
+    series->append(set);
+
+    // ===== Create Chart =====
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Company Distribution by " + filterType);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categories);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setTitleText("Number of Companies");
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    chart->legend()->setVisible(true);
+
+    // ===== Display in chartView_6 =====
+    ui->chartView_6->setChart(chart);
+    ui->chartView_6->setRenderHint(QPainter::Antialiasing);
+}
+
+//boat new functionalities
+void appwindow::on_clearBoatButton_clicked()
+{
+
+    ui->boatSizeLineEdit->clear();
+    ui->boatLocationLineEdit->clear();
+    ui->boatOwnerNameLineEdit->clear();
+    ui->boatOwnerEmailLineEdit->clear();
+    ui->boatTypeLineEdit->clear();
+    ui->boatStatusComboBox->setCurrentIndex(1);
+    ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
+    ui->boatTripsSpinBox->setValue(0);
+    ui->boatFishSpinBox->setValue(0);
+
+    // If we're in Edit mode, switch back to Add mode
+    if (currentBoatMode == BoatMode::Edit) {
+        setBoatMode(BoatMode::Add);
+    }
+}
+
+
+void appwindow::on_comboBox_15_currentIndexChanged(int index)
+{
+    switch (index) {                                                              break; // Sort by...
+    case 1: ui->Boatwidget_2->setSortingEnabled(true);
+        ui->Boatwidget_2->sortByColumn(1, Qt::AscendingOrder);
+        ui->Boatwidget_2->setSortingEnabled(false);                                       break; // Size
+    case 2: ui->Boatwidget_2->setSortingEnabled(true);
+        ui->Boatwidget_2->sortByColumn(7, Qt::AscendingOrder);
+        ui->Boatwidget_2->setSortingEnabled(false);                                       break; // Last Maintenance Date
+    default: break;
+    }
+}

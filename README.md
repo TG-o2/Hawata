@@ -59,6 +59,21 @@ make
 **Database Setup:**
 1. Install Oracle SQL Developer
 2. Run `database_schema.sql` to create tables
-3. Update database credentials in `appwindow.cpp`
+3. Set database credentials using environment variables (preferred)
+
+**Oracle Connection Environment Variables (used by `connection.cpp`):**
+- `HWT_DB_USER` (default: `SMARTFISH`)
+- `HWT_DB_PASSWORD` (default: `root`)
+- `HWT_DB_HOST` (default: `localhost`)
+- `HWT_DB_PORT` (default: `1521`)
+- `HWT_DB_SERVICE` (default: `XE`)
+- `HWT_DB_SID` (optional fallback)
+- `HWT_DB_CONNECT` (optional explicit connect string, e.g. `localhost:1521/XE`)
+- `HWT_DB_DSN` (ODBC DSN fallback, default: `HWT`)
+- `HWT_DB_ODBC_DRIVER` (ODBC Oracle driver name fallback)
+- `HWT_DB_ODBC_CONN` (optional full ODBC connection string)
+- `HWT_ORACLE_CLIENT_DIR` (optional; Oracle Instant Client folder to prepend to `PATH`)
+
+On Windows, if `QOCI` is not available at runtime, verify Qt SQL plugin deployment (`sqldrivers/qsqloci.dll`) and Oracle Instant Client (`oci.dll`) availability in `PATH`.
 
 See PRODUCT_CRUD_SETUP.md for detailed instructions.

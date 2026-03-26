@@ -132,9 +132,24 @@ private:
     int currentlySelectedId;
     BoatMode currentBoatMode = BoatMode::Add;
 
-
-
     Boats boatsTmp;
+    void createBoatChart(const QStringList &categories, const QList<int> &values,const QString &title, const QString &yAxisLabel);
+    void on_pushButton_10_clicked();
+
+    void checkAndSendMaintenanceReminders();
+    void sendMaintenanceReminderEmail(const QString &ownerEmail, const QString &ownerName,
+    const QString &boatId, const QString &boatType,
+    const QDate &lastMaintenanceDate, int weeksOverdue);
+    QDate getNextMaintenanceDate(const QDate &lastMaintenanceDate);
+    bool isEmailValid(const QString &email);
+
+    // Timer for periodic checking
+    QTimer *maintenanceCheckTimer;
+    //status bar
+    void updateBoatStatusProgressBar();
+
+
+
 
     // companies
     void loadCompaniesTable();
@@ -145,8 +160,11 @@ private:
     
     // product statistics
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
-    void createBoatChart(const QStringList &categories, const QList<int> &values,const QString &title, const QString &yAxisLabel);
-    void on_pushButton_10_clicked();
+
+
+private slots:
+    //boat
+    void onCheckMaintenanceReminders();
 };
 
 #endif // APPWINDOW_H

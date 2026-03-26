@@ -1,6 +1,7 @@
 #include "appwindow.h"
 #include "ui_appwindow.h"
 #include "mainwindow.h"
+#include "smtpclient.h"
 
 #include <QPixmap>
 #include <QMessageBox>
@@ -25,6 +26,10 @@
 #include <QtCharts/QBarCategoryAxis>
 #include <QtCharts/QValueAxis>
 
+#include <QTimer>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
+
 appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
     : QDialog(parent)
     , ui(new Ui::appwindow)
@@ -42,9 +47,9 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     displayBoats();
     connect(ui->comboBox_15, &QComboBox::currentIndexChanged,
             this, &appwindow::on_comboBox_15_currentIndexChanged);
-    // In the constructor, after all other connections, add this:
+
     connect(ui->pushButton_10, &QPushButton::clicked, this, &appwindow::on_pushButton_10_clicked);
-    //photo logo set up
+    updateBoatStatusProgressBar();
 
     QPixmap logo("icons/try1.png");
 
@@ -556,15 +561,19 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     });
     connect(ui->Display_22  , &QPushButton::clicked, this, [=]() {
         ui->boatPage->setCurrentIndex(2);
+        updateBoatStatusProgressBar();
     });
     connect(ui->Display_20  , &QPushButton::clicked, this, [=]() {
         ui->boatPage->setCurrentIndex(2);
+        updateBoatStatusProgressBar();
     });
     connect(ui->Display_21  , &QPushButton::clicked, this, [=]() {
         ui->boatPage->setCurrentIndex(2);
+        updateBoatStatusProgressBar();
     });
     connect(ui->Display_19  , &QPushButton::clicked, this, [=]() {
         ui->boatPage->setCurrentIndex(2);
+        updateBoatStatusProgressBar();
     });
     connect(ui->forgetpwd_7  , &QPushButton::clicked, this, [=]() {
         ui->boatPage->setCurrentIndex(3);
@@ -706,6 +715,19 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     ui->comboBox_12->setCurrentIndex(0);
     loadUserStatistics(true);
+
+    //BOATS STATUS BAR
+
+
+
+
+    //BOATS EMAILS
+    maintenanceCheckTimer = new QTimer(this);
+    connect(maintenanceCheckTimer, &QTimer::timeout, this, &appwindow::onCheckMaintenanceReminders);
+    maintenanceCheckTimer->start(86400000);
+
+
+    QTimer::singleShot(5000, this, &appwindow::onCheckMaintenanceReminders); // Check after 5 seconds
 }
 
 //add docking
@@ -2877,6 +2899,8 @@ void appwindow::on_addBoatButton_clicked()
     } else {
         QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());
     }
+
+    updateBoatStatusProgressBar();
 }
 
 // ─────────────────────────────────────────────
@@ -2970,6 +2994,9 @@ void appwindow::on_editBoatButton_clicked()
     // Return to list page and reset back to Add mode
     setBoatMode(BoatMode::Add);
     ui->boatPage->setCurrentIndex(1);
+
+
+    updateBoatStatusProgressBar();
 }
 
 // FIXED
@@ -3000,6 +3027,10 @@ void appwindow::on_deleteBoatButton_clicked()
             QMessageBox::critical(this, "Error", "Failed to delete boat: " + boatsTmp.getLastError());
         }
     }
+
+
+
+    updateBoatStatusProgressBar();
 }
 
 // ─────────────────────────────────────────────
@@ -3244,6 +3275,230 @@ void appwindow::createBoatChart(const QStringList &categories, const QList<int> 
     ui->chartView_4->repaint();
 
     qDebug() << "Chart created successfully";
+}
+
+
+
+////EMAILS BOATS
+// Add this function to check and send maintenance reminders
+void appwindow::checkAndSendMaintenanceReminders()
+{
+    qDebug() << "Checking for boats due for maintenance...";
+
+    QSqlQuery allBoats = Boats::getAll();
+
+    if (!allBoats.isActive()) {
+        qDebug() << "Failed to retrieve boats for maintenance check";
+        return;
+    }
+
+    QDate today = QDate::currentDate();
+    int remindersSent = 0;
+    int errorsEncountered = 0;
+
+    while (allBoats.next()) {
+        int boatId = allBoats.value(0).toInt();
+        QString size = allBoats.value(1).toString();
+        QString location = allBoats.value(2).toString();
+        QString ownerName = allBoats.value(3).toString();
+        QString ownerEmail = allBoats.value(4).toString();
+        int status = allBoats.value(5).toInt();
+        QString boatType = allBoats.value(6).toString();
+        QString lastMaintenanceDateStr = allBoats.value(7).toString();
+
+        // Skip boats without email or invalid email
+        if (ownerEmail.isEmpty() || !isEmailValid(ownerEmail)) {
+            qDebug() << "Skipping boat" << boatId << "- Invalid or missing email:" << ownerEmail;
+            continue;
+        }
+
+        // Parse the last maintenance date
+        QDate lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "yyyy-MM-dd");
+        if (!lastMaintenanceDate.isValid()) {
+            // Try alternative date formats
+            lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "dd-MMM-yyyy");
+            if (!lastMaintenanceDate.isValid()) {
+                lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "MM/dd/yy");
+            }
+        }
+
+        if (!lastMaintenanceDate.isValid()) {
+            qDebug() << "Skipping boat" << boatId << "- Invalid maintenance date:" << lastMaintenanceDateStr;
+            continue;
+        }
+
+        // Calculate days since last maintenance
+        int daysSinceMaintenance = lastMaintenanceDate.daysTo(today);
+        int weeksSinceMaintenance = daysSinceMaintenance / 7;
+
+        // Check if maintenance is overdue (more than 365 days / 52 weeks)
+        if (daysSinceMaintenance >= 365) {
+            int weeksOverdue = (daysSinceMaintenance - 365) / 7;
+
+            // Send reminder for first overdue or weekly thereafter
+            if (weeksOverdue == 0 || weeksOverdue % 1 == 0) { // Weekly reminders
+                qDebug() << "Boat" << boatId << "is overdue by" << weeksOverdue << "weeks";
+                sendMaintenanceReminderEmail(ownerEmail, ownerName, QString::number(boatId),
+                                             boatType, lastMaintenanceDate, weeksOverdue);
+                remindersSent++;
+            }
+        } else {
+            // Calculate days until maintenance is due
+            int daysUntilDue = 365 - daysSinceMaintenance;
+            qDebug() << "Boat" << boatId << "maintenance due in" << daysUntilDue << "days";
+        }
+    }
+
+    qDebug() << "Maintenance check complete. Sent" << remindersSent << "reminders. Errors:" << errorsEncountered;
+
+
+}
+
+//status boat
+void appwindow::updateBoatStatusProgressBar()
+{
+    // Get all boats
+    QSqlQuery allBoats = Boats::getAll();
+
+    if (!allBoats.isActive()) {
+        qDebug() << "Failed to retrieve boats for progress bar";
+        return;
+    }
+
+    int totalBoats = 0;
+    int boatsInPort = 0;
+
+    // Count boats
+    while (allBoats.next()) {
+        totalBoats++;
+        int status = allBoats.value(5).toInt(); // STATUS is column 5 (0=OUT, 1=IN PORT)
+        if (status == 1) {
+            boatsInPort++;
+        }
+    }
+
+    if (totalBoats == 0) {
+        ui->progressBar_5->setValue(0);
+        ui->label_77->setText("Percentage of active boats: 0% (No boats in system)");
+        return;
+    }
+
+    // Calculate percentage of boats IN PORT
+    int percentageInPort = (boatsInPort * 100) / totalBoats;
+
+    // Update progress bar
+    ui->progressBar_5->setValue(percentageInPort);
+
+    // Update label with detailed information
+    QString statusText = QString("Boats IN PORT: %1% (%2 of %3 boats)")
+                             .arg(percentageInPort)
+                             .arg(boatsInPort)
+                             .arg(totalBoats);
+    ui->label_77->setText(statusText);
+
+    qDebug() << "Boat status update - Total:" << totalBoats
+             << "In Port:" << boatsInPort
+             << "Percentage:" << percentageInPort << "%";
+}
+
+
+// Send maintenance reminder email
+void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QString &ownerName,
+                                             const QString &boatId, const QString &boatType,
+                                             const QDate &lastMaintenanceDate, int weeksOverdue)
+{
+    // Prepare subject
+    QString subject;
+    if (weeksOverdue == 0) {
+        subject = "URGENT: Boat Maintenance Overdue - Hawata Marina";
+    } else {
+        subject = QString("MAINTENANCE REMINDER - %1 Week%2 Overdue - Hawata Marina")
+        .arg(weeksOverdue)
+            .arg(weeksOverdue > 1 ? "s" : "");
+    }
+
+    // Prepare body
+    QString body;
+    if (weeksOverdue == 0) {
+        body = QString(
+                   "Dear %1,\n\n"
+                   "This is an important reminder that your boat (ID: %2, Type: %3) is now OVERDUE for maintenance.\n\n"
+                   "Last Maintenance Date: %4\n"
+                   "Current Status: OVERDUE BY 1 YEAR\n\n"
+                   "Regular maintenance is crucial for:\n"
+                   "✓ Ensuring safety of your vessel and crew\n"
+                   "✓ Preventing costly repairs in the future\n"
+                   "✓ Maintaining optimal performance\n"
+                   "✓ Compliance with marina regulations\n\n"
+                   "Please contact our maintenance department immediately to schedule your appointment.\n\n"
+                   "To schedule maintenance, please reply to this email or call us at +216 XX XXX XXX.\n\n"
+                   "Thank you for your prompt attention to this matter.\n\n"
+                   "Best regards,\n"
+                   "Hawata Marina Maintenance Team"
+                   ).arg(ownerName, boatId, boatType, lastMaintenanceDate.toString("MMMM dd, yyyy"));
+    } else {
+        body = QString(
+                   "Dear %1,\n\n"
+                   "This is a follow-up reminder that your boat (ID: %2, Type: %3) is now %4 week%5 overdue for maintenance.\n\n"
+                   "Last Maintenance Date: %6\n"
+                   "Overdue By: %4 week%5\n\n"
+                   "Please schedule your maintenance appointment as soon as possible.\n\n"
+                   "To schedule your maintenance, please contact us at:\n"
+                   "📞 Phone: +216 XX XXX XXX\n"
+                   "📧 Email: maintenance@hawatamarina.com\n\n"
+                   "We look forward to serving you.\n\n"
+                   "Best regards,\n"
+                   "Hawata Marina Maintenance Team"
+                   ).arg(ownerName, boatId, boatType)
+                   .arg(weeksOverdue)
+                   .arg(weeksOverdue > 1 ? "s" : "")
+                   .arg(lastMaintenanceDate.toString("MMMM dd, yyyy"));
+    }
+
+    // Show confirmation (remove in production)
+    QMessageBox::information(this, "Maintenance Reminder",
+                             QString("Sending reminder to:\n%1\n\nSubject: %2").arg(ownerEmail, subject));
+
+    // Create SMTP client
+    SmtpClient *smtp = new SmtpClient("smtp.gmail.com", 465, this);
+    smtp->setUsername("your-email@gmail.com");  // Replace with your email
+    smtp->setPassword("your-app-password");     // Replace with app password
+
+    connect(smtp, &SmtpClient::mailSent, [this, ownerEmail, subject](bool success, const QString &error) {
+        if (success) {
+            qDebug() << "Email sent successfully to:" << ownerEmail;
+            QMessageBox::information(this, "Email Sent",
+                                     QString("Maintenance reminder sent to:\n%1").arg(ownerEmail));
+        } else {
+            qDebug() << "Failed to send email to:" << ownerEmail << "Error:" << error;
+            QMessageBox::warning(this, "Email Failed",
+                                 QString("Failed to send to %1\nError: %2").arg(ownerEmail, error));
+        }
+        sender()->deleteLater();
+    });
+
+    smtp->sendMail("your-email@gmail.com", ownerEmail, subject, body);
+}
+
+// Validate email format
+bool appwindow::isEmailValid(const QString &email)
+{
+    QRegularExpression emailRegex("^[\\w\\.]+@[\\w\\.]+\\.[a-zA-Z]{2,}$");
+    return emailRegex.match(email).hasMatch();
+}
+
+// Get the next maintenance date (one year after last maintenance)
+QDate appwindow::getNextMaintenanceDate(const QDate &lastMaintenanceDate)
+{
+    return lastMaintenanceDate.addYears(1);
+}
+
+
+
+// Slot to check maintenance reminders (called by timer)
+void appwindow::onCheckMaintenanceReminders()
+{
+    checkAndSendMaintenanceReminders();
 }
 
 

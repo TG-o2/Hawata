@@ -8,8 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find Qt modules
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport)
+# Find Qt modules - ADDED Network module
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network)
 
 # List of project sources
 set(PROJECT_SOURCES
@@ -42,18 +42,21 @@ set(PROJECT_SOURCES
     style.qrc
 )
 
-# Create executable
+# Create executable - Added smtpclient files
 qt_add_executable(Sign_up
     MANUAL_FINALIZATION
     ${PROJECT_SOURCES}
+    smtpclient.h
+    smtpclient.cpp
 )
 
-# Link Qt libraries
+# Link Qt libraries - ADDED Qt6::Network
 target_link_libraries(Sign_up PRIVATE
     Qt6::Widgets
     Qt6::Sql
     Qt6::Charts
     Qt6::PrintSupport
+    Qt6::Network
 )
 
 # macOS bundle settings

@@ -17,6 +17,10 @@
 #include <QPageLayout>
 #include <QSqlQuery>
 #include <QSqlDatabase>
+#include <QCoreApplication>
+#include <QDir>
+#include <QStandardItemModel>
+#include <QHeaderView>
 
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
@@ -25,6 +29,10 @@
 #include <QtCharts/QBarSet>
 #include <QtCharts/QBarCategoryAxis>
 #include <QtCharts/QValueAxis>
+#include <QtCharts/QPieSeries>
+#include <QtCharts/QPieSlice>
+#include <QGraphicsProxyWidget>
+#include <QHBoxLayout>
 
 #include <QTimer>
 #include <QRegularExpression>
@@ -42,6 +50,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     loadUsersTable();
     loadProductTable();    // Load product table on startup
     loadCompaniesTable();
+    generateDockingStatistics();
 
     //load boat table
     displayBoats();
@@ -483,6 +492,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     });
     connect(ui->Display_18  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
+        generateDockingStatistics();
     });
     connect(ui->add_user_17  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(0);
@@ -494,6 +504,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->Display_17  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
         loadDockingTable();
+        generateDockingStatistics();
+
     });
     connect(ui->add_user_5  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(0);
@@ -505,6 +517,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->Display_5  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
         loadDockingTable();
+        generateDockingStatistics();
+
     });
     connect(ui->add_user_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(0);
@@ -515,16 +529,19 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     });
     connect(ui->Display_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(2);
-        loadDockingTable();
+        generateDockingStatistics();
     });
     connect(ui->forgetpwd_4  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
+        loadDockingHistoryView();
     });
     connect(ui->forgetpwd_2  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
+        loadDockingHistoryView();
     });
     connect(ui->forgetpwd_5  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
+        loadDockingHistoryView();
     });
     connect(ui->forgetpwd_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
@@ -730,6 +747,115 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     QTimer::singleShot(5000, this, &appwindow::onCheckMaintenanceReminders); // Check after 5 seconds
 }
 
+QString appwindow::dockingHistoryFilePath() const
+{
+    QStringList startDirs;
+    startDirs << QDir::currentPath() << QCoreApplication::applicationDirPath();
+
+    for (const QString &startPath : startDirs) {
+        QDir dir(startPath);
+        for (int i = 0; i < 8; ++i) {
+            if (dir.exists("CMakeLists.txt")) {
+                return dir.filePath("docking_history.txt");
+            }
+            if (!dir.cdUp()) {
+                break;
+            }
+        }
+    }
+
+    return QDir::current().filePath("docking_history.txt");
+}
+
+void appwindow::ensureDockingHistoryFile()
+{
+    QFile file(dockingHistoryFilePath());
+    if (!file.exists()) {
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            file.close();
+        }
+    }
+}
+
+void appwindow::appendDockingHistory(const QString &action, int dockId)
+{
+    ensureDockingHistoryFile();
+
+    QFile file(dockingHistoryFilePath());
+    if (!file.open(QIODevice::Append | QIODevice::Text)) {
+        qDebug() << "Failed to open docking_history.txt for append:" << file.errorString();
+        return;
+    }
+
+    const QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+    QTextStream out(&file);
+    out << timestamp << "\t" << action.toUpper() << "\t" << dockId << "\n";
+    file.close();
+
+    if (ui->stackedWidget_2->currentIndex() == 3) {
+        loadDockingHistoryView();
+    }
+}
+
+void appwindow::loadDockingHistoryView()
+{
+    ensureDockingHistoryFile();
+
+    QStandardItemModel *model = qobject_cast<QStandardItemModel*>(ui->history_view->model());
+    if (!model) {
+        model = new QStandardItemModel(ui->history_view);
+        ui->history_view->setModel(model);
+    }
+
+    model->clear();
+    model->setHorizontalHeaderLabels(QStringList() << "DateTime" << "Action" << "DockID");
+
+    QFile file(dockingHistoryFilePath());
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&file);
+        QStringList lines;
+        while (!in.atEnd()) {
+            const QString line = in.readLine().trimmed();
+            if (!line.isEmpty()) {
+                lines.append(line);
+            }
+        }
+        file.close();
+
+        for (int i = lines.size() - 1; i >= 0; --i) {
+            const QStringList parts = lines.at(i).split('\t');
+            if (parts.size() < 3) {
+                continue;
+            }
+
+            QList<QStandardItem*> row;
+            for (int c = 0; c < 3; ++c) {
+                QStandardItem *item = new QStandardItem(parts.at(c));
+                item->setEditable(false);
+                row.append(item);
+            }
+            model->appendRow(row);
+        }
+    }
+
+    if (model->rowCount() == 0) {
+        QList<QStandardItem*> row;
+        row.append(new QStandardItem("-"));
+        row.append(new QStandardItem("-"));
+        row.append(new QStandardItem("-"));
+        for (QStandardItem *item : row) {
+            item->setEditable(false);
+        }
+        model->appendRow(row);
+    }
+
+    ui->history_view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->history_view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->history_view->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->history_view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+}
+
 //add docking
 void appwindow::on_CreateDocking_clicked()
 {
@@ -860,6 +986,8 @@ void appwindow::on_CreateDocking_clicked()
             QMessageBox::critical(this, "Error", "Failed to commit docking transaction.");
             return;
         }
+
+        appendDockingHistory("ADD", createdDockId);
 
         QMessageBox::information(this, "Success", "Docking created successfully!");
         // Clear the form
@@ -1104,9 +1232,11 @@ void appwindow::on_edit_Docking_clicked()
 
     QString startDateStr = startDate.toString("dd/MM/yy");
     QString endDateStr = endDate.toString("dd/MM/yy");
+    int updatedDockId = selectedDockingId;
 
     if (dockingManager.updateDocking(selectedDockingId, location, length,
                                      height, status, capacity, startDateStr, endDateStr)) {
+        appendDockingHistory("UPDATE", updatedDockId);
         QMessageBox::information(this, "Success", "Docking updated successfully!");
         selectedDockingId = -1;          // reset selection
         loadDockingTable();              // refresh table
@@ -1140,6 +1270,7 @@ void appwindow::on_delete_docking_clicked()
 
     if (reply == QMessageBox::Yes) {
         if (dockingManager.deleteDocking(id)) {
+            appendDockingHistory("DELETE", id);
             QMessageBox::information(this, "Deleted", "Docking deleted successfully.");
             loadDockingTable();   // refresh the table
         } else {
@@ -1213,22 +1344,7 @@ void appwindow::on_docking_sort_currentIndexChanged(int index)
     }
 
     // Sort based on start date
-    if (index == 1) {  // Ascending - closest date to furthest (from today)
-        QDate today = QDate::currentDate();
-        std::sort(recordsToSort.begin(), recordsToSort.end(), [today](const DockingRecord &a, const DockingRecord &b) {
-            QDate dateA = QDate::fromString(a.startDate, "yyyy-MM-dd");
-            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "MM/dd/yy");
-            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "dd/MM/yy");
-
-            QDate dateB = QDate::fromString(b.startDate, "yyyy-MM-dd");
-            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "MM/dd/yy");
-            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "dd/MM/yy");
-
-            qint64 distA = qAbs(today.daysTo(dateA));
-            qint64 distB = qAbs(today.daysTo(dateB));
-            return distA < distB;
-        });
-    } else if (index == 2) {  // Descending - furthest date to closest (from today)
+    if (index == 1) {  // Ascending
         QDate today = QDate::currentDate();
         std::sort(recordsToSort.begin(), recordsToSort.end(), [today](const DockingRecord &a, const DockingRecord &b) {
             QDate dateA = QDate::fromString(a.startDate, "yyyy-MM-dd");
@@ -1242,6 +1358,21 @@ void appwindow::on_docking_sort_currentIndexChanged(int index)
             qint64 distA = qAbs(today.daysTo(dateA));
             qint64 distB = qAbs(today.daysTo(dateB));
             return distA > distB;
+        });
+    } else if (index == 2) {  // Descending
+        QDate today = QDate::currentDate();
+        std::sort(recordsToSort.begin(), recordsToSort.end(), [today](const DockingRecord &a, const DockingRecord &b) {
+            QDate dateA = QDate::fromString(a.startDate, "yyyy-MM-dd");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "MM/dd/yy");
+            if (!dateA.isValid()) dateA = QDate::fromString(a.startDate, "dd/MM/yy");
+
+            QDate dateB = QDate::fromString(b.startDate, "yyyy-MM-dd");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "MM/dd/yy");
+            if (!dateB.isValid()) dateB = QDate::fromString(b.startDate, "dd/MM/yy");
+
+            qint64 distA = qAbs(today.daysTo(dateA));
+            qint64 distB = qAbs(today.daysTo(dateB));
+            return distA < distB;
         });
     }
     // Index 0 = "Date" (default, no sorting needed)
@@ -2651,6 +2782,117 @@ void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &pr
     QMessageBox::information(this, "Product Statistics", statsText);
 }
 
+void appwindow::generateDockingStatistics()
+{
+    // Delete old scene if exists
+    QGraphicsScene *oldScene = ui->graph_docking->scene();
+    if (oldScene) {
+        delete oldScene;
+    }
+
+    // Create new scene
+    QGraphicsScene *scene = new QGraphicsScene();
+
+    // Get all docking records
+    QList<DockingRecord> dockings = dockingManager.getAllDockings();
+
+    if (dockings.isEmpty()) {
+        QGraphicsTextItem *textItem = scene->addText("No docking data available");
+        textItem->setPos(ui->graph_docking->width() / 2 - 100, ui->graph_docking->height() / 2 - 20);
+        ui->graph_docking->setScene(scene);
+        return;
+    }
+
+    // Get available dimensions
+    int viewWidth = ui->graph_docking->width();
+    int viewHeight = ui->graph_docking->height();
+    int chartWidth = viewWidth / 2;
+
+    // Chart 1: Total Count of Dockings
+    QChart *chart1 = new QChart();
+    chart1->setTitle("Total Dockings in Database");
+    chart1->setBackgroundBrush(QBrush(Qt::white));
+    chart1->setAnimationOptions(QChart::SeriesAnimations);
+    chart1->setMargins(QMargins(10, 10, 10, 10));
+
+    QPieSeries *pieSeries1 = new QPieSeries();
+    QPieSlice *slice1 = pieSeries1->append("Total Dockings", dockings.count());
+    slice1->setColor(QColor(173, 216, 230));  // Light blue
+    slice1->setLabelVisible(true);
+    slice1->setLabel(QString("Total: %1").arg(dockings.count()));
+
+    chart1->addSeries(pieSeries1);
+    chart1->legend()->setVisible(true);
+    chart1->legend()->setAlignment(Qt::AlignBottom);
+
+    QChartView *chartView1 = new QChartView(chart1);
+    chartView1->setRenderHint(QPainter::Antialiasing);
+    chartView1->setStyleSheet("background-color: white;");
+    chartView1->setFixedSize(chartWidth, viewHeight);
+
+    // Chart 2: Status breakdown (Occupied vs Available)
+    QChart *chart2 = new QChart();
+    chart2->setTitle("Dockings by Status");
+    chart2->setBackgroundBrush(QBrush(Qt::white));
+    chart2->setAnimationOptions(QChart::SeriesAnimations);
+    chart2->setMargins(QMargins(10, 10, 10, 10));
+
+    QBarSeries *barSeries = new QBarSeries();
+    QBarSet *statusSet = new QBarSet("Count");
+    QStringList statusCategories;
+
+    int occupied = 0, available = 0;
+    for (const DockingRecord &dock : dockings) {
+        if (dock.status == "Occupied") {
+            occupied++;
+        } else if (dock.status == "Available") {
+            available++;
+        }
+    }
+
+    *statusSet << occupied << available;
+    statusCategories << "Occupied" << "Available";
+    barSeries->append(statusSet);
+    statusSet->setColor(QColor(0, 102, 204));  // Dark blue
+
+    chart2->addSeries(barSeries);
+    chart2->setTitle("Dockings by Status");
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(statusCategories);
+    chart2->addAxis(axisX, Qt::AlignBottom);
+    barSeries->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    int maxValue = qMax(occupied, available);
+    axisY->setRange(0, maxValue > 0 ? maxValue + 1 : 5);
+    axisY->setLabelFormat("%d");
+    axisY->setTickCount(maxValue + 2);
+    chart2->addAxis(axisY, Qt::AlignLeft);
+    barSeries->attachAxis(axisY);
+
+    QChartView *chartView2 = new QChartView(chart2);
+    chartView2->setRenderHint(QPainter::Antialiasing);
+    chartView2->setStyleSheet("background-color: white;");
+    chartView2->setFixedSize(chartWidth, viewHeight);
+
+    // Create a layout to display both charts
+    QWidget *chartWidget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(chartWidget);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(chartView1, 1);
+    layout->addWidget(chartView2, 1);
+    chartWidget->setFixedSize(viewWidth, viewHeight);
+
+    // Add widget to scene and set proper bounds
+    QGraphicsProxyWidget *proxy = scene->addWidget(chartWidget);
+    scene->setSceneRect(0, 0, viewWidth, viewHeight);
+    proxy->setGeometry(QRectF(0, 0, viewWidth, viewHeight));
+    
+    ui->graph_docking->setScene(scene);
+    ui->graph_docking->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+}
 
 ///END
 appwindow::~appwindow()

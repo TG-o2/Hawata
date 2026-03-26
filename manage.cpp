@@ -15,13 +15,35 @@ bool Manage::ajouter_manage(int userId, int dockId)
         return false;
     }
 
+    // If relation already exists, treat it as success (idempotent behavior).
+    QSqlQuery existsQuery(db);
+    existsQuery.prepare("SELECT 1 FROM MANAGE WHERE USERID = :userId AND DOCKID = :dockId");
+    existsQuery.bindValue(":userId", userId);
+    existsQuery.bindValue(":dockId", dockId);
+    if (existsQuery.exec() && existsQuery.next()) {
+        return true;
+    }
+
     QSqlQuery query(db);
     query.prepare("INSERT INTO MANAGE (USERID, DOCKID) VALUES (:userId, :dockId)");
     query.bindValue(":userId", userId);
     query.bindValue(":dockId", dockId);
 
     if (!query.exec()) {
-        qDebug() << "Error inserting manage relation:" << query.lastError().text();
+        const QString errText = query.lastError().text();
+
+        // ORA-00001: if USERID is unique in MANAGE, update existing row instead of failing.
+        if (errText.contains("ORA-00001", Qt::CaseInsensitive)) {
+            QSqlQuery updateQuery(db);
+            updateQuery.prepare("UPDATE MANAGE SET DOCKID = :dockId WHERE USERID = :userId");
+            updateQuery.bindValue(":dockId", dockId);
+            updateQuery.bindValue(":userId", userId);
+            if (updateQuery.exec() && updateQuery.numRowsAffected() > 0) {
+                return true;
+            }
+        }
+
+        qDebug() << "Error inserting manage relation:" << errText;
         return false;
     }
 

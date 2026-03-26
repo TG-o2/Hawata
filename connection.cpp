@@ -24,8 +24,8 @@ bool Connection::createconnect()
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    const QString dbUser = qEnvironmentVariable("HWT_DB_USER", "qtuserc");
-    const QString dbPassword = qEnvironmentVariable("HWT_DB_PASSWORD", "mypassword123");
+    const QString dbUser = qEnvironmentVariable("HWT_DB_USER", "jihene");
+    const QString dbPassword = qEnvironmentVariable("HWT_DB_PASSWORD", "jihene");
     const QString dbHost = qEnvironmentVariable("HWT_DB_HOST", "localhost");
     const QString dbPort = qEnvironmentVariable("HWT_DB_PORT", "1521");
     const QString dbService = qEnvironmentVariable("HWT_DB_SERVICE", "XE");

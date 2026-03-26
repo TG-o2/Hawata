@@ -102,6 +102,11 @@ private:
     int selectedDockingId = -1;
     void loadDockingTable();
     void populateDockingTable(const QList<DockingRecord> &records);
+    void generateDockingStatistics();
+    QString dockingHistoryFilePath() const;
+    void ensureDockingHistoryFile();
+    void appendDockingHistory(const QString &action, int dockId);
+    void loadDockingHistoryView();
     QList<DockingRecord> allDockingRecords;
 
     // ============================ USER MODULE ============================

@@ -36,16 +36,38 @@ bool Docking::createDocking(const QString &location, const QString &length,
     }
 
     int newDockId = -1;
-    QVariant insertedId = query.lastInsertId();
-    if (insertedId.isValid()) {
-        newDockId = insertedId.toInt();
+
+    // QODBC + Oracle does not support query.lastInsertId(); resolve the inserted DOCKID with a SELECT.
+    QSqlQuery idQuery(db);
+    idQuery.prepare(
+        "SELECT DOCKID FROM ("
+        "  SELECT DOCKID FROM DOCKING "
+        "  WHERE LOCATION = :location "
+        "    AND LENGTH = :length "
+        "    AND HEIGHT = :height "
+        "    AND STATUS = :status "
+        "    AND CAPACITY = :capacity "
+        "    AND STARTDATE = :startDate "
+        "    AND ENDDATE = :endDate "
+        "  ORDER BY DOCKID DESC"
+        ") WHERE ROWNUM = 1");
+    idQuery.bindValue(":location", location);
+    idQuery.bindValue(":length", length);
+    idQuery.bindValue(":height", height);
+    idQuery.bindValue(":status", status);
+    idQuery.bindValue(":capacity", capacity);
+    idQuery.bindValue(":startDate", startDate);
+    idQuery.bindValue(":endDate", endDate);
+
+    if (idQuery.exec() && idQuery.next()) {
+        newDockId = idQuery.value(0).toInt();
     }
 
     if (newDockId <= 0) {
-        QSqlQuery idQuery(db);
-        idQuery.prepare("SELECT DOCKID FROM (SELECT DOCKID FROM DOCKING ORDER BY DOCKID DESC) WHERE ROWNUM = 1");
-        if (idQuery.exec() && idQuery.next()) {
-            newDockId = idQuery.value(0).toInt();
+        QSqlQuery fallbackQuery(db);
+        fallbackQuery.prepare("SELECT DOCKID FROM (SELECT DOCKID FROM DOCKING ORDER BY DOCKID DESC) WHERE ROWNUM = 1");
+        if (fallbackQuery.exec() && fallbackQuery.next()) {
+            newDockId = fallbackQuery.value(0).toInt();
         }
     }
 
@@ -136,12 +158,33 @@ bool Docking::deleteDocking(int id)
         return false;
     }
     
+    if (!db.transaction()) {
+        qDebug() << "Error starting transaction for docking delete:" << db.lastError().text();
+        return false;
+    }
+
     QSqlQuery query(db);
+
+    // Remove child rows first to satisfy FK_MANAGE_DOCK constraint.
+    query.prepare("DELETE FROM MANAGE WHERE DOCKID = :id");
+    query.bindValue(":id", id);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related manage rows:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
     query.prepare("DELETE FROM DOCKING WHERE DOCKID = :id");
     query.bindValue(":id", id);
-    
     if (!query.exec()) {
         qDebug() << "Error deleting docking:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    if (!db.commit()) {
+        qDebug() << "Error committing docking delete transaction:" << db.lastError().text();
+        db.rollback();
         return false;
     }
     

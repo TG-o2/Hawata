@@ -46,6 +46,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     loadProductTable();    // Load product table on startup
     loadCompaniesTable();
     generateDockingStatistics();
+    loadDockingHistoryView();
 
     //load boat table
     displayBoats();
@@ -542,6 +543,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     });
     connect(ui->forgetpwd_6  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_2->setCurrentIndex(3);
+        loadDockingHistoryView();
+
     });
 
     //page BOAT :,D

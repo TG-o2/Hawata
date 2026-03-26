@@ -1358,7 +1358,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_3">
       <widget class="QWidget" name="user_page1_4" native="true">

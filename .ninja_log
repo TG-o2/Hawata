@@ -1,92 +1,49 @@
 # ninja log v6
 1078	4415	7962604086636486	CMakeFiles/Sign_up.dir/main.cpp.obj	d3210977c7427e55
 58	110	7962604074498424	CMakeFiles/clean.additional	baedbe210acaa455
-61	381	7962606866388875	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
+60	831	7962638368967316	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
 110	126	7962604075006945	clean	577b940aee94fbd7
-61	381	7962606866388875	Sign_up_autogen/timestamp	b40bd04424a0c932
-382	2706	7962606869588656	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
+60	831	7962638368967316	Sign_up_autogen/timestamp	b40bd04424a0c932
+839	3255	7962638370059854	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
 916	1074	7962604086489349	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
 916	1074	7962604086489349	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
-61	381	7962606866388875	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-61	381	7962606866388875	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+60	831	7962638368967316	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+60	831	7962638368967316	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
 1100	3758	7962604086860138	CMakeFiles/Sign_up.dir/connection.cpp.obj	3350c6618c05e0b1
 1109	3725	7962604086946535	CMakeFiles/Sign_up.dir/boats.cpp.obj	4a2428a80b03e587
-389	2780	7962606869669557	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-1105	3821	7962604086910137	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
+846	3261	7962638370130112	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
+296	2432	7962624558652550	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
 897	1008	7962604085842751	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
 1084	3976	7962604086706519	CMakeFiles/Sign_up.dir/user.cpp.obj	be3e62dce1aedb89
 1088	3943	7962604086743108	CMakeFiles/Sign_up.dir/product.cpp.obj	f28a179064bdf48e
 1113	4092	7962604086996632	CMakeFiles/Sign_up.dir/company.cpp.obj	3b9d801efb609a6d
-698	2773	7962606462428026	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-395	6911	7962606869724703	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
+833	2705	7962638369988040	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
+852	7484	7962638370180221	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
 1144	1990	7962604087308211	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	4471eaef5596675
-6911	8265	7962606934880821	Sign_up.exe	4a2179f54b30aaaa
+7484	9031	7962638436505629	Sign_up.exe	4a2179f54b30aaaa
 897	1008	7962604085842751	Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
 904	1001	7962604085774464	Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
 904	1001	7962604085774464	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
 1122	1241	7962604087087215	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp.obj	b776f53f8f61a648
 1128	1282	7962604087142881	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp.obj	79b861670fe1aa64
-1118	3653	7962604087037129	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-51	390	7962609974121371	Sign_up_autogen/timestamp	b40bd04424a0c932
-51	390	7962609974121371	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-51	390	7962609974121371	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-51	390	7962609974121371	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-398	2800	7962609977601750	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-392	2803	7962609977526321	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-404	6913	7962609977647097	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-6913	8334	7962610042743819	Sign_up.exe	4a2179f54b30aaaa
-57	315	7962611802909807	Sign_up_autogen/timestamp	b40bd04424a0c932
-57	315	7962611802909807	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-57	315	7962611802909807	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-57	315	7962611802909807	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-316	2570	7962611805499684	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-319	2572	7962611805536287	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-322	6394	7962611805566268	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-6394	7736	7962611866286760	Sign_up.exe	4a2179f54b30aaaa
-13	285	7962619664087961	Sign_up_autogen/timestamp	b40bd04424a0c932
-13	285	7962619664087961	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-13	285	7962619664087961	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-13	285	7962619664087961	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-311	1847	7962619667058344	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-292	2616	7962619666868053	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-286	2625	7962619666805212	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-300	6579	7962619666952664	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-6579	8110	7962619729741048	Sign_up.exe	4a2179f54b30aaaa
-149	3275	7962622648660175	Sign_up_autogen/timestamp	b40bd04424a0c932
-149	3275	7962622648660175	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-149	3275	7962622648660175	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-149	3275	7962622648660175	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-3303	5193	7962622680201631	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-3299	5611	7962622680161604	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-3276	6013	7962622679927971	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-3283	6035	7962622680008082	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-3288	10780	7962622680054752	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-10780	14581	7962622754978977	Sign_up.exe	4a2179f54b30aaaa
-67	282	7962624556358133	Sign_up_autogen/timestamp	b40bd04424a0c932
-67	282	7962624556358133	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-67	282	7962624556358133	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-67	282	7962624556358133	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
 300	2196	7962624558692520	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-296	2432	7962624558652550	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-283	3420	7962624558526356	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-287	3595	7962624558556955	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-292	7900	7962624558606658	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-7900	9221	7962624634691627	Sign_up.exe	4a2179f54b30aaaa
-66	961	7962635553643861	Sign_up_autogen/timestamp	b40bd04424a0c932
-66	961	7962635553643861	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-66	961	7962635553643861	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-66	961	7962635553643861	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-962	2673	7962635554585635	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-969	3130	7962635554655961	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-966	3142	7962635554620537	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-977	7281	7962635554740086	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-7281	8826	7962635617768284	Sign_up.exe	4a2179f54b30aaaa
-60	831	7962638368967316	Sign_up_autogen/timestamp	b40bd04424a0c932
-60	831	7962638368967316	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-60	831	7962638368967316	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-60	831	7962638368967316	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-833	2705	7962638369988040	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-839	3255	7962638370059854	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-846	3261	7962638370130112	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-852	7484	7962638370180221	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-7484	9031	7962638436505629	Sign_up.exe	4a2179f54b30aaaa
+53	2246	7962663890703106	Sign_up_autogen/timestamp	b40bd04424a0c932
+53	2246	7962663890703106	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+53	2246	7962663890703106	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
+53	2246	7962663890703106	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+2267	4672	7962663891968830	CMakeFiles/Sign_up.dir/connection.cpp.obj	3350c6618c05e0b1
+2282	4674	7962663892118802	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
+2247	4694	7962663891768810	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
+2271	4699	7962663892008803	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
+2252	5256	7962663891828805	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
+2258	5302	7962663891878850	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
+2263	14017	7962663891928797	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
+14018	16266	7962664009478449	Sign_up.exe	4a2179f54b30aaaa
+69	354	7962666076491208	Sign_up_autogen/timestamp	b40bd04424a0c932
+69	354	7962666076491208	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+69	354	7962666076491208	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
+69	354	7962666076491208	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+359	2470	7962666079390143	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
+355	2471	7962666079350189	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
+363	6484	7962666079430142	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
+6484	7920	7962666140638128	Sign_up.exe	4a2179f54b30aaaa

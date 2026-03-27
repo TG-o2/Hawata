@@ -1,104 +1,25 @@
 #include "connection.h"
 #include <QDebug>
-#include <QStringList>
-#include <QtGlobal>
-
-Connection::Connection()
-{
-    //db = QSqlDatabase::addDatabase("QODBC");  // or "QOCI" for Oracle client
-    //db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=qtuserc;Pwd=mypassword123;");
-
-}
+#include <QSqlError>
 
 bool Connection::createconnect()
 {
-    m_lastError.clear();
+    QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
 
-    const QString connectionName = "qt_sql_default_connection";
+    db.setHostName("localhost");
+    db.setPort(1521);
+    db.setDatabaseName("projet_2A");
+    db.setUserName("SMARTFISH");
+    db.setPassword("root");
 
-    {
-        QSqlDatabase oldDb = QSqlDatabase::database(connectionName, false);
-        if (oldDb.isValid() && oldDb.isOpen()) {
-            oldDb.close();
-        }
-    }
-    QSqlDatabase::removeDatabase(connectionName);
-
-    const QString dbUser = qEnvironmentVariable("HWT_DB_USER", "jihene");
-    const QString dbPassword = qEnvironmentVariable("HWT_DB_PASSWORD", "jihene");
-    const QString dbHost = qEnvironmentVariable("HWT_DB_HOST", "localhost");
-    const QString dbPort = qEnvironmentVariable("HWT_DB_PORT", "1521");
-    const QString dbService = qEnvironmentVariable("HWT_DB_SERVICE", "XE");
-    const QString dbConnect = qEnvironmentVariable(
-        "HWT_DB_CONNECT",
-        QString("%1:%2/%3").arg(dbHost, dbPort, dbService)
-        );
-
-    const QString dbOdbcDriver = qEnvironmentVariable("HWT_DB_ODBC_DRIVER", "Oracle in XE");
-    const QString dbOdbcConn = qEnvironmentVariable(
-        "HWT_DB_ODBC_CONN",
-        QString("Driver={%1};Dbq=//%2:%3/%4;Uid=%5;Pwd=%6;")
-            .arg(dbOdbcDriver, dbHost, dbPort, dbService, dbUser, dbPassword)
-        );
-
-    const QStringList availableDrivers = QSqlDatabase::drivers();
-
-    auto tryDriver = [&](const QString &driver, const QStringList &databaseCandidates) -> bool {
-        if (!availableDrivers.contains(driver)) {
-            return false;
-        }
-
-        QString localLastError;
-        {
-            QSqlDatabase db = QSqlDatabase::addDatabase(driver, connectionName);
-            db.setUserName(dbUser);
-            db.setPassword(dbPassword);
-
-            for (const QString &databaseName : databaseCandidates) {
-                db.setDatabaseName(databaseName);
-                if (db.open()) {
-                    qDebug() << "Database connected. driver=" << driver << "databaseName=" << databaseName;
-                    return true;
-                }
-
-                localLastError = db.lastError().text();
-                qDebug() << "Database open failed. driver=" << driver
-                         << "databaseName=" << databaseName
-                         << "error=" << localLastError;
-            }
-
-            db.close();
-        }
-
-        QSqlDatabase::removeDatabase(connectionName);
-        m_lastError = localLastError;
+    if (db.open()) {
+        qDebug() << "Connected to MySQL!";
+        return true;
+    } else {
+        m_lastError = db.lastError().text();
+        qDebug() << "Error:" << m_lastError;
         return false;
-    };
-
-    const QStringList qociCandidates = {
-        dbConnect,
-        QString("//%1:%2/%3").arg(dbHost, dbPort, dbService),
-        dbService
-    };
-
-    if (tryDriver("QOCI", qociCandidates)) {
-        return true;
     }
-
-    const QStringList qodbcCandidates = {
-        dbOdbcConn,
-        QString("Driver={%1};Dbq=%2;Uid=%3;Pwd=%4;").arg(dbOdbcDriver, dbConnect, dbUser, dbPassword),
-
-    };
-
-    if (tryDriver("QODBC", qodbcCandidates)) {
-        return true;
-    }
-
-    m_lastError = QString("Database connection failed. Available Qt SQL drivers: %1. Last error: %2")
-                      .arg(availableDrivers.join(", "), m_lastError);
-    qDebug() << m_lastError;
-    return false;
 }
 
 QString Connection::lastError() const

@@ -2,15 +2,17 @@
 #include <QDebug>
 #include <QSqlError>
 
+Connection::Connection() = default;
+
 bool Connection::createconnect()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QODBC");
 
     db.setHostName("localhost");
     db.setPort(1521);
-    db.setDatabaseName("projet_2A");
-    db.setUserName("SMARTFISH");
-    db.setPassword("root");
+    db.setDatabaseName("HWT");
+    db.setUserName("qtuser");
+    db.setPassword("mypassword123");
 
     if (db.open()) {
         qDebug() << "Connected to MySQL!";

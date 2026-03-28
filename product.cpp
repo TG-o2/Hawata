@@ -29,7 +29,8 @@ bool Product::createProduct(const QString &type,
                             int quantity,
                             double price,
                             const QDateTime &fishCaught,
-                            const QDateTime &dateOfPurchase)
+                            const QDateTime &dateOfPurchase,
+                            int boatId)
 {
     QSqlDatabase db = QSqlDatabase::database();
 
@@ -41,8 +42,8 @@ bool Product::createProduct(const QString &type,
     QSqlQuery query(db);
 
     query.prepare("INSERT INTO products "
-                  "(type, status, location, quantity, price, fish_caught, dateofpurchase) "
-                  "VALUES (:type, :status, :location, :quantity, :price, :fishCaught, :dateOfPurchase)");
+                  "(type, status, location, quantity, price, fish_caught, dateofpurchase, boatid) "
+                  "VALUES (:type, :status, :location, :quantity, :price, :fishCaught, :dateOfPurchase, :boatId)");
 
     query.bindValue(":type", type);
     query.bindValue(":status", status);
@@ -51,6 +52,7 @@ bool Product::createProduct(const QString &type,
     query.bindValue(":price", price);
     query.bindValue(":fishCaught", fishCaught);
     query.bindValue(":dateOfPurchase", dateOfPurchase);
+    query.bindValue(":boatId", boatId > 0 ? boatId : QVariant());
 
     if (!query.exec()) {
         qDebug() << "Error inserting product:" << query.lastError().text();
@@ -123,7 +125,8 @@ bool Product::updateProduct(int id,
                             int quantity,
                             double price,
                             const QDateTime &fishCaught,
-                            const QDateTime &dateOfPurchase)
+                            const QDateTime &dateOfPurchase,
+                            int boatId)
 {
     QSqlDatabase db = QSqlDatabase::database();
 
@@ -135,7 +138,7 @@ bool Product::updateProduct(int id,
     QSqlQuery query(db);
     query.prepare("UPDATE products SET type = :type, location = :location, status = :status, "
                   "quantity = :quantity, price = :price, fish_caught = :fishCaught, "
-                  "dateofpurchase = :dateOfPurchase WHERE productid = :id");
+                  "dateofpurchase = :dateOfPurchase, boatid = :boatId WHERE productid = :id");
 
     query.addBindValue(type);
     query.addBindValue(location);
@@ -144,6 +147,7 @@ bool Product::updateProduct(int id,
     query.addBindValue(price);
     query.addBindValue(fishCaught);
     query.addBindValue(dateOfPurchase);
+    query.addBindValue(boatId > 0 ? boatId : QVariant());
     query.addBindValue(id);
 
     if (!query.exec()) {

@@ -42,7 +42,8 @@ public:
                        int quantity,
                        double price,
                        const QDateTime &fishCaught,
-                       const QDateTime &dateOfPurchase);
+                       const QDateTime &dateOfPurchase,
+                       int boatId = -1);
 
     QList<ProductRecord> getAllProducts();
 
@@ -55,7 +56,8 @@ public:
                        int quantity,
                        double price,
                        const QDateTime &fishCaught,
-                       const QDateTime &dateOfPurchase);
+                       const QDateTime &dateOfPurchase,
+                       int boatId = -1);
 
     bool deleteProduct(int id);
 

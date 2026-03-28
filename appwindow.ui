@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>4</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -4490,14 +4490,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_4">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>10</x>
        <y>10</y>
        <width>1161</width>
        <height>781</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_6">
       <widget class="QWidget" name="user_page1_7" native="true">
@@ -4523,16 +4523,6 @@ border: none;
         </property>
         <property name="text">
          <string>Type Of Fish:</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="prodcode">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>170</y>
-          <width>251</width>
-          <height>31</height>
-         </rect>
         </property>
        </widget>
        <widget class="QLabel" name="pic">
@@ -4736,19 +4726,6 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
-       <widget class="QLabel" name="label_26">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>140</y>
-          <width>201</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Product Code:</string>
-        </property>
-       </widget>
        <widget class="QLineEdit" name="fishprice">
         <property name="geometry">
          <rect>
@@ -4778,6 +4755,29 @@ font-size: 35px;
           <x>300</x>
           <y>270</y>
           <width>211</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_boat">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>140</y>
+          <width>201</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Boat ID</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="boatCombo">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>170</y>
+          <width>241</width>
           <height>31</height>
          </rect>
         </property>

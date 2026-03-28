@@ -2194,6 +2194,17 @@ void appwindow::on_checkProductButton_2_clicked()
         return;
     }
 
+    // Get boat ID from input field
+    int boatId = -1;
+    if (!ui->boatCombo->text().isEmpty()) {
+        bool ok;
+        boatId = ui->boatCombo->text().toInt(&ok);
+        if (!ok) {
+            QMessageBox::warning(this, "Error", "Boat ID must be a valid number!");
+            return;
+        }
+    }
+
     // Check if editing or creating
     if (selectedProductId > 0) {
         // Update existing product
@@ -2204,7 +2215,8 @@ void appwindow::on_checkProductButton_2_clicked()
                                          qty,
                                          pr,
                                          ui->fishdate1->dateTime(),
-                                         ui->fishdate2->dateTime())) {
+                                         ui->fishdate2->dateTime(),
+                                         boatId)) {
             QMessageBox::information(this, "Success", "Product updated successfully!");
             selectedProductId = -1;  // Reset for next operation
         } else {
@@ -2219,7 +2231,8 @@ void appwindow::on_checkProductButton_2_clicked()
                                           qty,
                                           pr,
                                           ui->fishdate1->dateTime(),
-                                          ui->fishdate2->dateTime())) {
+                                          ui->fishdate2->dateTime(),
+                                          boatId)) {
             QMessageBox::critical(this, "Error", "Failed to add product. Please check the database connection.");
             return;
         }
@@ -2227,7 +2240,6 @@ void appwindow::on_checkProductButton_2_clicked()
     }
 
     // Clear form
-    ui->prodcode->clear();
     ui->fishtype->clear();
     ui->fishStatus->setCurrentIndex(0);
     ui->qtyfish->clear();
@@ -2235,6 +2247,7 @@ void appwindow::on_checkProductButton_2_clicked()
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->locationfish->clear();
+    ui->boatCombo->clear();
     selectedProductId = -1;
 
     // Reset button text back to "Add Product"
@@ -2304,6 +2317,8 @@ void appwindow::loadProductTable()
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(records.size()));
 }
+
+
 
 void appwindow::on_Manage_24_clicked()
 {
@@ -2443,7 +2458,7 @@ void appwindow::on_delete_company_6_clicked()
             ui->qtyfish->clear();
             ui->fishprice->clear();
             ui->locationfish->clear();
-            ui->prodcode->clear();
+            ui->boatCombo->clear();
             ui->fishdate1->setDateTime(QDateTime::currentDateTime());
             ui->fishdate2->setDateTime(QDateTime::currentDateTime());
             selectedProductId = -1;
@@ -2463,9 +2478,9 @@ void appwindow::on_clear_6_clicked()
     ui->qtyfish->clear();
     ui->fishprice->clear();
     ui->locationfish->clear();
+    ui->boatCombo->clear();
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
-    ui->prodcode->clear();
     selectedProductId = -1;
 
     // Reset button text to "Add Product"

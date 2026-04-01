@@ -21,6 +21,13 @@
 #include <QDir>
 #include <QStandardItemModel>
 #include <QHeaderView>
+#include <QCalendarWidget>
+#include <QColor>
+#include <QFrame>
+#include <QLabel>
+#include <QTextCharFormat>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
@@ -37,6 +44,141 @@
 #include <QTimer>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+namespace {
+QString normalizeMonthAbbreviation(const QString &value)
+{
+    QString normalized = value.trimmed();
+    if (normalized.isEmpty()) {
+        return normalized;
+    }
+
+    const QRegularExpression monthPattern(R"((\b\d{1,2}[-/ ])([A-Za-z]{3})([-/ ]\d{2,4}\b))");
+    QRegularExpressionMatch match = monthPattern.match(normalized);
+    if (match.hasMatch()) {
+        QString month = match.captured(2).toLower();
+        month[0] = month[0].toUpper();
+        normalized = match.captured(1) + month + match.captured(3);
+    }
+
+    return normalized;
+}
+
+QDate normalizeTwoDigitYear(QDate date)
+{
+    if (date.isValid() && date.year() < 1950) {
+        return date.addYears(100);
+    }
+
+    return date;
+}
+
+QDate parseDockingDate(const QString &value)
+{
+    const QString trimmed = normalizeMonthAbbreviation(value);
+    if (trimmed.isEmpty()) {
+        return {};
+    }
+
+    const QStringList dateFormats = {
+        "dd/MM/yy",
+        "dd/MM/yyyy",
+        "dd-MM-yy",
+        "dd-MM-yyyy",
+        "dd-MMM-yy",
+        "dd-MMM-yyyy",
+        "yyyy-MM-dd",
+        "yyyy-MM-dd hh:mm:ss",
+        "yyyy-MM-ddThh:mm:ss",
+        "MM/dd/yy",
+        "MM/dd/yyyy",
+        "ddd MMM d hh:mm:ss yyyy",
+        "ddd MMM dd hh:mm:ss yyyy"
+    };
+
+    for (const QString &format : dateFormats) {
+        QDate date = QDate::fromString(trimmed, format);
+        if (date.isValid()) {
+            return normalizeTwoDigitYear(date);
+        }
+
+        QDateTime dateTime = QDateTime::fromString(trimmed, format);
+        if (dateTime.isValid()) {
+            return normalizeTwoDigitYear(dateTime.date());
+        }
+    }
+
+    QDateTime isoDateTime = QDateTime::fromString(trimmed, Qt::ISODate);
+    if (isoDateTime.isValid()) {
+        return normalizeTwoDigitYear(isoDateTime.date());
+    }
+
+    return {};
+}
+
+class DockCalendarWidget : public QCalendarWidget
+{
+public:
+    explicit DockCalendarWidget(QWidget *parent = nullptr)
+        : QCalendarWidget(parent)
+    {
+    }
+
+    void setDockColors(const QMap<QDate, QColor> &colors)
+    {
+        m_dockColors = colors;
+        updateCells();
+    }
+
+protected:
+    void paintCell(QPainter *painter, const QRect &rect, QDate date) const override
+    {
+        QCalendarWidget::paintCell(painter, rect, date);
+
+        const QColor color = m_dockColors.value(date);
+        if (!color.isValid()) {
+            return;
+        }
+
+        QColor overlay = color;
+        overlay.setAlpha(150);
+
+        painter->save();
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(overlay);
+        painter->drawRect(rect.adjusted(1, 1, -1, -1));
+        painter->restore();
+    }
+
+private:
+    QMap<QDate, QColor> m_dockColors;
+};
+
+int statusPriority(const QString &status)
+{
+    if (status.trimmed().compare("Occupied", Qt::CaseInsensitive) == 0) {
+        return 2;
+    }
+
+    if (status.trimmed().compare("Available", Qt::CaseInsensitive) == 0) {
+        return 1;
+    }
+
+    return 0;
+}
+
+QColor statusColor(const QString &status)
+{
+    if (status.trimmed().compare("Occupied", Qt::CaseInsensitive) == 0) {
+        return QColor("#f87171");
+    }
+
+    if (status.trimmed().compare("Available", Qt::CaseInsensitive) == 0) {
+        return QColor("#4ade80");
+    }
+
+    return QColor();
+}
+}
 
 appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
     : QDialog(parent)
@@ -2910,6 +3052,117 @@ void appwindow::generateDockingStatistics()
     
     ui->graph_docking->setScene(scene);
     ui->graph_docking->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+}
+
+void appwindow::on_DockCalender_clicked()
+{
+    QList<DockingRecord> dockings = dockingManager.getAllDockings();
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("Dock Calendar");
+    dialog.setMinimumSize(980, 720);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(&dialog);
+    mainLayout->setContentsMargins(24, 24, 24, 24);
+    mainLayout->setSpacing(16);
+
+    QLabel *titleLabel = new QLabel("Dock Reservation Calendar", &dialog);
+    titleLabel->setAlignment(Qt::AlignCenter);
+    titleLabel->setStyleSheet(
+        "font-family: 'Behove';"
+        "font-size: 24px;"
+        "font-weight: bold;"
+        "color: #0a4c73;"
+    );
+    mainLayout->addWidget(titleLabel);
+
+    QLabel *subtitleLabel = new QLabel(
+        "Red = Occupied reservation, Green = Available reservation",
+        &dialog);
+    subtitleLabel->setAlignment(Qt::AlignCenter);
+    subtitleLabel->setStyleSheet("color: #334155; font-size: 14px;");
+    mainLayout->addWidget(subtitleLabel);
+
+    QHBoxLayout *legendLayout = new QHBoxLayout();
+    legendLayout->setSpacing(18);
+
+    auto addLegendItem = [legendLayout, &dialog](const QString &labelText, const QColor &color) {
+        QWidget *itemWidget = new QWidget(&dialog);
+        QHBoxLayout *itemLayout = new QHBoxLayout(itemWidget);
+        itemLayout->setContentsMargins(0, 0, 0, 0);
+        itemLayout->setSpacing(8);
+
+        QLabel *swatch = new QLabel(itemWidget);
+        swatch->setFixedSize(18, 18);
+        swatch->setStyleSheet(QString("background-color: %1; border: 1px solid #64748b; border-radius: 4px;")
+                                  .arg(color.name()));
+
+        QLabel *text = new QLabel(labelText, itemWidget);
+        text->setStyleSheet("color: #334155; font-size: 13px;");
+
+        itemLayout->addWidget(swatch);
+        itemLayout->addWidget(text);
+        itemLayout->addStretch();
+        legendLayout->addWidget(itemWidget);
+    };
+
+    addLegendItem("Occupied", QColor("#f87171"));
+    addLegendItem("Available", QColor("#4ade80"));
+    legendLayout->addStretch();
+    mainLayout->addLayout(legendLayout);
+
+    DockCalendarWidget *calendar = new DockCalendarWidget(&dialog);
+    calendar->setGridVisible(true);
+    calendar->setNavigationBarVisible(true);
+    calendar->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+    calendar->setFirstDayOfWeek(Qt::Monday);
+    calendar->setSelectedDate(QDate::currentDate());
+    calendar->setStyleSheet(
+        "QCalendarWidget QWidget { background: white; }"
+        "QCalendarWidget QToolButton { height: 34px; font-size: 14px; font-weight: bold; color: #0a4c73; }"
+        "QCalendarWidget QAbstractItemView:enabled { selection-background-color: #0ea5e9; selection-color: white; }"
+    );
+
+    QMap<QDate, int> priorities;
+    QMap<QDate, QColor> dateColors;
+
+    for (const DockingRecord &dock : dockings) {
+        QDate startDate = parseDockingDate(dock.startDate);
+        QDate endDate = parseDockingDate(dock.endDate);
+        QColor color = statusColor(dock.status);
+
+        if (!startDate.isValid() || !endDate.isValid() || !color.isValid() || endDate < startDate) {
+            continue;
+        }
+
+        const int priority = statusPriority(dock.status);
+        for (QDate current = startDate; current <= endDate; current = current.addDays(1)) {
+            if (priority > priorities.value(current, 0)) {
+                priorities[current] = priority;
+                dateColors[current] = color;
+            }
+        }
+    }
+
+    for (auto it = dateColors.cbegin(); it != dateColors.cend(); ++it) {
+        QTextCharFormat format;
+        format.setBackground(QBrush(it.value()));
+        format.setForeground(QBrush(Qt::black));
+        calendar->setDateTextFormat(it.key(), format);
+    }
+
+    calendar->setDockColors(dateColors);
+
+    if (dateColors.isEmpty()) {
+        QLabel *emptyLabel = new QLabel("No dock reservations were found.", &dialog);
+        emptyLabel->setAlignment(Qt::AlignCenter);
+        emptyLabel->setStyleSheet("color: #475569; font-size: 14px;");
+        mainLayout->addWidget(emptyLabel);
+    }
+
+    mainLayout->addWidget(calendar, 1);
+
+    dialog.exec();
 }
 
 ///END

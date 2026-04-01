@@ -1358,7 +1358,7 @@ border: none;
       </rect>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="user_page1_3">
       <widget class="QWidget" name="user_page1_4" native="true">
@@ -2801,16 +2801,6 @@ border: none;
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QCalendarWidget" name="calendarWidget">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>170</y>
-         <width>331</width>
-         <height>271</height>
-        </rect>
-       </property>
-      </widget>
       <widget class="QLabel" name="labelStatsTitle_12">
        <property name="geometry">
         <rect>
@@ -2848,6 +2838,40 @@ border: none;
          <width>491</width>
          <height>431</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="DockCalender">
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>180</y>
+         <width>171</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #38bdf8, stop:1 #0ea5e9);
+}
+
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #0369a1, stop:1 #075985);
+}
+</string>
+       </property>
+       <property name="text">
+        <string>Dock Calendar</string>
        </property>
       </widget>
      </widget>

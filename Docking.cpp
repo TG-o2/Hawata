@@ -2,7 +2,25 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDateTime>
 #include <QDebug>
+
+namespace {
+QString normalizeDockingDate(const QVariant &value)
+{
+    const QDate date = value.toDate();
+    if (date.isValid()) {
+        return date.toString("dd/MM/yy");
+    }
+
+    const QDateTime dateTime = value.toDateTime();
+    if (dateTime.isValid()) {
+        return dateTime.date().toString("dd/MM/yy");
+    }
+
+    return value.toString().trimmed();
+}
+}
 
 Docking::Docking() {}
 
@@ -105,8 +123,8 @@ QList<DockingRecord> Docking::getAllDockings()
         record.height = query.value(3).toString();
         record.status = query.value(4).toString();
         record.capacity = query.value(5).toString();
-        record.startDate = query.value(6).toString();
-        record.endDate = query.value(7).toString();
+        record.startDate = normalizeDockingDate(query.value(6));
+        record.endDate = normalizeDockingDate(query.value(7));
         records.append(record);
     }
     

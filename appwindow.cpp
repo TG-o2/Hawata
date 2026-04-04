@@ -44,6 +44,7 @@
 #include <QTimer>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QItemSelectionModel>
 namespace {
 QString normalizeMonthAbbreviation(const QString &value)
 {
@@ -789,15 +790,19 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     });
     connect(ui->forgetpwd_12  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_4->setCurrentIndex(3);
+        refreshLowStockAlerts(true);
     });
     connect(ui->forgetpwd_14  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_4->setCurrentIndex(3);
+        refreshLowStockAlerts(true);
     });
     connect(ui->forgetpwd_15  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_4->setCurrentIndex(3);
+        refreshLowStockAlerts(true);
     });
     connect(ui->forgetpwd_16  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_4->setCurrentIndex(3);
+        refreshLowStockAlerts(true);
     });
     //cOMPANIES
 
@@ -2409,14 +2414,14 @@ void appwindow::on_pushButton_11_clicked()
     }
 
     // Determine which statistics to show
-    int selectedOption = ui->comboBox_20->currentIndex();
+    int selectedOption = ui->comboBox_17->currentIndex();
 
     if (selectedOption == 0) {
-        // Show statistics by Status
+        // Show statistics by Status (pie chart)
         generateProductStatisticsByStatus(allProducts);
     } else {
-        // Show statistics by Preferred Fish (for companies)
-        generateProductStatisticsByStatus(allProducts);
+        // Show quantity distribution by fish type (pie chart)
+        generateProductQuantityByType(allProducts);
     }
 }
 
@@ -2435,10 +2440,11 @@ void appwindow::loadProductTable()
 
     QTableWidget *table = ui->tableWidget_10;
     table->setRowCount(0);
-    table->setColumnCount(8);
+    table->setColumnCount(9);
     table->setHorizontalHeaderLabels(
-        {"ID", "Status", "Type", "Fish Caught", "Date Purchase", "Quantity", "Location", "Price"});
+        {"ID", "Status", "Type", "Fish Caught", "Date Purchase", "Quantity", "Location", "Original Price", "Discounted Price"});
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     for (const ProductRecord &r : records) {
@@ -2451,13 +2457,17 @@ void appwindow::loadProductTable()
         table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
         table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
         table->setItem(row, 6, new QTableWidgetItem(r.location));
-        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.price, 'f', 2)));
+        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
+        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(records.size()));
+
+    // Keep Discounts page alerts synced with current product quantities.
+    refreshLowStockAlerts(false);
 }
 
 
@@ -2465,6 +2475,56 @@ void appwindow::loadProductTable()
 void appwindow::on_Manage_24_clicked()
 {
     loadProductTable();
+}
+
+void appwindow::refreshLowStockAlerts(bool showPopup)
+{
+    const QList<ProductRecord> products = productManager.getAllProducts();
+    QStringList lowStockLines;
+
+    auto resizeAlertArea = [&](int lineCount) {
+        const int visibleLines = qMax(2, lineCount);
+        const int contentHeight = 24 + (visibleLines * 24);
+        const int dockHeight = contentHeight + 55;
+
+        ui->dockWidget_2->setMinimumHeight(dockHeight);
+        ui->dockWidget_2->resize(ui->dockWidget_2->width(), dockHeight);
+
+        const int labelWidth = qMax(200, ui->dockWidgetContents_2->width() - 20);
+        ui->label_3->setGeometry(10, 16, labelWidth, contentHeight);
+        ui->label_3->setWordWrap(true);
+        ui->label_3->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    };
+
+    for (const ProductRecord &product : products) {
+        if (product.quantity < 30) {
+            lowStockLines << QString("- %1 (ID %2): %3 left")
+                                 .arg(product.type)
+                                 .arg(product.id)
+                                 .arg(product.quantity);
+        }
+    }
+
+    if (lowStockLines.isEmpty()) {
+        resizeAlertArea(2);
+        ui->dockWidget_2->setWindowTitle("Stock level looks good");
+        ui->label_3->setText(QString("No low-stock products.\nTotal products: %1").arg(products.size()));
+        ui->label_3->setStyleSheet("color: #14532d; font-weight: 600;");
+        return;
+    }
+
+    resizeAlertArea(lowStockLines.size() + 1);
+    ui->dockWidget_2->setWindowTitle(QString("Low-stock alert: %1 product(s) below 30").arg(lowStockLines.size()));
+    ui->label_3->setText(lowStockLines.join("\n"));
+    ui->label_3->setStyleSheet("color: #b91c1c; font-weight: 700;");
+
+    if (showPopup && !lowStockWarningShown) {
+        QMessageBox::warning(this,
+                             "Low Stock Alert",
+                             QString("At least one product is below quantity 30.\n\n%1")
+                                 .arg(lowStockLines.join("\n")));
+        lowStockWarningShown = true;
+    }
 }
 
 void appwindow::on_tableWidget_10_cellClicked(int row, int /*column*/)
@@ -2712,7 +2772,8 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
         table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
         table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
         table->setItem(row, 6, new QTableWidgetItem(r.location));
-        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.price, 'f', 2)));
+        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
+        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -2723,6 +2784,25 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
 
 void appwindow::on_export_pdf_6_clicked()
 {
+    QTableWidget *table = ui->tableWidget_10;
+    QList<int> selectedRows;
+
+    if (table->selectionModel()) {
+        const QModelIndexList selectedIndexes = table->selectionModel()->selectedRows();
+        for (const QModelIndex &index : selectedIndexes) {
+            selectedRows.append(index.row());
+        }
+    }
+
+    std::sort(selectedRows.begin(), selectedRows.end());
+
+    if (selectedRows.isEmpty()) {
+        QMessageBox::information(this,
+                                 "Select Products",
+                                 "Please select one or more products from the table before exporting to PDF.");
+        return;
+    }
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     tr("Export Product Data to PDF"), "",
                                                     tr("PDF Files (*.pdf);;All Files (*)"));
@@ -2764,7 +2844,7 @@ void appwindow::on_export_pdf_6_clicked()
     painter.setFont(titleFont);
     painter.setPen(Qt::white);
     painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
-                     Qt::AlignCenter | Qt::AlignVCenter, "PRODUCT DATA REPORT");
+                     Qt::AlignCenter | Qt::AlignVCenter, "PRODUCTS SOLD");
 
     yPos += titleBlockHeight + 30;
 
@@ -2779,8 +2859,7 @@ void appwindow::on_export_pdf_6_clicked()
     yPos += 50;
 
     // ── TABLE ─────────────────────────────────────────────────────────────────
-    QTableWidget *table = ui->tableWidget_10;
-    int rowCount    = table->rowCount();
+    int rowCount    = selectedRows.size();
     int columnCount = table->columnCount();
 
     if (rowCount == 0) {
@@ -2824,17 +2903,17 @@ void appwindow::on_export_pdf_6_clicked()
     drawHeader();
     yPos += headerHeight;
 
-    int rowHeight    = 75;
-    int footerHeight = 80;
-    int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
+    int rowHeight       = 75;
+    int footerReserve   = 260; // Keep space for summary and signature area at the bottom.
 
     QFont cellFont("Arial", 11);
     painter.setFont(cellFont);
 
-    for (int row = 0; row < rowCount; row++) {
+    for (int exportRow = 0; exportRow < rowCount; exportRow++) {
+        const int row = selectedRows.at(exportRow);
 
         // ── New page if needed ──
-        if (row > 0 && row % rowsPerPage == 0) {
+        if (exportRow > 0 && (yPos + rowHeight + footerReserve) > pageHeight) {
             pdfWriter.newPage();
             yPos = marginTop;
             drawHeader();
@@ -2842,7 +2921,7 @@ void appwindow::on_export_pdf_6_clicked()
             painter.setFont(cellFont);
         }
 
-        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        QColor rowBg = (exportRow % 2 == 0) ? Qt::white : veryLightBlue;
         painter.fillRect(marginLeft, yPos, contentWidth, rowHeight, rowBg);
 
         painter.setPen(QPen(borderColor, 1));
@@ -2870,6 +2949,16 @@ void appwindow::on_export_pdf_6_clicked()
     }
 
     // ── FOOTER ───────────────────────────────────────────────────────────────
+    const int summaryBlockHeight = 90;
+    const int signatureBlockHeight = 420;
+    const int gapBeforeSignature = 190;
+    const int neededBottomSpace = 40 + summaryBlockHeight + gapBeforeSignature + signatureBlockHeight;
+
+    if (yPos + neededBottomSpace > pageHeight) {
+        pdfWriter.newPage();
+        yPos = marginTop;
+    }
+
     yPos += 30;
 
     painter.setPen(QPen(darkBlue, 3));
@@ -2887,6 +2976,70 @@ void appwindow::on_export_pdf_6_clicked()
                      contentWidth, 50,
                      Qt::AlignRight | Qt::AlignVCenter,
                      QString("Marina Management System"));
+
+    yPos += gapBeforeSignature;
+
+    const int signatureWidth = (contentWidth * 7) / 10;
+    const int signatureHeight = 420;
+    const int signatureX = marginLeft + (contentWidth - signatureWidth) / 2;
+    int signatureY = yPos;
+
+    // Keep signature area intentionally low on the page.
+    const int lowAnchorY = pageHeight - signatureHeight - 60;
+    if (signatureY < lowAnchorY) {
+        signatureY = lowAnchorY;
+    }
+
+    painter.setPen(QPen(QColor(190, 190, 190), 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRoundedRect(signatureX, signatureY,
+                            signatureWidth, signatureHeight,
+                            8, 8);
+
+    painter.setFont(QFont("Arial", 16, QFont::Bold));
+    painter.setPen(QColor(90, 90, 90));
+    painter.drawText(signatureX, signatureY + 24,
+                     signatureWidth, 42,
+                     Qt::AlignHCenter | Qt::AlignVCenter,
+                     "AUTHORIZED SIGNATURE");
+
+    painter.setFont(QFont("Arial", 12, QFont::Bold));
+    painter.setPen(QColor(95, 95, 95));
+    painter.drawText(signatureX, signatureY + 102,
+                     signatureWidth, 36,
+                     Qt::AlignHCenter | Qt::AlignVCenter,
+                     "Sign here");
+
+    painter.setPen(QPen(QColor(70, 70, 70), 2));
+    const int signatureLineY = signatureY + 280;
+    painter.drawLine(signatureX + 100, signatureLineY, signatureX + signatureWidth - 100, signatureLineY);
+
+    const QString reportDate = QDate::currentDate().toString("yyyy-MM-dd");
+    painter.setFont(QFont("Arial", 11));
+    const int detailsY = signatureLineY + 46;
+    const int detailsLeft = signatureX + 40;
+    const int detailsWidth = signatureWidth - 80;
+    const int columnGap = 30;
+    const int detailsColumnWidth = (detailsWidth - (2 * columnGap)) / 3;
+
+    const int dateX = detailsLeft;
+    const int nameX = dateX + detailsColumnWidth + columnGap;
+    const int idX = nameX + detailsColumnWidth + columnGap;
+
+    painter.drawText(dateX, detailsY,
+                     detailsColumnWidth, 30,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     QString("Date: %1").arg(reportDate));
+
+    painter.drawText(nameX, detailsY,
+                     detailsColumnWidth, 30,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     "Name: ____________");
+
+    painter.drawText(idX, detailsY,
+                     detailsColumnWidth, 30,
+                     Qt::AlignLeft | Qt::AlignVCenter,
+                     "ID/Stamp: ____________");
 
     painter.end();
 
@@ -2914,13 +3067,49 @@ void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &pr
         return;
     }
 
+    if (statusCount.isEmpty()) {
+        QMessageBox::warning(this, "No Data", "No product status data available.");
+        return;
+    }
+
     // Calculate percentage of active/available products
     int activeQuantity = statusQuantity.value("Available", 0) +
                          statusQuantity.value("In Stock", 0);
     int percentage = (totalQuantity > 0) ? (activeQuantity * 100) / totalQuantity : 0;
 
     // Update progress bar
-    ui->progressBar_7->setValue(percentage);
+    ui->progressBar_6->setValue(percentage);
+
+    // Build pie chart by product status for Product Activity page
+    QPieSeries *series = new QPieSeries();
+    QList<QColor> sliceColors = {
+        QColor("#0ea5e9"),
+        QColor("#22c55e"),
+        QColor("#f59e0b"),
+        QColor("#ef4444"),
+        QColor("#6366f1"),
+        QColor("#14b8a6")
+    };
+
+    int colorIndex = 0;
+    for (auto it = statusCount.begin(); it != statusCount.end(); ++it) {
+        QPieSlice *slice = series->append(it.key(), it.value());
+        slice->setLabelVisible(true);
+        const int pct = (it.value() * 100) / qMax(1, products.size());
+        slice->setLabel(QString("%1 (%2, %3%)").arg(it.key()).arg(it.value()).arg(pct));
+        slice->setColor(sliceColors.at(colorIndex % sliceColors.size()));
+        colorIndex++;
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Products Distribution by Status");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    ui->chartView_5->setChart(chart);
+    ui->chartView_5->setRenderHint(QPainter::Antialiasing);
 
     // Update label with statistics
     QString statsText = QString("Percentage of Active Products in system: %1%\n").arg(percentage);
@@ -2937,9 +3126,61 @@ void appwindow::generateProductStatisticsByStatus(const QList<ProductRecord> &pr
                          .arg(pct);
     }
 
-    ui->label_79->setText(statsText);
+    ui->label_78->setText(QString("Percentage of active Product in system: %1%").arg(percentage));
 
     QMessageBox::information(this, "Product Statistics", statsText);
+}
+
+void appwindow::generateProductQuantityByType(const QList<ProductRecord> &products)
+{
+    QMap<QString, int> quantityByType;
+    int totalQuantity = 0;
+
+    for (const ProductRecord &product : products) {
+        const QString fishType = product.type.trimmed().isEmpty() ? "Unknown" : product.type.trimmed();
+        quantityByType[fishType] += product.quantity;
+        totalQuantity += product.quantity;
+    }
+
+    if (quantityByType.isEmpty() || totalQuantity <= 0) {
+        QMessageBox::warning(this, "No Data", "No quantity data available for fish types.");
+        return;
+    }
+
+    QPieSeries *series = new QPieSeries();
+    QList<QColor> sliceColors = {
+        QColor("#0ea5e9"),
+        QColor("#22c55e"),
+        QColor("#f59e0b"),
+        QColor("#ef4444"),
+        QColor("#6366f1"),
+        QColor("#14b8a6")
+    };
+
+    int colorIndex = 0;
+    for (auto it = quantityByType.begin(); it != quantityByType.end(); ++it) {
+        QPieSlice *slice = series->append(it.key(), it.value());
+        slice->setLabelVisible(true);
+        const int pct = (it.value() * 100) / qMax(1, totalQuantity);
+        slice->setLabel(QString("%1 (%2 units, %3%)").arg(it.key()).arg(it.value()).arg(pct));
+        slice->setColor(sliceColors.at(colorIndex % sliceColors.size()));
+        colorIndex++;
+    }
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Quantity Distribution by Fish Type");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+
+    ui->chartView_5->setChart(chart);
+    ui->chartView_5->setRenderHint(QPainter::Antialiasing);
+
+    const int maxTypeQty = *std::max_element(quantityByType.begin(), quantityByType.end());
+    const int dominantPct = (maxTypeQty * 100) / qMax(1, totalQuantity);
+    ui->progressBar_6->setValue(dominantPct);
+    ui->label_78->setText(QString("Quantity share of top fish type: %1%").arg(dominantPct));
 }
 
 void appwindow::generateDockingStatistics()

@@ -126,6 +126,8 @@ private:
     Product productManager;
     int selectedProductId = -1;
     void loadProductTable();
+    void refreshLowStockAlerts(bool showPopup = false);
+    bool lowStockWarningShown = false;
     QList<ProductRecord> allProductRecords;
 
     //boats
@@ -166,6 +168,7 @@ private:
     
     // product statistics
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
+    void generateProductQuantityByType(const QList<ProductRecord> &products);
 
 
 private slots:

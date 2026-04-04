@@ -12,6 +12,8 @@ struct ProductRecord {
     QString status;
     int quantity;
     double price;
+    double originalPrice;
+    double discountedPrice;
     QString fishCaught;
     QString dateOfPurchase;
 };

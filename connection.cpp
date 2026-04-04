@@ -11,8 +11,8 @@ bool Connection::createconnect()
     db.setHostName("localhost");
     db.setPort(1521);
     db.setDatabaseName("HWT");
-    db.setUserName("jihene");
-    db.setPassword("jihene");
+    db.setUserName("qtuser");
+    db.setPassword("mypassword123");
 
     if (db.open()) {
         qDebug() << "Connected to MySQL!";

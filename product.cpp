@@ -5,6 +5,67 @@
 #include <QVariant>
 #include <QDebug>
 #include <QList>
+
+namespace {
+QDate parseProductDate(const QString &value)
+{
+    const QString trimmed = value.trimmed();
+    if (trimmed.isEmpty()) {
+        return {};
+    }
+
+    const QStringList dateFormats = {
+        "yyyy-MM-dd",
+        "yyyy-MM-ddThh:mm:ss",
+        "yyyy-MM-dd hh:mm:ss",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss",
+        "dd/MM/yyyy",
+        "dd-MM-yyyy"
+    };
+
+    for (const QString &format : dateFormats) {
+        QDateTime dateTime = QDateTime::fromString(trimmed, format);
+        if (dateTime.isValid()) {
+            return dateTime.date();
+        }
+
+        QDate date = QDate::fromString(trimmed, format);
+        if (date.isValid()) {
+            return date;
+        }
+    }
+
+    QDateTime isoDateTime = QDateTime::fromString(trimmed, Qt::ISODate);
+    if (isoDateTime.isValid()) {
+        return isoDateTime.date();
+    }
+
+    return {};
+}
+
+double applyAgeDiscount(double originalPrice, const QString &purchaseDateText)
+{
+    const QDate purchaseDate = parseProductDate(purchaseDateText);
+    if (!purchaseDate.isValid()) {
+        return originalPrice;
+    }
+
+    const int ageInDays = purchaseDate.daysTo(QDate::currentDate());
+
+    double discountRate = 0.0;
+    if (ageInDays >= 30) {
+        discountRate = 0.30;
+    } else if (ageInDays >= 20) {
+        discountRate = 0.20;
+    } else if (ageInDays >= 10) {
+        discountRate = 0.10;
+    }
+
+    return originalPrice * (1.0 - discountRate);
+}
+}
+
 Product::Product(const QString &type,
                  const QString &location,
                  const QDateTime &fishCaught,
@@ -88,7 +149,9 @@ QList<ProductRecord> Product::getAllProducts()
         record.location = query.value(2).toString();
         record.status = query.value(3).toString();
         record.quantity = query.value(4).toInt();
-        record.price = query.value(5).toDouble();
+        record.originalPrice = query.value(5).toDouble();
+        record.discountedPrice = applyAgeDiscount(record.originalPrice, query.value(7).toString());
+        record.price = record.discountedPrice;
         record.fishCaught = query.value(6).toString();
         record.dateOfPurchase = query.value(7).toString();
         records.append(record);

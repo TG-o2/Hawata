@@ -2299,7 +2299,7 @@ void appwindow::on_pushButton_8_clicked()
 }
 
 
-
+//log out special feature:
 
 
 
@@ -4784,3 +4784,14 @@ void appwindow::on_comboBox_15_currentIndexChanged(int index)
     default: break;
     }
 }
+
+void appwindow::on_logout_clicked()
+{
+    QSettings settings("MyApp", "UserLogin");
+    settings.clear(); // remove saved session
+
+    MainWindow *login = new MainWindow();
+    login->show();
+    this->close();
+}
+

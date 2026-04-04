@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -179,7 +179,7 @@ QPushButton:pressed {
      <property name="geometry">
       <rect>
        <x>990</x>
-       <y>600</y>
+       <y>640</y>
        <width>161</width>
        <height>41</height>
       </rect>
@@ -213,7 +213,7 @@ QPushButton:pressed {
      <property name="geometry">
       <rect>
        <x>990</x>
-       <y>548</y>
+       <y>540</y>
        <width>161</width>
        <height>41</height>
       </rect>
@@ -262,6 +262,40 @@ border: none;
      </property>
      <property name="text">
       <string>Leave application?</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="logout">
+     <property name="geometry">
+      <rect>
+       <x>990</x>
+       <y>588</y>
+       <width>161</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+    background-color: #3498db;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #38bdf8, stop:1 #0ea5e9);
+}
+
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #0369a1, stop:1 #075985);
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Log out</string>
      </property>
     </widget>
    </widget>
@@ -4452,8 +4486,8 @@ border: none;
         <rect>
          <x>280</x>
          <y>560</y>
-            <width>831</width>
-            <height>221</height>
+         <width>831</width>
+         <height>221</height>
         </rect>
        </property>
        <property name="windowTitle">
@@ -6038,15 +6072,15 @@ border: none;
           <rect>
            <x>10</x>
            <y>20</y>
-                        <width>791</width>
-                        <height>151</height>
+           <width>791</width>
+           <height>151</height>
           </rect>
          </property>
-                 <property name="wordWrap">
-                    <bool>true</bool>
-                 </property>
          <property name="text">
           <string>0 Products in system</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </widget>

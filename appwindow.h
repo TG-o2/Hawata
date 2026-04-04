@@ -8,6 +8,7 @@
 #include "company.h"
 #include "Docking.h"
 #include "manage.h"
+#include <QSettings>
 #include <QDialog>
 
 class QModelIndex;
@@ -40,6 +41,8 @@ private slots:
     void on_searchbar_3_textChanged(const QString &text);
     void on_comboBox_11_currentIndexChanged(int index);
     void on_export_pdf_user_clicked();
+    void on_logout_clicked();
+
     // ============================ END USER MODULE .h ============================
 
     // docking CRUD

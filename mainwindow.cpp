@@ -24,9 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //create account link
-    ui->create_acc->setTextFormat(Qt::RichText);
+    ui->forgot_password->setTextFormat(Qt::RichText);
 
-    ui->create_acc->setText(
+    ui->forgot_password->setText(
         "<a href=\"signup\">forgot password?</a>"
         );
     ui->BackFrame->lower();
@@ -36,10 +36,27 @@ MainWindow::MainWindow(QWidget *parent)
         "border-radius: 16px;"
         );
 
-    ui->create_acc->setTextInteractionFlags(Qt::TextBrowserInteraction);
-    ui->create_acc->setOpenExternalLinks(false);
-    ui->create_acc->setCursor(Qt::PointingHandCursor);
+    ui->forgot_password->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    ui->forgot_password->setOpenExternalLinks(false);
+    ui->forgot_password->setCursor(Qt::PointingHandCursor);
 
+
+    //auto login part of user (special feature 1)
+
+    QSettings settings("MyApp", "UserLogin");
+
+    bool remember = settings.value("remember", false).toBool();
+
+    if (remember) {
+        int userId = settings.value("userId").toInt();
+        QString role = settings.value("role").toString();
+
+        qDebug() << "Auto login for user ID:" << userId;
+
+        appwindow *app = new appwindow(this, userId, role);
+        app->show();
+        this->hide();
+    }
 
 
 
@@ -85,9 +102,21 @@ void MainWindow::on_Sign_in_clicked()
     {
         if(query.next())
         {
+
+
             int connectedUserId = query.value(0).toInt();
             QString connectedEmail = query.value(1).toString();
             QString connectedUserRole = query.value(2).toString();
+            QSettings settings("MyApp", "UserLogin");
+
+            if (ui->Remember_me->isChecked()) {
+                settings.setValue("userId", connectedUserId);
+                settings.setValue("email", connectedEmail);
+                settings.setValue("role", connectedUserRole);
+                settings.setValue("remember", true);
+            } else {
+                settings.clear(); // remove saved login
+            }
             qDebug() << "Connected user:" << connectedEmail << "ID:" << connectedUserId << "Role:" << connectedUserRole;
             appwindow *app = new appwindow(this, connectedUserId, connectedUserRole);
             app->show();

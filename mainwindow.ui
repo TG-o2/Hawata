@@ -75,7 +75,7 @@ font-size: 45px;
      <string>secondary</string>
     </property>
    </widget>
-   <widget class="QLabel" name="create_acc">
+   <widget class="QLabel" name="forgot_password">
     <property name="geometry">
      <rect>
       <x>490</x>

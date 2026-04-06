@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -6095,14 +6095,14 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_5">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>-30</x>
        <y>0</y>
        <width>1271</width>
        <height>791</height>
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="user_page1_8">
       <widget class="QWidget" name="BackFrame_30" native="true">
@@ -7286,10 +7286,10 @@ border: none;
        </property>
        <property name="geometry">
         <rect>
-         <x>230</x>
-         <y>20</y>
-         <width>1001</width>
-         <height>631</height>
+         <x>210</x>
+         <y>30</y>
+         <width>1061</width>
+         <height>671</height>
         </rect>
        </property>
        <property name="title">
@@ -7347,10 +7347,10 @@ border: none;
        <widget class="QWidget" name="widget_filters_2" native="true">
         <property name="geometry">
          <rect>
-          <x>29</x>
-          <y>70</y>
+          <x>10</x>
+          <y>90</y>
           <width>1041</width>
-          <height>541</height>
+          <height>551</height>
          </rect>
         </property>
         <widget class="QWidget" name="horizontalLayoutWidget_4">
@@ -7560,7 +7560,7 @@ The Team</string>
           <rect>
            <x>10</x>
            <y>375</y>
-           <width>931</width>
+           <width>951</width>
            <height>71</height>
           </rect>
          </property>
@@ -7601,7 +7601,7 @@ The Team</string>
            <x>20</x>
            <y>460</y>
            <width>821</width>
-           <height>41</height>
+           <height>51</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="layout_buttons_2">
@@ -7683,20 +7683,20 @@ The Team</string>
           </item>
          </layout>
         </widget>
+        <widget class="QPushButton" name="CheckInsightsComp">
+         <property name="geometry">
+          <rect>
+           <x>890</x>
+           <y>470</y>
+           <width>151</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </widget>
-      </widget>
-      <widget class="QPushButton" name="CheckInsightsComp">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>720</y>
-         <width>231</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Check Insights 👀 -&gt;</string>
-       </property>
       </widget>
       <widget class="QWidget" name="BackFrame_28" native="true">
        <property name="geometry">

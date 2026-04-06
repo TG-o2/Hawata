@@ -1,80 +1,55 @@
 #ifndef COMPANY_H
 #define COMPANY_H
+
 #include <QString>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QSqlQueryModel>
 #include <QList>
 
-class CompanyRecord {
+class Company
+{
 public:
-    CompanyRecord() = default;
-    CompanyRecord(int id,
-                  const QString &name,
-                  const QString &location,
-                  const QString &email,
-                  const QString &phone,
-                  const QString &preferredFish,
-                  const QString &status)
-        : m_id(id),
-        m_name(name),
-        m_location(location),
-        m_email(email),
-        m_phone(phone),
-        m_preferredFish(preferredFish),
-        m_status(status)
-    {
-    }
+    Company();
+    Company(int companyId,
+            const QString &name,
+            const QString &location,
+            const QString &email,
+            const QString &phone,
+            const QString &preferredFish,
+            const QString &status);
 
-    int id() const { return m_id; }
-    const QString& name() const { return m_name; }
-    const QString& location() const { return m_location; }
-    const QString& email() const { return m_email; }
-    const QString& phone() const { return m_phone; }
-    const QString& preferredFish() const { return m_preferredFish; }
-    const QString& status() const { return m_status; }
+    int getCompanyId() const;
+    QString getName() const;
+    QString getLocation() const;
+    QString getEmail() const;
+    QString getPhone() const;
+    QString getPreferredFish() const;
+    QString getStatus() const;
+
+    void setCompanyId(int value);
+    void setName(const QString &value);
+    void setLocation(const QString &value);
+    void setEmail(const QString &value);
+    void setPhone(const QString &value);
+    void setPreferredFish(const QString &value);
+    void setStatus(const QString &value);
+
+    bool ajouter_company();
+    QSqlQueryModel* afficher();
+    bool supprimer(int companyId);
+    bool modifier_company();
+    QList<Company> afficher_liste();
+    QString getLastError();
 
 private:
-    int m_id = 0;
+    int m_companyId;
     QString m_name;
     QString m_location;
     QString m_email;
     QString m_phone;
     QString m_preferredFish;
     QString m_status; // "ACTIVE" or "INACTIVE"
-};
-
-class Company
-{
-private:
-    QSqlQueryModel* companiesModel;
-
-public:
-    Company();
-    ~Company() {
-        delete companiesModel;
-    }
-
-    bool createCompany(const QString &name,
-                       const QString &location,
-                       const QString &email,
-                       const QString &phone,
-                       const QString &preferredFish,
-                       const QString &status);
-
-    QList<CompanyRecord> getAllCompanies();
-    QString getLastError();
-    QSqlQueryModel* getCompaniesModel();
-    bool deleteCompany(int companyId);
-    bool updateCompany(int companyId,
-                       const QString &name,
-                       const QString &location,
-                       const QString &email,
-                       const QString &phone,
-                       const QString &preferredFish,
-                       const QString &status);
-    QList<CompanyRecord> searchCompanies(const QString &keyword);
-    QList<CompanyRecord> sortCompaniesBy(const QString &column);
 };
 
 #endif // COMPANY_H

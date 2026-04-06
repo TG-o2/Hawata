@@ -82,7 +82,7 @@ private slots:
     void on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item);
 
     // companies CRUD
-   void on_tableWidget_11_cellClicked(int row, int column);
+    void on_tableWidget_11_cellClicked(int row, int column);
     void on_tableWidget_11_cellDoubleClicked(int row, int column);
     void on_CreateUser_3_clicked();
     void on_edit_company_7_clicked();
@@ -94,8 +94,17 @@ private slots:
     void on_comboBox_19_currentTextChanged(const QString &arg1);
 
     void on_clearBoatButton_clicked();
-
     void on_comboBox_15_currentIndexChanged(int index);
+    void initEmailCampaignPage();
+    void updateTargetCount();
+    QList<Company> getTargetCompanies();
+    QString buildEmailBody(const Company &company, const QString &templateText);
+    void on_btn_template_inactive_2_clicked();
+    void on_btn_template_promo_2_clicked();
+    void on_btn_template_clear_2_clicked();
+    void on_btn_preview_2_clicked();
+    void on_btn_send_now_2_clicked();
+    void on_btn_schedule_2_clicked();
 
 private:
     Ui::appwindow *ui;
@@ -164,11 +173,10 @@ private:
 
     // companies
     void loadCompaniesTable();
-    void loadCompaniesTableFromList(const QList<CompanyRecord> &records);
+    void loadCompaniesTableFromList(const QList<Company> &records);
     void fillCompanyForm(int row);
-    Company companyManager;
     int selectedCompanyId = -1;
-    
+
     // product statistics
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
     void generateProductQuantityByType(const QList<ProductRecord> &products);

@@ -45,6 +45,9 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QItemSelectionModel>
+
+#include <QRandomGenerator>
+#include <QEventLoop>
 namespace {
 QString normalizeMonthAbbreviation(const QString &value)
 {
@@ -193,6 +196,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     loadUsersTable();
     loadProductTable();    // Load product table on startup
     loadCompaniesTable();
+    initEmailCampaignPage();
     generateDockingStatistics();
     loadDockingHistoryView();
 
@@ -4257,10 +4261,10 @@ void appwindow::onCheckMaintenanceReminders()
 
 
 ///=============COMPANY SECTION=============
-
 void appwindow::loadCompaniesTable()
 {
-    QList<CompanyRecord> records = companyManager.getAllCompanies();
+    Company companyObj;
+    QList<Company> records = companyObj.afficher_liste();
 
     QTableWidget *table = ui->tableWidget_11;
     table->setRowCount(0);
@@ -4272,37 +4276,35 @@ void appwindow::loadCompaniesTable()
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->setAlternatingRowColors(true);
 
-    for (const CompanyRecord &r : records) {
+    for (const Company &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
-        table->setItem(row, 1, new QTableWidgetItem(r.name()));
-        table->setItem(row, 2, new QTableWidgetItem(r.location()));
-        table->setItem(row, 3, new QTableWidgetItem(r.email()));
-        table->setItem(row, 4, new QTableWidgetItem(r.phone()));
-        table->setItem(row, 5, new QTableWidgetItem(r.preferredFish()));
-        table->setItem(row, 6, new QTableWidgetItem(r.status()));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.getCompanyId())));
+        table->setItem(row, 1, new QTableWidgetItem(r.getName()));
+        table->setItem(row, 2, new QTableWidgetItem(r.getLocation()));
+        table->setItem(row, 3, new QTableWidgetItem(r.getEmail()));
+        table->setItem(row, 4, new QTableWidgetItem(r.getPhone()));
+        table->setItem(row, 5, new QTableWidgetItem(r.getPreferredFish()));
+        table->setItem(row, 6, new QTableWidgetItem(r.getStatus()));
     }
 
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->labelResults_7->setText(QString("Showing %1 Companies").arg(records.size()));
 }
-
 void appwindow::fillCompanyForm(int row)
 {
     if (row < 0) return;
 
     QTableWidget *table = ui->tableWidget_11;
-
-    if (!table->item(row, 0)) return; // safety
+    if (!table->item(row, 0)) return;
 
     selectedCompanyId = table->item(row, 0)->text().toInt();
 
     ui->firstNameEdit_8->setText(table->item(row, 1) ? table->item(row, 1)->text() : "");
-    ui->lastNameEdit_7->setText(table->item(row, 2) ? table->item(row, 2)->text() : "");
-    ui->emailEdit_4->setText(table->item(row, 3) ? table->item(row, 3)->text() : "");
-    ui->passwordEdit_3->setText(table->item(row, 4) ? table->item(row, 4)->text() : "");
-    ui->lastNameEdit_8->setText(table->item(row, 5) ? table->item(row, 5)->text() : "");
+    ui->lastNameEdit_7->setText (table->item(row, 2) ? table->item(row, 2)->text() : "");
+    ui->emailEdit_4->setText    (table->item(row, 3) ? table->item(row, 3)->text() : "");
+    ui->passwordEdit_3->setText (table->item(row, 4) ? table->item(row, 4)->text() : "");
+    ui->lastNameEdit_8->setText (table->item(row, 5) ? table->item(row, 5)->text() : "");
 
     QString statusText = table->item(row, 6) ? table->item(row, 6)->text() : "";
     int statusIdx = ui->role_option_7->findText(statusText);
@@ -4318,13 +4320,11 @@ void appwindow::on_tableWidget_11_cellClicked(int row, int /*column*/)
     if (row < 0 || !ui->tableWidget_11->item(row, 0)) return;
     selectedCompanyId = ui->tableWidget_11->item(row, 0)->text().toInt();
 }
-
 void appwindow::on_tableWidget_11_cellDoubleClicked(int row, int column)
 {
     Q_UNUSED(column);
     fillCompanyForm(row);
 }
-
 ///CREATE / UPDATE
 void appwindow::on_CreateUser_3_clicked()
 {
@@ -4368,24 +4368,33 @@ void appwindow::on_CreateUser_3_clicked()
 
     bool success = false;
 
-    // ===== CREATE OR UPDATE =====
     if (selectedCompanyId == -1) {
-        // CREATE
-        success = companyManager.createCompany(
-            name, location, email, phone, preferredFish, status);
+        // ===== CREATE =====
+        Company c;
+        c.setName(name);
+        c.setLocation(location);
+        c.setEmail(email);
+        c.setPhone(phone);
+        c.setPreferredFish(preferredFish);
+        c.setStatus(status);
 
-        if (success) {
+        success = c.ajouter_company();
+        if (success)
             QMessageBox::information(this, "Success", "Company created successfully.");
-        }
     } else {
-        // UPDATE
-        success = companyManager.updateCompany(
-            selectedCompanyId,
-            name, location, email, phone, preferredFish, status);
+        // ===== UPDATE =====
+        Company c;
+        c.setCompanyId(selectedCompanyId);
+        c.setName(name);
+        c.setLocation(location);
+        c.setEmail(email);
+        c.setPhone(phone);
+        c.setPreferredFish(preferredFish);
+        c.setStatus(status);
 
-        if (success) {
+        success = c.modifier_company();
+        if (success)
             QMessageBox::information(this, "Success", "Company updated successfully.");
-        }
     }
 
     if (!success) {
@@ -4393,13 +4402,9 @@ void appwindow::on_CreateUser_3_clicked()
         return;
     }
 
-    // Refresh table
     loadCompaniesTable();
-
-    // Clear form
     on_clear_7_clicked();
 }
-
 ///EDIT
 void appwindow::on_edit_company_7_clicked()
 {
@@ -4423,17 +4428,20 @@ void appwindow::on_delete_company_7_clicked()
     int row = selected.first().row();
     int id  = ui->tableWidget_11->item(row, 0)->text().toInt();
     QString name = ui->tableWidget_11->item(row, 1)->text();
+
     if (id <= 0) {
         QMessageBox::warning(this, "Error", "Invalid company ID.");
         return;
     }
+
     QMessageBox::StandardButton reply = QMessageBox::question(
         this, "Confirm Delete",
         QString("Are you sure you want to delete \"%1\" (ID: %2)?").arg(name).arg(id),
         QMessageBox::Yes | QMessageBox::No);
 
     if (reply == QMessageBox::Yes) {
-        if (companyManager.deleteCompany(id)) {
+        Company c;
+        if (c.supprimer(id)) {
             QMessageBox::information(this, "Deleted", "Company deleted successfully.");
             selectedCompanyId = -1;
             loadCompaniesTable();
@@ -4447,7 +4455,6 @@ void appwindow::on_searchbar_7_textChanged(const QString &text)
 {
     for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row) {
         bool match = false;
-
         for (int col = 0; col < ui->tableWidget_11->columnCount(); ++col) {
             QTableWidgetItem *item = ui->tableWidget_11->item(row, col);
             if (item && item->text().contains(text, Qt::CaseInsensitive)) {
@@ -4455,7 +4462,6 @@ void appwindow::on_searchbar_7_textChanged(const QString &text)
                 break;
             }
         }
-
         ui->tableWidget_11->setRowHidden(row, !match);
     }
 }
@@ -4656,79 +4662,68 @@ void appwindow::on_export_pdf_7_clicked()
 
     QMessageBox::information(this, "Success", "PDF exported successfully!");
 }
-void appwindow::loadCompaniesTableFromList(const QList<CompanyRecord> &records)
+void appwindow::loadCompaniesTableFromList(const QList<Company> &records)
 {
     QTableWidget *table = ui->tableWidget_11;
     table->setRowCount(0);
 
-    for (const CompanyRecord &r : records) {
+    for (const Company &r : records) {
         int row = table->rowCount();
         table->insertRow(row);
-
-        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.id())));
-        table->setItem(row, 1, new QTableWidgetItem(r.name()));
-        table->setItem(row, 2, new QTableWidgetItem(r.location()));
-        table->setItem(row, 3, new QTableWidgetItem(r.email()));
-        table->setItem(row, 4, new QTableWidgetItem(r.phone()));
-        table->setItem(row, 5, new QTableWidgetItem(r.preferredFish()));
-        table->setItem(row, 6, new QTableWidgetItem(r.status()));
+        table->setItem(row, 0, new QTableWidgetItem(QString::number(r.getCompanyId())));
+        table->setItem(row, 1, new QTableWidgetItem(r.getName()));
+        table->setItem(row, 2, new QTableWidgetItem(r.getLocation()));
+        table->setItem(row, 3, new QTableWidgetItem(r.getEmail()));
+        table->setItem(row, 4, new QTableWidgetItem(r.getPhone()));
+        table->setItem(row, 5, new QTableWidgetItem(r.getPreferredFish()));
+        table->setItem(row, 6, new QTableWidgetItem(r.getStatus()));
     }
 
     ui->labelResults_7->setText(QString("Showing %1 Companies").arg(records.size()));
 }
 void appwindow::on_comboBox_19_currentTextChanged(const QString &arg1)
 {
-    QList<CompanyRecord> records;
+    Company companyObj;
+    QList<Company> records = companyObj.afficher_liste();
 
-    if (arg1 == "Name")
-        records = companyManager.sortCompaniesBy("NAME");
-    else if (arg1 == "Preferred Fish")
-        records = companyManager.sortCompaniesBy("PREFERRED_FISH");
-    else
-        records = companyManager.getAllCompanies();
+    if (arg1 == "Name") {
+        std::sort(records.begin(), records.end(), [](const Company &a, const Company &b) {
+            return a.getName().toLower() < b.getName().toLower();
+        });
+    } else if (arg1 == "Preferred Fish") {
+        std::sort(records.begin(), records.end(), [](const Company &a, const Company &b) {
+            return a.getPreferredFish().toLower() < b.getPreferredFish().toLower();
+        });
+    }
 
     loadCompaniesTableFromList(records);
 }
+
 void appwindow::on_pushButton_12_clicked()
 {
     QString filterType = ui->comboBox_20->currentText();
 
     QMap<QString, int> stats;
 
-    // Loop through tableWidget_11 (Companies table)
-    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row)
-    {
+    for (int row = 0; row < ui->tableWidget_11->rowCount(); ++row) {
         QString key;
-
         if (filterType == "Status")
-        {
-            // Assuming Status column index = 6
             key = ui->tableWidget_11->item(row, 6)->text();
-        }
         else if (filterType == "Preferred Fish")
-        {
-            // Assuming Preferred Fish column index = 5
             key = ui->tableWidget_11->item(row, 5)->text();
-        }
-
         stats[key]++;
     }
 
-    // ===== Create Bar Series =====
     QBarSeries *series = new QBarSeries();
     QBarSet *set = new QBarSet(filterType);
-
     QStringList categories;
 
-    for (auto it = stats.begin(); it != stats.end(); ++it)
-    {
+    for (auto it = stats.begin(); it != stats.end(); ++it) {
         *set << it.value();
         categories << it.key();
     }
-
     series->append(set);
 
-    // ===== Create Chart =====
     QChart *chart = new QChart();
     chart->addSeries(series);
     chart->setTitle("Company Distribution by " + filterType);
@@ -4746,11 +4741,433 @@ void appwindow::on_pushButton_12_clicked()
 
     chart->legend()->setVisible(true);
 
-    // ===== Display in chartView_6 =====
     ui->chartView_6->setChart(chart);
     ui->chartView_6->setRenderHint(QPainter::Antialiasing);
 }
+// =====================================================================
+// ============= COMPANY EMAIL CAMPAIGN SECTION ========================
+// =====================================================================
 
+void appwindow::initEmailCampaignPage()
+{
+    connect(ui->radio_inactive_2,  &QRadioButton::toggled,
+            this, &appwindow::updateTargetCount);
+    connect(ui->radio_promotion_2, &QRadioButton::toggled,
+            this, &appwindow::updateTargetCount);
+    connect(ui->radio_custom_2,    &QRadioButton::toggled,
+            this, &appwindow::updateTargetCount);
+
+    connect(ui->filter_fish_2,     qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &appwindow::updateTargetCount);
+    connect(ui->filter_location_2, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &appwindow::updateTargetCount);
+
+    connect(ui->btn_template_inactive_2, &QPushButton::clicked,
+            this, &appwindow::on_btn_template_inactive_2_clicked);
+    connect(ui->btn_template_promo_2,    &QPushButton::clicked,
+            this, &appwindow::on_btn_template_promo_2_clicked);
+    connect(ui->btn_template_clear_2,    &QPushButton::clicked,
+            this, &appwindow::on_btn_template_clear_2_clicked);
+
+    connect(ui->btn_preview_2,  &QPushButton::clicked,
+            this, &appwindow::on_btn_preview_2_clicked);
+    connect(ui->btn_send_now_2, &QPushButton::clicked,
+            this, &appwindow::on_btn_send_now_2_clicked);
+    connect(ui->btn_schedule_2, &QPushButton::clicked,
+            this, &appwindow::on_btn_schedule_2_clicked);
+
+    ui->schedule_date_2->setDateTime(QDateTime::currentDateTime().addDays(1));
+
+    updateTargetCount();
+}
+
+// ─────────────────────────────────────────────
+//  Build filtered company list from UI state
+// ─────────────────────────────────────────────
+QList<Company> appwindow::getTargetCompanies()
+{
+    Company obj;
+    QList<Company> all = obj.afficher_liste();
+    QList<Company> result;
+
+    QString fishFilter     = ui->filter_fish_2->currentText();
+    QString locationFilter = ui->filter_location_2->currentText();
+
+    for (const Company &c : all) {
+
+        // ── Status filter ─────────────────────────────
+        if (ui->radio_inactive_2->isChecked()) {
+            if (c.getStatus().toUpper() != "INACTIVE") continue;
+        } else if (ui->radio_promotion_2->isChecked()) {
+            if (c.getStatus().toUpper() != "ACTIVE") continue;
+        }
+        // radio_custom_2 → no status filter
+
+        // ── Fish filter ───────────────────────────────
+        if (fishFilter != "All Fish Types") {
+            if (!c.getPreferredFish().contains(fishFilter, Qt::CaseInsensitive))
+                continue;
+        }
+
+        // ── Location filter ───────────────────────────
+        if (locationFilter != "All Locations") {
+            if (!c.getLocation().contains(locationFilter, Qt::CaseInsensitive))
+                continue;
+        }
+
+        result.append(c);
+    }
+    return result;
+}
+
+// ─────────────────────────────────────────────
+//  Update "Target: X companies" label
+// ─────────────────────────────────────────────
+void appwindow::updateTargetCount()
+{
+    int count = getTargetCompanies().size();
+    ui->label_target_count_2->setText(
+        QString("Target: %1 compan%2")
+            .arg(count)
+            .arg(count == 1 ? "y" : "ies"));
+}
+
+// ─────────────────────────────────────────────
+//  Replace [placeholders] for one company
+// ─────────────────────────────────────────────
+QString appwindow::buildEmailBody(const Company &company, const QString &templateText)
+{
+    QString body = templateText;
+    body.replace("[Company Name]",   company.getName());
+    body.replace("[Preferred Fish]", company.getPreferredFish());
+    body.replace("[Location]",       company.getLocation());
+    body.replace("[Email]",          company.getEmail());
+    return body;
+}
+
+// ─────────────────────────────────────────────
+//  Template buttons  (random pick from vector)
+// ─────────────────────────────────────────────
+void appwindow::on_btn_template_inactive_2_clicked()
+{
+    static const QVector<QPair<QString,QString>> inactiveTemplates = {
+        {
+            "We Miss You, [Company Name]!",
+            "Dear [Company Name],\n\n"
+            "We noticed it has been a while since we last had the pleasure of working together. "
+            "Our team has been thinking about you and we would love to reconnect.\n\n"
+            "We continue to offer the finest [Preferred Fish] from the waters of [Location], "
+            "and we believe there is a great opportunity waiting for both of us.\n\n"
+            "Would you be open to a quick call this week to explore how we can serve you better?\n\n"
+            "Warm regards,\nHawata Marina Team"
+        },
+        {
+            "A Special Offer to Welcome You Back – [Company Name]",
+            "Dear [Company Name],\n\n"
+            "It has been some time since your last visit and we genuinely value our relationship with you.\n\n"
+            "To show our appreciation, we are offering an exclusive discount on your next order of "
+            "[Preferred Fish] — a product we know your business depends on.\n\n"
+            "Your location in [Location] puts you perfectly within our delivery range, and we are "
+            "ready to fulfil your needs faster than ever.\n\n"
+            "Let us know if you are interested and we will get things moving right away.\n\n"
+            "Best wishes,\nHawata Marina Team"
+        },
+        {
+            "Checking In — How Can We Help, [Company Name]?",
+            "Hello [Company Name],\n\n"
+            "We have not heard from you in a while and we just wanted to check in.\n\n"
+            "If there is anything that caused a pause in our partnership — whether it is pricing, "
+            "availability of [Preferred Fish], or anything else — we would love to hear your feedback "
+            "and work together to find a solution.\n\n"
+            "Your satisfaction is our priority, and we are here whenever you are ready.\n\n"
+            "Looking forward to hearing from you,\nHawata Marina Team"
+        },
+        {
+            "Fresh Stock Alert for [Company Name]",
+            "Dear [Company Name],\n\n"
+            "Great news! We have just received a fresh batch of [Preferred Fish] that we think "
+            "would be of interest to your operations in [Location].\n\n"
+            "Given our previous partnership, we wanted to give you early access before "
+            "opening stock to the wider market.\n\n"
+            "Quantities are limited — reach out today to secure your allocation.\n\n"
+            "Kind regards,\nHawata Marina Team"
+        },
+        {
+            "We Value Your Partnership, [Company Name]",
+            "Dear [Company Name],\n\n"
+            "Partnerships like ours are built on trust and consistency, and we want to make sure "
+            "we are still meeting your expectations.\n\n"
+            "We noticed your last interaction with us was some time ago. Our team is ready to "
+            "resume deliveries of [Preferred Fish] to [Location] at competitive prices.\n\n"
+            "Please feel free to reply to this message — we would be happy to reconnect at your convenience.\n\n"
+            "Sincerely,\nHawata Marina Team"
+        }
+    };
+
+    int idx = QRandomGenerator::global()->bounded(inactiveTemplates.size());
+    ui->input_subject_2->setText(inactiveTemplates[idx].first);
+    ui->email_template_2->setPlainText(inactiveTemplates[idx].second);
+}
+
+void appwindow::on_btn_template_promo_2_clicked()
+{
+    static const QVector<QPair<QString,QString>> promoTemplates = {
+        {
+            "Exclusive Seasonal Offer for [Company Name]",
+            "Dear [Company Name],\n\n"
+            "As one of our valued active partners, we are thrilled to bring you an exclusive "
+            "seasonal promotion on [Preferred Fish].\n\n"
+            "For a limited time, we are offering priority pricing and guaranteed stock "
+            "reservations for companies in [Location].\n\n"
+            "Take advantage of this offer before it expires — quantities are limited and our "
+            "loyal partners always come first.\n\n"
+            "Best regards,\nHawata Marina Team"
+        },
+        {
+            "New Arrivals — [Preferred Fish] Now in Stock!",
+            "Hello [Company Name],\n\n"
+            "We are excited to announce that our latest catch of [Preferred Fish] has just arrived "
+            "and is ready for immediate dispatch to [Location].\n\n"
+            "As a valued partner, you get first access to our freshest stock at preferential rates.\n\n"
+            "Place your order today and experience the quality that sets us apart.\n\n"
+            "Warm regards,\nHawata Marina Team"
+        },
+        {
+            "Bulk Order Discount — Just for You, [Company Name]",
+            "Dear [Company Name],\n\n"
+            "We know how important cost efficiency is to your business, which is why we are "
+            "launching a special bulk discount programme exclusively for our active partners.\n\n"
+            "Order a qualifying quantity of [Preferred Fish] and receive a significant price reduction "
+            "— delivered directly to [Location] on your schedule.\n\n"
+            "Reply to this email to learn more and lock in your rate.\n\n"
+            "Looking forward to serving you,\nHawata Marina Team"
+        },
+        {
+            "A Thank You from the Marina Team — Special Reward Inside",
+            "Dear [Company Name],\n\n"
+            "Your continued trust and partnership means everything to us.\n\n"
+            "As a token of our appreciation, we are offering [Company Name] an exclusive "
+            "loyalty reward on your next shipment of [Preferred Fish] to [Location].\n\n"
+            "No action is required — simply place your order as usual and the discount "
+            "will be applied automatically.\n\n"
+            "Thank you for being an outstanding partner.\n\n"
+            "With gratitude,\nHawata Marina Team"
+        },
+        {
+            "Weekend Flash Sale — [Preferred Fish] at Special Rates",
+            "Hello [Company Name],\n\n"
+            "This weekend only, we are running a flash promotion on [Preferred Fish] "
+            "for our active partners across [Location] and beyond.\n\n"
+            "Prices are reduced, stock is fresh, and delivery slots are available immediately.\n\n"
+            "This offer expires Sunday midnight — do not miss out!\n\n"
+            "Act fast and reply to this email to reserve your order.\n\n"
+            "Hawata Marina Team"
+        }
+    };
+
+    int idx = QRandomGenerator::global()->bounded(promoTemplates.size());
+    ui->input_subject_2->setText(promoTemplates[idx].first);
+    ui->email_template_2->setPlainText(promoTemplates[idx].second);
+}
+
+void appwindow::on_btn_template_clear_2_clicked()
+{
+    ui->input_subject_2->clear();
+    ui->email_template_2->clear();
+}
+
+// ─────────────────────────────────────────────
+//  Preview → QDialog with rendered email
+// ─────────────────────────────────────────────
+void appwindow::on_btn_preview_2_clicked()
+{
+    QString subject      = ui->input_subject_2->text().trimmed();
+    QString templateText = ui->email_template_2->toPlainText().trimmed();
+
+    if (subject.isEmpty() || templateText.isEmpty()) {
+        QMessageBox::warning(this, "Missing Content",
+                             "Please fill in the subject and template before previewing.");
+        return;
+    }
+
+    QList<Company> targets = getTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Targets",
+                             "No companies match the current filters.");
+        return;
+    }
+
+    Company sample      = targets.first();
+    QString previewBody = buildEmailBody(sample, templateText);
+
+    QDialog *dlg = new QDialog(this);
+    dlg->setWindowTitle("Email Preview");
+    dlg->setMinimumSize(650, 520);
+
+    QVBoxLayout *layout = new QVBoxLayout(dlg);
+
+    QLabel *infoLabel = new QLabel(
+        QString("Sample preview for: <b>%1</b>  —  "
+                "<b>%2</b> total recipient%3")
+            .arg(sample.getName())
+            .arg(targets.size())
+            .arg(targets.size() == 1 ? "" : "s"));
+    infoLabel->setStyleSheet(
+        "padding: 8px; background: #e8f4f8; border-radius: 4px; font-size: 13px;");
+    layout->addWidget(infoLabel);
+
+    QLabel *subjectLabel = new QLabel("<b>Subject:</b> " + subject);
+    subjectLabel->setStyleSheet("padding: 6px; font-size: 13px;");
+    layout->addWidget(subjectLabel);
+
+    QFrame *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setStyleSheet("color: #ccc;");
+    layout->addWidget(line);
+
+    QTextEdit *bodyView = new QTextEdit();
+    bodyView->setPlainText(previewBody);
+    bodyView->setReadOnly(true);
+    bodyView->setStyleSheet("font-size: 13px; padding: 6px;");
+    layout->addWidget(bodyView);
+
+    QPushButton *closeBtn = new QPushButton("Close");
+    closeBtn->setFixedHeight(35);
+    connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
+    layout->addWidget(closeBtn);
+
+    dlg->exec();
+    delete dlg;
+}
+
+// ─────────────────────────────────────────────
+//  Send Now
+// ─────────────────────────────────────────────
+void appwindow::on_btn_send_now_2_clicked()
+{
+    QString subject      = ui->input_subject_2->text().trimmed();
+    QString templateText = ui->email_template_2->toPlainText().trimmed();
+
+    if (subject.isEmpty() || templateText.isEmpty()) {
+        QMessageBox::warning(this, "Missing Content",
+                             "Please fill in the subject and email template.");
+        return;
+    }
+
+    QList<Company> targets = getTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Targets",
+                             "No companies match the current filters.");
+        return;
+    }
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirm Send",
+        QString("Send emails to %1 compan%2?\n\nSubject: %3")
+            .arg(targets.size())
+            .arg(targets.size() == 1 ? "y" : "ies")
+            .arg(subject),
+        QMessageBox::Yes | QMessageBox::No);
+    if (reply != QMessageBox::Yes) return;
+
+    int sent = 0, failed = 0, skipped = 0;
+
+    ui->btn_send_now_2->setEnabled(false);
+    ui->btn_send_now_2->setText("Sending...");
+    QApplication::processEvents();
+
+    QRegularExpression emailRegex("^[\\w\\.]+@[\\w\\.]+\\.[a-zA-Z]{2,}$");
+
+    for (const Company &company : targets) {
+
+        if (company.getEmail().isEmpty() ||
+            !emailRegex.match(company.getEmail()).hasMatch()) {
+            skipped++;
+            continue;
+        }
+
+        QString body = buildEmailBody(company, templateText);
+
+        SmtpClient *smtp = new SmtpClient("smtp.gmail.com", 465, this);
+        smtp->setUsername("khelifaaa.ahmed@gmail.com");
+        smtp->setPassword("psdb ozyc uypx vqcb");
+
+        bool thisSent = false;
+        QEventLoop loop;
+        connect(smtp, &SmtpClient::mailSent,
+                [&](bool success, const QString &error) {
+                    thisSent = success;
+                    if (!success)
+                        qDebug() << "Send failed to" << company.getEmail() << ":" << error;
+                    loop.quit();
+                });
+
+        smtp->sendMail("khelifaaa.ahmed@gmail.com",
+                       company.getEmail(),
+                       subject,
+                       body);
+        loop.exec();
+        smtp->deleteLater();
+
+        thisSent ? sent++ : failed++;
+        QApplication::processEvents();
+    }
+
+    ui->btn_send_now_2->setEnabled(true);
+    ui->btn_send_now_2->setText("📧 Send Now");
+
+    QMessageBox::information(this, "Campaign Complete",
+                             QString("✅ Sent:     %1\n"
+                                     "❌ Failed:   %2\n"
+                                     "⚠️ Skipped:  %3  (invalid/missing email)")
+                                 .arg(sent).arg(failed).arg(skipped));
+}
+
+// ─────────────────────────────────────────────
+//  Schedule
+// ─────────────────────────────────────────────
+void appwindow::on_btn_schedule_2_clicked()
+{
+    QString subject      = ui->input_subject_2->text().trimmed();
+    QString templateText = ui->email_template_2->toPlainText().trimmed();
+    QDateTime scheduleAt = ui->schedule_date_2->dateTime();
+
+    if (subject.isEmpty() || templateText.isEmpty()) {
+        QMessageBox::warning(this, "Missing Content",
+                             "Please fill in the subject and email template.");
+        return;
+    }
+
+    if (scheduleAt <= QDateTime::currentDateTime()) {
+        QMessageBox::warning(this, "Invalid Time",
+                             "Please select a future date and time.");
+        return;
+    }
+
+    QList<Company> targets = getTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Targets",
+                             "No companies match the current filters.");
+        return;
+    }
+
+    qint64 msDelay = QDateTime::currentDateTime().msecsTo(scheduleAt);
+
+    QMessageBox::information(this, "Scheduled",
+                             QString("Campaign scheduled for:\n%1\n\nRecipients: %2 compan%3")
+                                 .arg(scheduleAt.toString("dd/MM/yyyy  hh:mm"))
+                                 .arg(targets.size())
+                                 .arg(targets.size() == 1 ? "y" : "ies"));
+
+    ui->btn_schedule_2->setEnabled(false);
+    ui->btn_schedule_2->setText("⏰ Scheduled");
+
+    QTimer::singleShot(msDelay, this, [this]() {
+        ui->btn_schedule_2->setEnabled(true);
+        ui->btn_schedule_2->setText("⏰ Schedule");
+        on_btn_send_now_2_clicked();
+    });
+}
 //boat new functionalities
 void appwindow::on_clearBoatButton_clicked()
 {

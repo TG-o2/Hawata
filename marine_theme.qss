@@ -1026,15 +1026,17 @@ QTableWidget#tableWidget QScrollBar::handle {
    AUTOMATED EMAIL BUTTONS STYLING
    ================================================ */
 
+/* Preview Button - Primary Blue */
 QPushButton#btn_preview_2 {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #42a5f5, stop:1 #2196F3);
     color: white;
     font-weight: bold;
-    border-radius: 5px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 10px 16px;      /* was 8px — added horizontal padding */
     font-size: 14px;
     border: none;
+    min-height: 35px;        /* ensures consistent height with other action buttons */
 }
 
 QPushButton#btn_preview_2:hover {
@@ -1045,6 +1047,7 @@ QPushButton#btn_preview_2:hover {
 QPushButton#btn_preview_2:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #1976d2, stop:1 #1565c0);
+    padding-top: 11px;       /* subtle press effect */
 }
 
 /* Send Now Button - Success Green */
@@ -1053,10 +1056,11 @@ QPushButton#btn_send_now_2 {
                                 stop:0 #66bb6a, stop:1 #4CAF50);
     color: white;
     font-weight: bold;
-    border-radius: 5px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 10px 16px;      /* was 8px */
     font-size: 14px;
     border: none;
+    min-height: 35px;
 }
 
 QPushButton#btn_send_now_2:hover {
@@ -1067,6 +1071,7 @@ QPushButton#btn_send_now_2:hover {
 QPushButton#btn_send_now_2:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #388e3c, stop:1 #2e7d32);
+    padding-top: 11px;
 }
 
 /* Schedule Button - Danger Red */
@@ -1075,10 +1080,11 @@ QPushButton#btn_schedule_2 {
                                 stop:0 #ef5350, stop:1 #e53935);
     color: white;
     font-weight: bold;
-    border-radius: 5px;
-    padding: 8px;
+    border-radius: 8px;
+    padding: 10px 16px;      /* was 8px */
     font-size: 14px;
     border: none;
+    min-height: 35px;
 }
 
 QPushButton#btn_schedule_2:hover {
@@ -1089,6 +1095,7 @@ QPushButton#btn_schedule_2:hover {
 QPushButton#btn_schedule_2:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #d32f2f, stop:1 #c62828);
+    padding-top: 11px;
 }
 
 /* Template Buttons - Secondary Blue */
@@ -1098,9 +1105,10 @@ QPushButton#btn_template_promo_2 {
                                 stop:0 #42a5f5, stop:1 #2196F3);
     color: white;
     font-weight: bold;
-    border-radius: 3px;
-    padding: 5px 10px;
+    border-radius: 6px;
+    padding: 7px 14px;       /* was 5px 10px — more breathing room */
     border: none;
+    min-height: 28px;        /* prevents text clipping */
 }
 
 QPushButton#btn_template_inactive_2:hover,
@@ -1113,6 +1121,7 @@ QPushButton#btn_template_inactive_2:pressed,
 QPushButton#btn_template_promo_2:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #1976d2, stop:1 #1565c0);
+    padding-top: 8px;
 }
 
 /* Clear Template Button - Gray */
@@ -1121,19 +1130,33 @@ QPushButton#btn_template_clear_2 {
                                 stop:0 #bdbdbd, stop:1 #9E9E9E);
     color: white;
     font-weight: bold;
-    border-radius: 3px;
-    padding: 5px 10px;
+    border-radius: 6px;
+    padding: 7px 14px;       /* was 5px 10px */
     border: none;
+    min-height: 28px;
 }
 
 QPushButton#btn_template_clear_2:hover {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #e0e0e0, stop:1 #bdbdbd);
+    color: #333333;
 }
 
 QPushButton#btn_template_clear_2:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                                 stop:0 #757575, stop:1 #616161);
+    padding-top: 8px;
+}
+
+/* GroupBox title — fix cramped title on email section */
+QGroupBox#groupBox_target {
+    margin-top: 20px;
+    padding: 14px 16px 16px 16px;  /* top/right/bottom/left — gives title room */
+}
+
+QGroupBox#groupBox_target::title {
+    padding: 4px 12px;
+    font-size: 13px;
 }
 /* ================================================
    STATISTICS SECTION STYLING

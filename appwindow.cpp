@@ -2465,7 +2465,18 @@ void appwindow::loadProductTable()
         table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    QHeaderView *header = table->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setStretchLastSection(false);
+    table->setColumnWidth(0, 60);   // ID
+    table->setColumnWidth(1, 120);  // Status
+    table->setColumnWidth(2, 120);  // Type
+    table->setColumnWidth(3, 170);  // Fish Caught
+    table->setColumnWidth(4, 170);  // Date Purchase
+    table->setColumnWidth(5, 100);  // Quantity
+    table->setColumnWidth(6, 130);  // Location
+    table->setColumnWidth(7, 160);  // Original Price
+    table->setColumnWidth(8, 180);  // Discounted Price
 
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(records.size()));
@@ -2780,7 +2791,18 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
         table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
-    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    QHeaderView *header = table->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setStretchLastSection(false);
+    table->setColumnWidth(0, 60);   // ID
+    table->setColumnWidth(1, 120);  // Status
+    table->setColumnWidth(2, 120);  // Type
+    table->setColumnWidth(3, 170);  // Fish Caught
+    table->setColumnWidth(4, 170);  // Date Purchase
+    table->setColumnWidth(5, 100);  // Quantity
+    table->setColumnWidth(6, 130);  // Location
+    table->setColumnWidth(7, 160);  // Original Price
+    table->setColumnWidth(8, 180);  // Discounted Price
 
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(recordsToDisplay.size()));
@@ -2875,7 +2897,39 @@ void appwindow::on_export_pdf_6_clicked()
         return;
     }
 
-    int columnWidth = contentWidth / columnCount;
+    QVector<int> columnWidths;
+    if (columnCount == 9) {
+        // Give extra room to date/price columns to avoid clipping in PDF.
+        columnWidths = {60, 105, 105, 240, 250, 90, 115, 145, 165};
+    } else {
+        const int fallbackWidth = contentWidth / qMax(1, columnCount);
+        for (int i = 0; i < columnCount; ++i) {
+            columnWidths.append(fallbackWidth);
+        }
+    }
+
+    int totalColumnWidth = 0;
+    for (int w : columnWidths) {
+        totalColumnWidth += w;
+    }
+
+    const qreal widthScale = totalColumnWidth > 0
+                                 ? static_cast<qreal>(contentWidth) / static_cast<qreal>(totalColumnWidth)
+                                 : 1.0;
+
+    for (int i = 0; i < columnWidths.size(); ++i) {
+        columnWidths[i] = qMax(60, qRound(columnWidths[i] * widthScale));
+    }
+
+    int scaledSum = 0;
+    for (int w : columnWidths) {
+        scaledSum += w;
+    }
+
+    if (!columnWidths.isEmpty()) {
+        columnWidths[columnWidths.size() - 1] += (contentWidth - scaledSum);
+    }
+
     int headerHeight = 80;
 
     auto drawHeader = [&]() {
@@ -2890,17 +2944,18 @@ void appwindow::on_export_pdf_6_clicked()
             QString headerText = table->horizontalHeaderItem(col)
             ? table->horizontalHeaderItem(col)->text()
             : "";
-            painter.drawText(xPos + 8, yPos, columnWidth - 16, headerHeight,
+            const int currentWidth = columnWidths.value(col, 100);
+            painter.drawText(xPos + 8, yPos, currentWidth - 16, headerHeight,
                              Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
                              headerText);
 
             if (col < columnCount - 1) {
                 painter.setPen(QPen(Qt::white, 2));
-                painter.drawLine(xPos + columnWidth, yPos,
-                                 xPos + columnWidth, yPos + headerHeight);
+                painter.drawLine(xPos + currentWidth, yPos,
+                                 xPos + currentWidth, yPos + headerHeight);
                 painter.setPen(Qt::white);
             }
-            xPos += columnWidth;
+            xPos += currentWidth;
         }
     };
 
@@ -2937,16 +2992,17 @@ void appwindow::on_export_pdf_6_clicked()
             QString cellText = item ? item->text() : "";
 
             painter.setPen(textColor);
-            painter.drawText(xPos + 10, yPos, columnWidth - 20, rowHeight,
+            const int currentWidth = columnWidths.value(col, 100);
+            painter.drawText(xPos + 10, yPos, currentWidth - 20, rowHeight,
                              Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
                              cellText);
 
             if (col < columnCount - 1) {
                 painter.setPen(QPen(borderColor, 1));
-                painter.drawLine(xPos + columnWidth, yPos,
-                                 xPos + columnWidth, yPos + rowHeight);
+                painter.drawLine(xPos + currentWidth, yPos,
+                                 xPos + currentWidth, yPos + rowHeight);
             }
-            xPos += columnWidth;
+            xPos += currentWidth;
         }
 
         yPos += rowHeight;

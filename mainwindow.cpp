@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "createacc.h"
+//#include "createacc.h"
 #include "appwindow.h"
+#include "emailsender.h"
 
 
 //libraries
@@ -81,13 +82,6 @@ void MainWindow::on_Exit_clicked()
 
 
 
-void MainWindow::on_create_acc_linkActivated(const QString &link)
-{
-    qDebug() << "LINK CLICKED:" << link;
-
-    CreateAcc create_account(this);
-    create_account.exec();
-}
 
 void MainWindow::on_Sign_in_clicked()
 {
@@ -132,4 +126,35 @@ void MainWindow::on_Sign_in_clicked()
         qDebug() << query.lastError();
     }
 
+}
+
+///forgot passwrd special feature user
+void MainWindow::on_forgot_password_linkActivated(const QString &link)
+{
+    QString email = ui->firstName_input->text();
+
+    if (email.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Enter your email");
+        return;
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT PASSWORD FROM USERS WHERE EMAIL = :email");
+    query.bindValue(":email", email);
+
+    if (!query.exec() || !query.next()) {
+        QMessageBox::warning(this, "Error", "Email not found");
+        return;
+    }
+
+    QString password = query.value(0).toString();
+
+    EmailSender sender;
+
+    QString subject = "Password Recovery";
+    QString body = "Your password is: " + password;
+
+    sender.sendEmail(email, subject, body);
+
+    QMessageBox::information(this, "Success", "Password sent to your email");
 }

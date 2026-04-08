@@ -48,6 +48,8 @@ qt_add_executable(Sign_up
     ${PROJECT_SOURCES}
     smtpclient.h
     smtpclient.cpp
+    emailsender.h emailsender.cpp
+
 )
 
 # Link Qt libraries - ADDED Qt6::Network

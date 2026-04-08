@@ -43,6 +43,8 @@ private:
     void sendCommand(const QString &cmd);
     void processResponse();
     QString base64Encode(const QString &str);
+
+    bool mailSentEmitted;
 };
 
 #endif // SMTPCLIENT_H

@@ -4094,8 +4094,28 @@ void appwindow::createBoatChart(const QStringList &categories, const QList<int> 
 
 
 ////EMAILS BOATS
+QDate appwindow::parseBoatMaintenanceDate(const QString &rawDate)
+{
+    QString normalized = rawDate;
+    QStringList parts = normalized.split('/');
+    if (parts.size() == 3) {
+        // Convert "2/FEB/2027" → "2/Feb/2027" (month first letter capital, rest lower)
+        QString month = parts[1];
+        month = month[0].toUpper() + month.mid(1).toLower();
+        normalized = parts[0] + "/" + month + "/" + parts[2];
+    }
+
+    for (const QString &fmt : {"d/MMM/yyyy", "dd/MMM/yyyy", "d/MMM/yy", "dd/MMM/yy"}) {
+        QDate date = QDate::fromString(normalized, fmt);
+        if (date.isValid()) {
+            if (date.year() < 2000) date = date.addYears(100);
+            return date;
+        }
+    }
+    return QDate();
+}
 // Add this function to check and send maintenance reminders
-void appwindow::checkAndSendMaintenanceReminders()
+/*void appwindow::checkAndSendMaintenanceReminders() //apparently bad????
 {
     qDebug() << "Checking for boats due for maintenance...";
 
@@ -4126,14 +4146,11 @@ void appwindow::checkAndSendMaintenanceReminders()
             continue;
         }
 
-        // Parse the last maintenance date
-        QDate lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "yyyy-MM-dd");
+        // Parse the last maintenance date//updated
+        QDate lastMaintenanceDate = parseBoatMaintenanceDate(lastMaintenanceDateStr);
         if (!lastMaintenanceDate.isValid()) {
-            // Try alternative date formats
-            lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "dd-MMM-yyyy");
-            if (!lastMaintenanceDate.isValid()) {
-                lastMaintenanceDate = QDate::fromString(lastMaintenanceDateStr, "MM/dd/yy");
-            }
+            qDebug() << "Invalid date for boat" << boatId << ":" << lastMaintenanceDateStr;
+            continue;
         }
 
         if (!lastMaintenanceDate.isValid()) {
@@ -4166,6 +4183,44 @@ void appwindow::checkAndSendMaintenanceReminders()
     qDebug() << "Maintenance check complete. Sent" << remindersSent << "reminders. Errors:" << errorsEncountered;
 
 
+}*/
+
+
+
+void appwindow::checkAndSendMaintenanceReminders()
+{
+    QSqlQuery allBoats = Boats::getAll();
+    if (!allBoats.isActive()) return;
+
+    QDate today = QDate::currentDate();
+    int remindersSent = 0;
+
+    while (allBoats.next()) {
+        int boatId = allBoats.value(0).toInt();
+        QString ownerEmail = allBoats.value(4).toString();
+        QString ownerName = allBoats.value(3).toString();
+        QString boatType = allBoats.value(6).toString();
+        QString lastMaintStr = allBoats.value(7).toString();
+
+        if (!isEmailValid(ownerEmail)) continue;
+
+        QDate lastMaint = parseBoatMaintenanceDate(lastMaintStr);
+        if (!lastMaint.isValid()) continue;
+
+        int daysOverdue = lastMaint.daysTo(today) - 365;  // positive if overdue
+        if (daysOverdue >= 0) {
+            // Send only once per week (avoid daily spam)
+            int weeksOverdue = daysOverdue / 7;
+            // Use a persistent record (e.g., database column or QSettings)
+            if (weeksOverdue > 0 && weeksOverdue % 1 == 0) {  // weekly
+                sendMaintenanceReminderEmail(ownerEmail, ownerName,
+                                             QString::number(boatId),
+                                             boatType, lastMaint, weeksOverdue);
+                remindersSent++;
+            }
+        }
+    }
+    qDebug() << "Maintenance reminders sent:" << remindersSent;
 }
 
 //status boat
@@ -4215,6 +4270,8 @@ void appwindow::updateBoatStatusProgressBar()
              << "Percentage:" << percentageInPort << "%";
 }
 
+//////////boat maintenance section
+
 
 // Send maintenance reminder email
 void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QString &ownerName,
@@ -4231,7 +4288,7 @@ void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QS
             .arg(weeksOverdue > 1 ? "s" : "");
     }
 
-    // Prepare body
+    // Prepare body (same as before)
     QString body;
     if (weeksOverdue == 0) {
         body = QString(
@@ -4269,31 +4326,53 @@ void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QS
                    .arg(lastMaintenanceDate.toString("MMMM dd, yyyy"));
     }
 
-    // Show confirmation (remove in production)
-    QMessageBox::information(this, "Maintenance Reminder",
-                             QString("Sending reminder to:\n%1\n\nSubject: %2").arg(ownerEmail, subject));
+    // Get email credentials from environment (DO NOT HARDCODE!)
+    QString emailUser = "stargaser518@gmail.com";
+    QString emailPass = "njnvzpfrozglrzam";
 
-    // Create SMTP client
+    if (emailUser.isEmpty() || emailPass.isEmpty()) {
+        qDebug() << "ERROR: Email credentials not set!";
+        QMessageBox::warning(this, "Email Error",
+                             "Email credentials not configured.\n"
+                             "Set HWT_EMAIL_USER and HWT_EMAIL_PASS environment variables.");
+        return;
+    }
+
     SmtpClient *smtp = new SmtpClient("smtp.gmail.com", 465, this);
-    smtp->setUsername("your-email@gmail.com");  // Replace with your email
-    smtp->setPassword("your-app-password");     // Replace with app password
+    smtp->setUsername(emailUser);
+    smtp->setPassword(emailPass);
 
-    connect(smtp, &SmtpClient::mailSent, [this, ownerEmail, subject](bool success, const QString &error) {
+    // ✅ FIX: Use a flag to ensure we only handle ONE signal
+    bool *handled = new bool(false);
+
+    connect(smtp, &SmtpClient::mailSent, this, [this, ownerEmail, subject, smtp, handled](bool success, const QString &error) {
+        if (*handled) {
+            // Already handled this email, ignore duplicate signals
+            return;
+        }
+        *handled = true;
+
         if (success) {
             qDebug() << "Email sent successfully to:" << ownerEmail;
-            QMessageBox::information(this, "Email Sent",
-                                     QString("Maintenance reminder sent to:\n%1").arg(ownerEmail));
+            // Optional: Show a non-blocking notification instead of QMessageBox
+            // QMessageBox::information(this, "Email Sent",
+            //                          QString("Maintenance reminder sent to:\n%1").arg(ownerEmail));
         } else {
             qDebug() << "Failed to send email to:" << ownerEmail << "Error:" << error;
-            QMessageBox::warning(this, "Email Failed",
-                                 QString("Failed to send to %1\nError: %2").arg(ownerEmail, error));
+            // Only show error for first failure, not for the socket close after success
+            if (!error.contains("closed the connection")) {
+                QMessageBox::warning(this, "Email Failed",
+                                     QString("Failed to send to %1\nError: %2").arg(ownerEmail, error));
+            }
         }
-        sender()->deleteLater();
+
+        // Clean up
+        smtp->deleteLater();
+        delete handled;
     });
 
-    smtp->sendMail("your-email@gmail.com", ownerEmail, subject, body);
+    smtp->sendMail(emailUser, ownerEmail, subject, body);
 }
-
 // Validate email format
 bool appwindow::isEmailValid(const QString &email)
 {

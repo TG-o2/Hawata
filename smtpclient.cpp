@@ -3,7 +3,7 @@
 #include <QDateTime>
 
 SmtpClient::SmtpClient(const QString &host, int port, QObject *parent)
-    : QObject(parent), host(host), port(port), state(0), waitingForResponse(false)
+    : QObject(parent), host(host), port(port), state(0), waitingForResponse(false), mailSentEmitted(false)
 {
     socket = new QSslSocket(this);
     connect(socket, &QSslSocket::connected, this, &SmtpClient::onConnected);
@@ -63,6 +63,12 @@ QString SmtpClient::base64Encode(const QString &str)
 
 void SmtpClient::processResponse()
 {
+    if (mailSentEmitted) {
+        // Already emitted result, ignore further responses
+        responseBuffer.clear();
+        return;
+    }
+
     QString response = responseBuffer.trimmed();
     qDebug() << "Response:" << response;
 
@@ -179,7 +185,10 @@ void SmtpClient::processResponse()
     }
 
     if (state == 9) {
-        emit mailSent(true, "Email sent successfully");
+        if (!mailSentEmitted) {
+            mailSentEmitted = true;
+            emit mailSent(true, "Email sent successfully");
+        }
         socket->disconnectFromHost();
     }
 
@@ -189,6 +198,9 @@ void SmtpClient::processResponse()
 void SmtpClient::onErrorOccurred(QAbstractSocket::SocketError socketError)
 {
     Q_UNUSED(socketError)
-    qDebug() << "Socket error:" << socket->errorString();
-    emit mailSent(false, socket->errorString());
+    if (!mailSentEmitted) {
+        mailSentEmitted = true;
+        qDebug() << "Socket error:" << socket->errorString();
+        emit mailSent(false, socket->errorString());
+    }
 }

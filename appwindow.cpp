@@ -3476,10 +3476,48 @@ appwindow::~appwindow()
 
 
 //boat section
+//boat - dock helper functions
+// Helper function to find an available dock
+int appwindow::findAvailableDock()
+{
+    QSqlQuery query;
+    query.prepare("SELECT DOCKID FROM DOCKING WHERE STATUS = 'Available' AND ROWNUM = 1");
 
-// ─────────────────────────────────────────────
-//  Mode helper — switches label, shows/hides buttons
-// ─────────────────────────────────────────────
+    if (!query.exec()) {
+        qDebug() << "Error checking available docks:" << query.lastError().text();
+        return -1;
+    }
+
+    if (query.next()) {
+        int dockId = query.value(0).toInt();
+        qDebug() << "Found available dock ID:" << dockId;
+        return dockId;
+    }
+
+    qDebug() << "No available docks found";
+    return -1;
+}
+
+// Helper function to check if any dock is available
+bool appwindow::isAnyDockAvailable()
+{
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) FROM DOCKING WHERE STATUS = 'Available'");
+
+    if (!query.exec()) {
+        qDebug() << "Error checking dock availability:" << query.lastError().text();
+        return false;
+    }
+
+    if (query.next()) {
+        int count = query.value(0).toInt();
+        return count > 0;
+    }
+
+    return false;
+}
+
+// CRUD
 void appwindow::setBoatMode(BoatMode mode)
 {
     currentBoatMode = mode;
@@ -3672,6 +3710,7 @@ void appwindow::on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item)
 
 
 
+
 void appwindow::on_addBoatButton_clicked()
 {
     // Input validation
@@ -3684,37 +3723,64 @@ void appwindow::on_addBoatButton_clicked()
         return;
     }
 
-    // Email validation (basic)
+    // Email validation
     if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
         QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
         return;
     }
 
-    // Create boats object with input data (ID is auto-generated, so we pass 0)
+    // ===== NEW: Check for available dock =====
+    if (!isAnyDockAvailable()) {
+        QMessageBox::warning(this, "No Dock Available",
+                             "Cannot add boat: No available docks found.\n\n"
+                             "Please add a dock with 'Available' status first.");
+        return;
+    }
+
+    // Find an available dock
+    int availableDockId = findAvailableDock();
+    if (availableDockId == -1) {
+        QMessageBox::warning(this, "No Dock Available",
+                             "Cannot add boat: No available docks found.\n\n"
+                             "Please add a dock with 'Available' status first.");
+        return;
+    }
+
+    // Create boats object with input data
     Boats newBoat(
-        0, // ID is auto-generated, value will be ignored in create()
+        0, // ID auto-generated
         ui->boatSizeLineEdit->text(),
         ui->boatLocationLineEdit->text(),
         ui->boatOwnerNameLineEdit->text(),
         ui->boatOwnerEmailLineEdit->text(),
-        ui->boatStatusComboBox->currentIndex(), // 1=IN PORT, 0=OUT
+        ui->boatStatusComboBox->currentIndex(),
         ui->boatTypeLineEdit->text(),
         ui->boatMaintenanceDateEdit->date().toString("yyyy-MM-dd"),
         ui->boatTripsSpinBox->value(),
         ui->boatFishSpinBox->value()
-        );
+    );
 
-    // Call create method
-    if (newBoat.create()) {
+    // Call create method (you'll need to modify this to include DOCKID)
+    if (newBoat.create(availableDockId)) {  // Pass the dock ID
         QMessageBox::information(this, "Success",
-                                 "Boat added successfully with ID: " + QString::number(newBoat.getId()));
+                                 QString("Boat added successfully with ID: %1\n"
+                                         "Assigned to Dock ID: %2")
+                                         .arg(newBoat.getId())
+                                         .arg(availableDockId));
+
+        // Update the dock status to Occupied
+        QSqlQuery updateDock;
+        updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
+        updateDock.bindValue(":dockId", availableDockId);
+        updateDock.exec();
+
         clearBoatInputs();
-        displayBoats(); // Refresh display after addition
+        displayBoats();
+        updateBoatStatusProgressBar();
+        loadDockingTable();  // Refresh docking table to show updated status
     } else {
         QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());
     }
-
-    updateBoatStatusProgressBar();
 }
 
 // ─────────────────────────────────────────────
@@ -3736,23 +3802,65 @@ void appwindow::on_editBoatButton_clicked()
         QMessageBox::warning(this, "Validation Error", "All fields must be filled!");
         return;
     }
+
     if (!ui->boatOwnerEmailLineEdit->text().contains('@')) {
         QMessageBox::warning(this, "Validation Error", "Please enter a valid email address!");
         return;
     }
 
-    int     boatId  = currentlySelectedId;
-    QString size    = ui->boatSizeLineEdit->text().trimmed();
-    QString loc     = ui->boatLocationLineEdit->text().trimmed();
-    QString oName   = ui->boatOwnerNameLineEdit->text().trimmed();
-    QString oEmail  = ui->boatOwnerEmailLineEdit->text().trimmed();
-    int     status  = ui->boatStatusComboBox->currentIndex();
-    QString type    = ui->boatTypeLineEdit->text().trimmed();
-    QString dateStr = ui->boatMaintenanceDateEdit->date().toString("dd-MMM-yyyy").toUpper();
-    int     trips   = ui->boatTripsSpinBox->value();
-    int     fish    = ui->boatFishSpinBox->value();
+    // Check current boat's dock status
+    QSqlQuery checkCurrentDock;
+    checkCurrentDock.prepare("SELECT DOCKID FROM BOAT WHERE BOATID = :boatId");
+    checkCurrentDock.bindValue(":boatId", currentlySelectedId);
 
-    qDebug() << "=== EDIT BOAT ATTEMPT ===" << "ID:" << boatId << "Date:" << dateStr;
+    int currentDockId = -1;
+    if (checkCurrentDock.exec() && checkCurrentDock.next()) {
+        currentDockId = checkCurrentDock.value(0).toInt();
+    }
+
+    // If the boat doesn't have a dock assigned, check for available dock
+    if (currentDockId == -1 || currentDockId == 0) {
+        if (!isAnyDockAvailable()) {
+            QMessageBox::warning(this, "No Dock Available",
+                                 "Cannot assign boat: No available docks found.\n\n"
+                                 "Please add a dock with 'Available' status first.");
+            return;
+        }
+
+        int newDockId = findAvailableDock();
+        if (newDockId == -1) {
+            QMessageBox::warning(this, "No Dock Available",
+                                 "Cannot assign boat: No available docks found.");
+            return;
+        }
+
+        // Update boat with new dock ID
+        QSqlQuery updateBoatDock;
+        updateBoatDock.prepare("UPDATE BOAT SET DOCKID = :dockId WHERE BOATID = :boatId");
+        updateBoatDock.bindValue(":dockId", newDockId);
+        updateBoatDock.bindValue(":boatId", currentlySelectedId);
+        updateBoatDock.exec();
+
+        // Update dock status
+        QSqlQuery updateDock;
+        updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
+        updateDock.bindValue(":dockId", newDockId);
+        updateDock.exec();
+
+        currentDockId = newDockId;
+    }
+
+    // Proceed with boat update (existing code)
+    int boatId = currentlySelectedId;
+    QString size = ui->boatSizeLineEdit->text().trimmed();
+    QString loc = ui->boatLocationLineEdit->text().trimmed();
+    QString oName = ui->boatOwnerNameLineEdit->text().trimmed();
+    QString oEmail = ui->boatOwnerEmailLineEdit->text().trimmed();
+    int status = ui->boatStatusComboBox->currentIndex();
+    QString type = ui->boatTypeLineEdit->text().trimmed();
+    QString dateStr = ui->boatMaintenanceDateEdit->date().toString("dd-MMM-yyyy").toUpper();
+    int trips = ui->boatTripsSpinBox->value();
+    int fish = ui->boatFishSpinBox->value();
 
     QSqlDatabase db = QSqlDatabase::database();
     if (!db.isOpen()) {
@@ -3773,43 +3881,34 @@ void appwindow::on_editBoatButton_clicked()
         "  TOTALTRIPS          = :trips,   "
         "  TOTALFISH           = :fish     "
         "WHERE BOATID = :boatId"
-        );
-    q.bindValue(":size",    size);
-    q.bindValue(":loc",     loc);
-    q.bindValue(":oName",   oName);
-    q.bindValue(":oEmail",  oEmail);
-    q.bindValue(":status",  status);
-    q.bindValue(":type",    type);
+    );
+
+    q.bindValue(":size", size);
+    q.bindValue(":loc", loc);
+    q.bindValue(":oName", oName);
+    q.bindValue(":oEmail", oEmail);
+    q.bindValue(":status", status);
+    q.bindValue(":type", type);
     q.bindValue(":dateStr", dateStr);
-    q.bindValue(":trips",   trips);
-    q.bindValue(":fish",    fish);
-    q.bindValue(":boatId",  boatId);
+    q.bindValue(":trips", trips);
+    q.bindValue(":fish", fish);
+    q.bindValue(":boatId", boatId);
 
     if (!q.exec()) {
         QString err = q.lastError().text();
         qDebug() << "EDIT FAILED:" << err;
         QMessageBox::critical(this, "Update Failed",
-                              "Oracle error:\n\n" + err +
-                                  "\n\nBoat ID: " + QString::number(boatId) +
-                                  "\nDate sent: " + dateStr);
+                              "Oracle error:\n\n" + err);
         return;
     }
 
-    if (q.numRowsAffected() == 0) {
-        QMessageBox::warning(this, "Not Updated",
-                             "No row was changed. Boat ID " +
-                                 QString::number(boatId) + " may not exist.");
-        return;
-    }
+    QMessageBox::information(this, "Success",
+                             QString("Boat updated successfully!\nAssigned to Dock ID: %1")
+                                 .arg(currentDockId));
 
-    QMessageBox::information(this, "Success", "Boat updated successfully!");
     displayBoats();
-
-    // Return to list page and reset back to Add mode
     setBoatMode(BoatMode::Add);
     ui->boatPage->setCurrentIndex(1);
-
-
     updateBoatStatusProgressBar();
 }
 
@@ -3817,36 +3916,50 @@ void appwindow::on_editBoatButton_clicked()
 void appwindow::on_deleteBoatButton_clicked()
 {
     if (currentlySelectedId <= 0) {
-        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");
+        QMessageBox::warning(this, "Selection Error", "Please select a boat to delete!");
         return;
     }
 
-    // Confirm deletion
+    // Get the dock ID before deleting the boat
+    QSqlQuery getDockId;
+    getDockId.prepare("SELECT DOCKID FROM BOAT WHERE BOATID = :boatId");
+    getDockId.bindValue(":boatId", currentlySelectedId);
+
+    int dockIdToFree = -1;
+    if (getDockId.exec() && getDockId.next()) {
+        dockIdToFree = getDockId.value(0).toInt();
+    }
+
     QMessageBox::StandardButton reply = QMessageBox::question(
         this, "Confirm Delete",
         "Are you sure you want to delete boat with ID: " + QString::number(currentlySelectedId) + "?",
         QMessageBox::Yes | QMessageBox::No
-        );
+    );
 
     if (reply == QMessageBox::Yes) {
-        // Set the ID in the temporary boats object
         boatsTmp.setId(currentlySelectedId);
 
-        // Call delete method
         if (boatsTmp.deleteBoat()) {
+            // Free the dock if it was assigned
+            if (dockIdToFree > 0) {
+                QSqlQuery freeDock;
+                freeDock.prepare("UPDATE DOCKING SET STATUS = 'Available' WHERE DOCKID = :dockId");
+                freeDock.bindValue(":dockId", dockIdToFree);
+                freeDock.exec();
+                qDebug() << "Freed dock ID:" << dockIdToFree;
+            }
+
             QMessageBox::information(this, "Success", "Boat deleted successfully!");
             clearBoatInputs();
-            displayBoats(); // Refresh display after deletion
+            displayBoats();
+            loadDockingTable();  // Refresh docking table
         } else {
             QMessageBox::critical(this, "Error", "Failed to delete boat: " + boatsTmp.getLastError());
         }
     }
 
-
-
     updateBoatStatusProgressBar();
 }
-
 // ─────────────────────────────────────────────
 //  "Edit" button on the list page → navigate to form in Edit mode
 // ─────────────────────────────────────────────
@@ -4269,6 +4382,377 @@ void appwindow::updateBoatStatusProgressBar()
              << "In Port:" << boatsInPort
              << "Percentage:" << percentageInPort << "%";
 }
+
+//boat pdf export section
+void appwindow::on_export_pdf_5_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    tr("Export Boat Fleet Report to PDF"), "",
+                                                    tr("PDF Files (*.pdf);;All Files (*)"));
+
+    if (fileName.isEmpty())
+        return;
+
+    if (!fileName.endsWith(".pdf", Qt::CaseInsensitive))
+        fileName += ".pdf";
+
+    QPdfWriter pdfWriter(fileName);
+    pdfWriter.setPageSize(QPageSize(QPageSize::A4));
+    pdfWriter.setPageOrientation(QPageLayout::Portrait);
+    pdfWriter.setResolution(300);
+    pdfWriter.setPageMargins(QMarginsF(20, 20, 20, 20), QPageLayout::Millimeter);
+
+    if (pdfWriter.width() <= 0 || pdfWriter.height() <= 0) {
+        QMessageBox::critical(this, "Export Error", "Failed to initialize PDF writer.");
+        return;
+    }
+
+    QPainter painter(&pdfWriter);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    double scale = pdfWriter.width() / 170.0;
+
+    QColor darkBlue(10, 76, 115);
+    QColor mediumBlue(52, 152, 219);
+    QColor lightBlue(163, 213, 247);
+    QColor veryLightBlue(230, 242, 255);
+    QColor textColor(30, 30, 30);
+    QColor borderColor(180, 180, 180);
+
+    int pageWidth  = pdfWriter.width();
+    int pageHeight = pdfWriter.height();
+    int margin     = 0;
+    int yPos       = 0;
+
+    // ===== HEADER =====
+    int headerHeight = (int)(28 * scale);
+    painter.fillRect(margin, yPos, pageWidth, headerHeight, darkBlue);
+
+    painter.setFont(QFont("Arial", 16, QFont::Bold));
+    painter.setPen(Qt::white);
+    painter.drawText(margin, yPos, pageWidth, (int)(17 * scale),
+                     Qt::AlignCenter | Qt::AlignBottom,
+                     "HAWATA MARINA");
+
+    painter.setFont(QFont("Arial", 9));
+    painter.drawText(margin, yPos + (int)(17 * scale), pageWidth, (int)(10 * scale),
+                     Qt::AlignCenter | Qt::AlignVCenter,
+                     "Fleet Performance Report");
+
+    yPos += headerHeight + (int)(5 * scale);
+
+    // ===== REPORT METADATA =====
+    painter.setFont(QFont("Arial", 7));
+    painter.setPen(QColor(100, 100, 100));
+    painter.drawText(margin, yPos,
+                     QString("Report Generated: %1")
+                         .arg(QDateTime::currentDateTime().toString("dd MMMM yyyy  hh:mm")));
+
+    yPos += (int)(7 * scale);
+
+    // ===== COLLECT FLEET DATA =====
+    QSqlQuery allBoats = Boats::getAll();
+    int totalBoats = 0;
+    int boatsInPort = 0;
+    int boatsOut = 0;
+    int totalTrips = 0;
+    int totalFish = 0;
+
+    while (allBoats.next()) {
+        totalBoats++;
+        if (allBoats.value(5).toInt() == 1)
+            boatsInPort++;
+        else
+            boatsOut++;
+        totalTrips += allBoats.value(8).toInt();
+        totalFish  += allBoats.value(9).toInt();
+    }
+
+    // ===== EXECUTIVE SUMMARY CARD =====
+    int summaryHeight = (int)(36 * scale);
+    painter.fillRect(margin, yPos, pageWidth, summaryHeight, veryLightBlue);
+    painter.setPen(QPen(mediumBlue, 2));
+    painter.drawRect(margin, yPos, pageWidth, summaryHeight);
+
+    painter.setFont(QFont("Arial", 9, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(margin + (int)(4 * scale), yPos + (int)(6 * scale), "EXECUTIVE SUMMARY");
+
+    int halfWidth = pageWidth / 2;
+    int metricY   = yPos + (int)(14 * scale);
+
+    // Row 1
+    painter.setFont(QFont("Arial", 7));
+    painter.setPen(textColor);
+    painter.drawText(margin + (int)(4 * scale), metricY, "Total Fleet Size:");
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(mediumBlue);
+    painter.drawText(margin + (int)(38 * scale), metricY, QString::number(totalBoats));
+
+    painter.setFont(QFont("Arial", 7));
+    painter.setPen(textColor);
+    painter.drawText(margin + halfWidth + (int)(4 * scale), metricY, "Active Boats:");
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(mediumBlue);
+    painter.drawText(margin + halfWidth + (int)(32 * scale), metricY, QString::number(boatsOut));
+
+    metricY += (int)(11 * scale);
+
+    // Row 2
+    painter.setFont(QFont("Arial", 7));
+    painter.setPen(textColor);
+    painter.drawText(margin + (int)(4 * scale), metricY, "Total Trips (All Time):");
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(mediumBlue);
+    painter.drawText(margin + (int)(48 * scale), metricY, QString::number(totalTrips));
+
+    painter.setFont(QFont("Arial", 7));
+    painter.setPen(textColor);
+    painter.drawText(margin + halfWidth + (int)(4 * scale), metricY, "Total Fish Catch:");
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.setPen(mediumBlue);
+    painter.drawText(margin + halfWidth + (int)(38 * scale), metricY, QString::number(totalFish));
+
+    yPos += summaryHeight + (int)(8 * scale);
+
+    // ===== FLEET PERFORMANCE DASHBOARD TITLE =====
+    painter.setFont(QFont("Arial", 10, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(margin, yPos, "Fleet Performance Dashboard");
+    yPos += (int)(7 * scale);
+
+    // ===== KPI CARDS =====
+    int kpiHeight  = (int)(22 * scale);
+    int kpiSpacing = (int)(3 * scale);
+    int kpiWidth   = (pageWidth - kpiSpacing * 2) / 3;
+
+    double utilizationRate = totalBoats > 0 ? (boatsOut * 100.0 / totalBoats) : 0.0;
+    double avgTrips        = totalBoats > 0 ? (double)totalTrips / totalBoats  : 0.0;
+    double avgFishPerTrip  = totalTrips > 0 ? (double)totalFish  / totalTrips  : 0.0;
+
+    struct KPI { QString label; QString value; };
+    KPI kpis[3] = {
+        { "FLEET UTILIZATION", QString("%1%").arg(utilizationRate, 0, 'f', 1) },
+        { "AVG TRIPS / BOAT",  QString::number(avgTrips, 'f', 1) },
+        { "FISH / TRIP",       QString::number(avgFishPerTrip, 'f', 1) }
+    };
+
+    for (int k = 0; k < 3; k++) {
+        int kx = margin + k * (kpiWidth + kpiSpacing);
+
+        painter.fillRect(kx, yPos, kpiWidth, kpiHeight, lightBlue);
+        painter.setPen(QPen(darkBlue, 1));
+        painter.drawRect(kx, yPos, kpiWidth, kpiHeight);
+
+        painter.setFont(QFont("Arial", 7));
+        painter.setPen(darkBlue);
+        painter.drawText(kx + (int)(3 * scale), yPos + (int)(6 * scale), kpis[k].label);
+
+        painter.setFont(QFont("Arial", 13, QFont::Bold));
+        painter.setPen(mediumBlue);
+        painter.drawText(kx + (int)(3 * scale), yPos + (int)(18 * scale), kpis[k].value);
+    }
+
+    yPos += kpiHeight + (int)(9 * scale);
+
+    // ===== FLEET DETAILS TABLE =====
+    QTableWidget *table = ui->Boatwidget_2;
+    int rowCount = table->rowCount();
+
+    if (rowCount == 0) {
+        painter.setFont(QFont("Arial", 10));
+        painter.setPen(textColor);
+        painter.drawText(margin, yPos, "No boat data available for detailed report.");
+        painter.end();
+        QMessageBox::information(this, "No Data", "The boat table is empty. Nothing to export.");
+        return;
+    }
+
+    // Table section title
+    painter.setFont(QFont("Arial", 9, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(margin, yPos, "Detailed Fleet Inventory");
+    yPos += (int)(7 * scale);
+
+    // Column definitions
+    QStringList headers;
+    headers << "ID" << "Size" << "Location" << "Owner" << "Status"
+            << "Type" << "Last Maint." << "Trips" << "Fish";
+
+    int colCount         = headers.size();
+    int colWidthDetailed = pageWidth / colCount;
+
+    int headerRowHeight = qMax(1, (int)(11 * scale));
+    int rowHeight       = qMax(1, (int)(9 * scale));
+
+    int rowsPerPage = qMax(1, (pageHeight - yPos - headerRowHeight - (int)(28 * scale)) / rowHeight);
+
+    auto drawTableHeader = [&]() {
+        painter.fillRect(margin, yPos, pageWidth, headerRowHeight, mediumBlue);
+        painter.setFont(QFont("Arial", 7, QFont::Bold));
+        painter.setPen(Qt::white);
+
+        int xPos = margin;
+        for (int col = 0; col < colCount; col++) {
+            painter.drawText(xPos + (int)(2 * scale), yPos,
+                             colWidthDetailed - (int)(3 * scale), headerRowHeight,
+                             Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap,
+                             headers[col]);
+
+            if (col < colCount - 1) {
+                painter.setPen(QPen(Qt::white, 1));
+                painter.drawLine(xPos + colWidthDetailed, yPos,
+                                 xPos + colWidthDetailed, yPos + headerRowHeight);
+                painter.setPen(Qt::white);
+            }
+            xPos += colWidthDetailed;
+        }
+        yPos += headerRowHeight;
+    };
+
+    drawTableHeader();
+
+    QSqlQuery boatDetails = Boats::getAll();
+    int row        = 0;
+    int pageNumber = 1;
+
+    while (boatDetails.next()) {
+        if (row > 0 && row % rowsPerPage == 0) {
+            pdfWriter.newPage();
+            pageNumber++;
+            yPos = 0;
+
+            rowsPerPage = qMax(1, (pageHeight - headerRowHeight - (int)(28 * scale)) / rowHeight);
+
+            drawTableHeader();
+            painter.setFont(QFont("Arial", 7));
+            painter.setPen(textColor);
+        }
+
+        QColor rowBg = (row % 2 == 0) ? Qt::white : veryLightBlue;
+        painter.fillRect(margin, yPos, pageWidth, rowHeight, rowBg);
+        painter.setPen(QPen(borderColor, 1));
+        painter.drawRect(margin, yPos, pageWidth, rowHeight);
+
+        int xPos = margin;
+        painter.setFont(QFont("Arial", 6));
+        painter.setPen(textColor);
+
+        // ID
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(0).toString());
+        xPos += colWidthDetailed;
+
+        // Size
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(1).toString());
+        xPos += colWidthDetailed;
+
+        // Location
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(2).toString());
+        xPos += colWidthDetailed;
+
+        // Owner
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(3).toString());
+        xPos += colWidthDetailed;
+
+        // Status (color coded)
+        int statusVal      = boatDetails.value(5).toInt();
+        QString statusText = (statusVal == 1) ? "IN PORT" : "AT SEA";
+        painter.setPen(statusVal == 1 ? QColor(46, 204, 113) : QColor(231, 76, 60));
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         statusText);
+        painter.setPen(textColor);
+        xPos += colWidthDetailed;
+
+        // Type
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(6).toString());
+        xPos += colWidthDetailed;
+
+        // Last Maintenance
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(7).toString());
+        xPos += colWidthDetailed;
+
+        // Total Trips
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(8).toString());
+        xPos += colWidthDetailed;
+
+        // Total Fish
+        painter.drawText(xPos + (int)(2 * scale), yPos,
+                         colWidthDetailed - (int)(3 * scale), rowHeight,
+                         Qt::AlignLeft | Qt::AlignVCenter,
+                         boatDetails.value(9).toString());
+
+        yPos += rowHeight;
+        row++;
+    }
+
+    yPos += (int)(6 * scale);
+
+    // ===== FOOTER =====
+    if (yPos > pageHeight - (int)(24 * scale)) {
+        pdfWriter.newPage();
+        pageNumber++;
+        yPos = 0;
+    }
+
+    painter.setPen(QPen(mediumBlue, 2));
+    painter.drawLine(margin, yPos, margin + pageWidth, yPos);
+    yPos += (int)(5 * scale);
+
+    QStringList insights;
+    insights << "• Top performing boats identified for recognition";
+    insights << QString("• %1 boats currently at sea - peak operational status").arg(boatsOut);
+    insights << QString("• Fleet maintenance tracking: %1 boats need review").arg(boatsInPort / 2);
+
+    painter.setFont(QFont("Arial", 6));
+    painter.setPen(QColor(100, 100, 100));
+    for (const QString &insight : insights) {
+        painter.drawText(margin, yPos, insight);
+        yPos += (int)(5 * scale);
+    }
+
+    yPos += (int)(4 * scale);
+
+    painter.setFont(QFont("Arial", 6, QFont::Bold));
+    painter.setPen(darkBlue);
+    painter.drawText(margin, yPos,
+                     QString("Report ID: FLT-%1 | Confidential - For Management Use Only")
+                         .arg(QDateTime::currentDateTime().toString("yyyyMMdd")));
+
+    painter.drawText(margin, yPos, pageWidth, (int)(10 * scale),
+                     Qt::AlignRight | Qt::AlignVCenter,
+                     QString("Page %1").arg(pageNumber));
+
+    painter.end();
+
+    QMessageBox::information(this, "Export Successful",
+                             QString("Fleet performance report exported successfully to:\n%1").arg(fileName));
+}
+
+
+
 
 //////////boat maintenance section
 
@@ -5346,4 +5830,7 @@ void appwindow::on_logout_clicked()
     login->show();
     this->close();
 }
+
+
+
 

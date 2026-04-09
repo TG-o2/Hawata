@@ -19,7 +19,7 @@ Boats::Boats(int id, const QString &size, const QString &location,
 {
 }
 
-bool Boats::create()
+bool Boats::create(int dockId)
 {
     lastError.clear();
     QSqlDatabase db = QSqlDatabase::database();
@@ -32,9 +32,8 @@ bool Boats::create()
 
     QSqlQuery query(db);
 
-    // If ID is 0, we need to get the next value
+    // If ID is 0, get the next value
     if (id == 0) {
-        // Get the max ID and add 1
         QSqlQuery maxQuery(db);
         maxQuery.exec("SELECT NVL(MAX(BOATID), 0) + 1 FROM BOAT");
         if (maxQuery.next()) {
@@ -45,13 +44,12 @@ bool Boats::create()
         }
     }
 
-    // Now include BOATID in the INSERT
+    // Updated INSERT to include DOCKID
     query.prepare("INSERT INTO BOAT (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
-                  "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH) "
+                  "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH, DOCKID) "
                   "VALUES (:id, :size, :location, :ownerName, :ownerEmail, "
-                  ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish)");
+                  ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish, :dockId)");
 
-    // Bind values including ID
     query.bindValue(":id", id);
     query.bindValue(":size", size);
     query.bindValue(":location", location);
@@ -62,6 +60,7 @@ bool Boats::create()
     query.bindValue(":lastMaintenanceDate", lastMaintenanceDate);
     query.bindValue(":totalTrips", totalTrips);
     query.bindValue(":totalFish", totalFish);
+    query.bindValue(":dockId", dockId);  // Bind the dock ID
 
     if (!query.exec()) {
         lastError = query.lastError().text();
@@ -69,9 +68,10 @@ bool Boats::create()
         return false;
     }
 
-    qDebug() << "Boat created successfully with ID:" << id;
+    qDebug() << "Boat created successfully with ID:" << id << "assigned to Dock:" << dockId;
     return true;
 }
+
 bool Boats::update()
 {
     lastError.clear();

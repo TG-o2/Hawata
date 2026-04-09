@@ -80,6 +80,9 @@ private slots:
     void on_searchBoatButton_3_clicked();
     void on_Boatwidget_2_itemSelectionChanged();
     void on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item);
+    //boat special features
+    void onCheckMaintenanceReminders();
+    void on_export_pdf_5_clicked();
 
     // companies CRUD
     void on_tableWidget_11_cellClicked(int row, int column);
@@ -144,6 +147,8 @@ private:
 
     //boats
     enum class BoatMode { Add, Edit };
+    int findAvailableDock();
+    bool isAnyDockAvailable();
 
     void displayBoats();
     void clearBoatInputs();
@@ -163,7 +168,6 @@ private:
     const QDate &lastMaintenanceDate, int weeksOverdue);
     QDate getNextMaintenanceDate(const QDate &lastMaintenanceDate);
     bool isEmailValid(const QString &email);
-
 
     // Timer for periodic checking
     QTimer *maintenanceCheckTimer;
@@ -185,9 +189,8 @@ private:
     void generateProductQuantityByType(const QList<ProductRecord> &products);
 
 
-private slots:
-    //boat
-    void onCheckMaintenanceReminders();
+
+
 };
 
 #endif // APPWINDOW_H

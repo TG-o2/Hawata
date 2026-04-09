@@ -40,7 +40,7 @@ public:
     void setTotalFish(int newTotalFish) { totalFish = newTotalFish; }
 
     // CRUD Operations
-    bool create();  // Now doesn't require ID in parameters
+    bool create(int dockId = -1);  // Now doesn't require ID in parameters
     bool update();
     bool deleteBoat();
     void read(); // Populates the current object with data from DB for its ID

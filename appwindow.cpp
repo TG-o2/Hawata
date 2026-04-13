@@ -877,12 +877,13 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->Exit, &QPushButton::clicked, qApp, &QApplication::quit);
 
     /// Log in page
+    /*
     connect(ui->Goback, &QPushButton::clicked, this, [=]() {
         MainWindow *w = new MainWindow();
         w->show();
         this->close();   // or hide()
     });
-
+    */
     //docking connects
 
     // Wire double-click (add once, anywhere in the constructor)
@@ -2235,9 +2236,9 @@ void appwindow::on_export_pdf_user_clicked()
     QMessageBox::information(this, "Export Successful",
                              QString("PDF exported successfully to:\n%1").arg(fileName));
 }
-
 void appwindow::loadUserStatistics(bool byRole)
 {
+    // Clear previous chart
     while (QLayoutItem *item = ui->statsiticslayout->takeAt(0)) {
         if (item->widget()) {
             item->widget()->deleteLater();
@@ -2245,14 +2246,21 @@ void appwindow::loadUserStatistics(bool byRole)
         delete item;
     }
 
+    // Get TOTAL users
+    int total = 0;
+    QSqlQuery totalQuery;
+    if (totalQuery.exec("SELECT COUNT(*) FROM USERS") && totalQuery.next()) {
+        total = totalQuery.value(0).toInt();
+    }
+
     QBarSeries *series = new QBarSeries();
-    QBarSet *set = new QBarSet("Users Count");
+    QBarSet *set = new QBarSet("Percentage (%)");
     QStringList categories;
 
     QSqlQuery query;
     const QString sql = byRole
-                            ? "SELECT ROLE, COUNT(*) FROM USERS GROUP BY ROLE ORDER BY ROLE"
-                            : "SELECT GENDER, COUNT(*) FROM USERS GROUP BY GENDER ORDER BY GENDER";
+        ? "SELECT ROLE, COUNT(*) FROM USERS GROUP BY ROLE ORDER BY ROLE"
+        : "SELECT GENDER, COUNT(*) FROM USERS GROUP BY GENDER ORDER BY GENDER";
 
     if (!query.exec(sql)) {
         QLabel *errorLabel = new QLabel("Failed to load statistics data.");
@@ -2261,20 +2269,20 @@ void appwindow::loadUserStatistics(bool byRole)
         return;
     }
 
-    int maxCount = 0;
+    // Fill data (convert to percentage)
     while (query.next()) {
         const QString category = query.value(0).toString().trimmed().isEmpty()
-        ? "Unknown"
-        : query.value(0).toString().trimmed();
-        const int count = query.value(1).toInt();
+            ? "Unknown"
+            : query.value(0).toString().trimmed();
 
-        *set << count;
+        const int count = query.value(1).toInt();
+        double percentage = (total > 0) ? (count * 100.0 / total) : 0;
+
+        *set << percentage;
         categories << category;
-        if (count > maxCount) {
-            maxCount = count;
-        }
     }
 
+    // Handle empty data
     if (categories.isEmpty()) {
         *set << 0;
         categories << "No Data";
@@ -2282,22 +2290,27 @@ void appwindow::loadUserStatistics(bool byRole)
 
     series->append(set);
 
+    // Create chart
     QChart *chart = new QChart();
     chart->addSeries(series);
-    chart->setTitle(byRole ? "Users Statistics by Role" : "Users Statistics by Gender");
+    chart->setTitle(byRole ? "Users Statistics by Role (%)"
+                           : "Users Statistics by Gender (%)");
     chart->setAnimationOptions(QChart::SeriesAnimations);
 
+    // X axis
     QBarCategoryAxis *axis = new QBarCategoryAxis();
     axis->append(categories);
     chart->addAxis(axis, Qt::AlignBottom);
     series->attachAxis(axis);
 
+    // Y axis (percentage)
     QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, qMax(1, maxCount));
-    axisY->setLabelFormat("%d");
+    axisY->setRange(0, 100);
+    axisY->setLabelFormat("%.0f%%");
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
+    // Chart view
     QChartView *chartView = new QChartView(chart);
     chartView->setRenderHint(QPainter::Antialiasing);
 

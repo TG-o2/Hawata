@@ -16,6 +16,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    bool isAutoLoginTriggered() const;
 
 public slots:
 private slots:
@@ -28,7 +29,10 @@ private slots:
     void on_forgot_password_linkActivated(const QString &link);
 
 private:
+    void openAppWindow(int userId, const QString &role);
+
     Ui::MainWindow *ui;
+    bool m_autoLoginTriggered = false;
 };
 
 #endif // MAINWINDOW_H

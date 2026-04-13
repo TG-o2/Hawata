@@ -60,7 +60,9 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
-    w.show();
+    if (!w.isAutoLoginTriggered()) {
+        w.show();
+    }
 
     return app.exec();
 }

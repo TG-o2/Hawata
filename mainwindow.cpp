@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->logo->setScaledContents(true);
 
 
-    //create account link
+    //forgot password for account link
     ui->forgot_password->setTextFormat(Qt::RichText);
 
     ui->forgot_password->setText(
@@ -53,14 +53,25 @@ MainWindow::MainWindow(QWidget *parent)
         QString role = settings.value("role").toString();
 
         qDebug() << "Auto login for user ID:" << userId;
-
-        appwindow *app = new appwindow(this, userId, role);
-        app->show();
-        this->hide();
+        m_autoLoginTriggered = true;
+        openAppWindow(userId, role);
     }
 
 
 
+}
+
+bool MainWindow::isAutoLoginTriggered() const
+{
+    return m_autoLoginTriggered;
+}
+
+void MainWindow::openAppWindow(int userId, const QString &role)
+{
+    appwindow *app = new appwindow(nullptr, userId, role);
+    app->setAttribute(Qt::WA_DeleteOnClose);
+    app->show();
+    this->close();
 }
 
 MainWindow::~MainWindow()
@@ -112,9 +123,7 @@ void MainWindow::on_Sign_in_clicked()
                 settings.clear(); // remove saved login
             }
             qDebug() << "Connected user:" << connectedEmail << "ID:" << connectedUserId << "Role:" << connectedUserRole;
-            appwindow *app = new appwindow(this, connectedUserId, connectedUserRole);
-            app->show();
-            this->hide();
+            openAppWindow(connectedUserId, connectedUserRole);
         }
         else
         {

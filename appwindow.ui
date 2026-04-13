@@ -175,45 +175,11 @@ QPushButton:pressed {
       <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="Goback">
-     <property name="geometry">
-      <rect>
-       <x>990</x>
-       <y>640</y>
-       <width>161</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-    background-color: #3498db;
-    color: white;
-    font-size: 17px;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-}
-QPushButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #38bdf8, stop:1 #0ea5e9);
-}
-
-QPushButton:pressed {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #0369a1, stop:1 #075985);
-}
-</string>
-     </property>
-     <property name="text">
-      <string>Go back </string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="Exit">
      <property name="geometry">
       <rect>
        <x>990</x>
-       <y>540</y>
+       <y>562</y>
        <width>161</width>
        <height>41</height>
       </rect>
@@ -268,7 +234,7 @@ border: none;
      <property name="geometry">
       <rect>
        <x>990</x>
-       <y>588</y>
+       <y>610</y>
        <width>161</width>
        <height>41</height>
       </rect>
@@ -4548,9 +4514,9 @@ border: none;
     <widget class="QStackedWidget" name="stackedWidget_4">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>30</x>
        <y>0</y>
-       <width>1161</width>
+       <width>1191</width>
        <height>781</height>
       </rect>
      </property>
@@ -5056,8 +5022,8 @@ QPushButton:pressed {
       <widget class="QWidget" name="BackFrame_24" native="true">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>0</x>
+         <y>20</y>
          <width>201</width>
          <height>741</height>
         </rect>
@@ -7292,7 +7258,7 @@ border: none;
        </property>
        <property name="geometry">
         <rect>
-         <x>210</x>
+         <x>230</x>
          <y>10</y>
          <width>1061</width>
          <height>751</height>
@@ -7301,7 +7267,7 @@ border: none;
        <property name="currentIndex">
         <number>1</number>
        </property>
-       <widget class="QWidget" name="tabWidget_targetPage1" native="true">
+       <widget class="QWidget" name="tabWidget_targetPage1">
         <attribute name="title">
          <string>Emails</string>
         </attribute>
@@ -7703,10 +7669,15 @@ The Team</string>
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>10</y>
+           <y>0</y>
            <width>980</width>
            <height>70</height>
           </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>11</pointsize>
+          </font>
          </property>
          <property name="title">
           <string>Channel</string>
@@ -7768,10 +7739,15 @@ The Team</string>
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>90</y>
+           <y>80</y>
            <width>980</width>
-           <height>80</height>
+           <height>81</height>
           </rect>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
          </property>
          <property name="title">
           <string>Alert Type</string>
@@ -7915,8 +7891,8 @@ QPushButton:hover { background-color: #1a6fa3; }
           <rect>
            <x>10</x>
            <y>170</y>
-           <width>470</width>
-           <height>170</height>
+           <width>491</width>
+           <height>231</height>
           </rect>
          </property>
          <property name="title">
@@ -7925,9 +7901,9 @@ QPushButton:hover { background-color: #1a6fa3; }
          <widget class="QRadioButton" name="rec_all">
           <property name="geometry">
            <rect>
-            <x>12</x>
+            <x>10</x>
             <y>28</y>
-            <width>200</width>
+            <width>331</width>
             <height>22</height>
            </rect>
           </property>
@@ -7941,9 +7917,9 @@ QPushButton:hover { background-color: #1a6fa3; }
          <widget class="QRadioButton" name="rec_fish">
           <property name="geometry">
            <rect>
-            <x>12</x>
-            <y>56</y>
-            <width>220</width>
+            <x>10</x>
+            <y>60</y>
+            <width>261</width>
             <height>22</height>
            </rect>
           </property>
@@ -7957,8 +7933,8 @@ QPushButton:hover { background-color: #1a6fa3; }
           </property>
           <property name="geometry">
            <rect>
-            <x>240</x>
-            <y>52</y>
+            <x>280</x>
+            <y>56</y>
             <width>200</width>
             <height>30</height>
            </rect>
@@ -7992,7 +7968,7 @@ QPushButton:hover { background-color: #1a6fa3; }
          <widget class="QRadioButton" name="rec_location">
           <property name="geometry">
            <rect>
-            <x>12</x>
+            <x>10</x>
             <y>90</y>
             <width>220</width>
             <height>22</height>
@@ -8008,8 +7984,8 @@ QPushButton:hover { background-color: #1a6fa3; }
           </property>
           <property name="geometry">
            <rect>
-            <x>240</x>
-            <y>86</y>
+            <x>280</x>
+            <y>90</y>
             <width>200</width>
             <height>30</height>
            </rect>
@@ -8048,9 +8024,9 @@ QPushButton:hover { background-color: #1a6fa3; }
          <widget class="QRadioButton" name="rec_custom">
           <property name="geometry">
            <rect>
-            <x>12</x>
-            <y>120</y>
-            <width>200</width>
+            <x>10</x>
+            <y>130</y>
+            <width>221</width>
             <height>22</height>
            </rect>
           </property>
@@ -8062,9 +8038,9 @@ QPushButton:hover { background-color: #1a6fa3; }
           <property name="geometry">
            <rect>
             <x>12</x>
-            <y>145</y>
+            <y>167</y>
             <width>440</width>
-            <height>18</height>
+            <height>31</height>
            </rect>
           </property>
           <property name="styleSheet">
@@ -8079,9 +8055,9 @@ QPushButton:hover { background-color: #1a6fa3; }
          <property name="geometry">
           <rect>
            <x>510</x>
-           <y>170</y>
+           <y>180</y>
            <width>500</width>
-           <height>170</height>
+           <height>221</height>
           </rect>
          </property>
          <property name="title">
@@ -8212,7 +8188,7 @@ QPushButton:hover { background-color: #0284c7; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>350</y>
+           <y>400</y>
            <width>980</width>
            <height>20</height>
           </rect>
@@ -8228,9 +8204,9 @@ QPushButton:hover { background-color: #0284c7; }
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>370</y>
+           <y>424</y>
            <width>980</width>
-           <height>150</height>
+           <height>131</height>
           </rect>
          </property>
          <property name="placeholderText">
@@ -8249,7 +8225,7 @@ Dear [Company Name], we would like to inform you that [Fish Type] is now availab
          <property name="geometry">
           <rect>
            <x>420</x>
-           <y>556</y>
+           <y>591</y>
            <width>200</width>
            <height>32</height>
           </rect>
@@ -8262,7 +8238,7 @@ Dear [Company Name], we would like to inform you that [Fish Type] is now availab
          <property name="geometry">
           <rect>
            <x>410</x>
-           <y>518</y>
+           <y>553</y>
            <width>100</width>
            <height>30</height>
           </rect>
@@ -8281,7 +8257,7 @@ QPushButton:hover { background-color: #f1f5f9; color: #64748b; }
         <widget class="QPushButton" name="btn_send_alert">
          <property name="geometry">
           <rect>
-           <x>640</x>
+           <x>770</x>
            <y>580</y>
            <width>190</width>
            <height>44</height>
@@ -8303,7 +8279,7 @@ QPushButton:pressed { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0
          <property name="geometry">
           <rect>
            <x>140</x>
-           <y>601</y>
+           <y>636</y>
            <width>160</width>
            <height>30</height>
           </rect>
@@ -8327,9 +8303,9 @@ QPushButton:pressed { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0
         <widget class="QPushButton" name="btn_schedule_alert">
          <property name="geometry">
           <rect>
-           <x>840</x>
-           <y>580</y>
-           <width>165</width>
+           <x>770</x>
+           <y>630</y>
+           <width>191</width>
            <height>44</height>
           </rect>
          </property>
@@ -8349,7 +8325,7 @@ QPushButton:pressed { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0
          <property name="geometry">
           <rect>
            <x>30</x>
-           <y>605</y>
+           <y>640</y>
            <width>100</width>
            <height>20</height>
           </rect>
@@ -8365,8 +8341,8 @@ QPushButton:pressed { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0
          <property name="geometry">
           <rect>
            <x>320</x>
-           <y>605</y>
-           <width>260</width>
+           <y>640</y>
+           <width>391</width>
            <height>22</height>
           </rect>
          </property>
@@ -8378,7 +8354,7 @@ QPushButton:pressed { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0
          <property name="geometry">
           <rect>
            <x>240</x>
-           <y>518</y>
+           <y>553</y>
            <width>160</width>
            <height>30</height>
           </rect>
@@ -8398,7 +8374,7 @@ QPushButton:hover { background-color: #e0f2fe; }
          <property name="geometry">
           <rect>
            <x>290</x>
-           <y>560</y>
+           <y>595</y>
            <width>120</width>
            <height>24</height>
           </rect>
@@ -8411,7 +8387,7 @@ QPushButton:hover { background-color: #e0f2fe; }
          <property name="geometry">
           <rect>
            <x>30</x>
-           <y>562</y>
+           <y>597</y>
            <width>130</width>
            <height>20</height>
           </rect>
@@ -8427,7 +8403,7 @@ QPushButton:hover { background-color: #e0f2fe; }
          <property name="geometry">
           <rect>
            <x>30</x>
-           <y>522</y>
+           <y>557</y>
            <width>200</width>
            <height>20</height>
           </rect>
@@ -8443,7 +8419,7 @@ QPushButton:hover { background-color: #e0f2fe; }
          <property name="geometry">
           <rect>
            <x>170</x>
-           <y>560</y>
+           <y>595</y>
            <width>110</width>
            <height>24</height>
           </rect>
@@ -8460,8 +8436,8 @@ QPushButton:hover { background-color: #e0f2fe; }
       <widget class="QWidget" name="BackFrame_28" native="true">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>30</x>
+         <y>20</y>
          <width>201</width>
          <height>741</height>
         </rect>

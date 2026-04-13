@@ -6,7 +6,7 @@
 Connection::Connection()
 {
     //db = QSqlDatabase::addDatabase("QODBC");  // or "QOCI" for Oracle client
-    //db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=qtuserc;Pwd=mypassword123;");
+    //db.setDatabaseName("Driver={Oracle in XE};Dbq=localhost:1521/XE;Uid=C;Pwd=root;");
 
 }
 
@@ -24,8 +24,8 @@ bool Connection::createconnect()
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    const QString dbUser = qEnvironmentVariable("HWT_DB_USER", "qtuserc");
-    const QString dbPassword = qEnvironmentVariable("HWT_DB_PASSWORD", "mypassword123");
+    const QString dbUser = qEnvironmentVariable("HWT_DB_USER", "SMARTFISH");
+    const QString dbPassword = qEnvironmentVariable("HWT_DB_PASSWORD", "root");
     const QString dbHost = qEnvironmentVariable("HWT_DB_HOST", "localhost");
     const QString dbPort = qEnvironmentVariable("HWT_DB_PORT", "1521");
     const QString dbService = qEnvironmentVariable("HWT_DB_SERVICE", "XE");

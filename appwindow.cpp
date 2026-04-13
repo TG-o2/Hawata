@@ -45,6 +45,11 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QItemSelectionModel>
+#include <QDesktopServices>
+#include <QThread>
+#include <QUrl>
+#include <QUrlQuery>
+ #include <QButtonGroup>
 
 #include <QRandomGenerator>
 #include <QEventLoop>
@@ -197,6 +202,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     loadProductTable();    // Load product table on startup
     loadCompaniesTable();
     initEmailCampaignPage();
+    initWhatsAppSmsPage();
     generateDockingStatistics();
     loadDockingHistoryView();
 
@@ -858,12 +864,13 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->forgetpwd_19  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_5->setCurrentIndex(3);
     });
-    connect(ui->CheckInsightsComp  , &QPushButton::clicked, this, [=]() {
+
+    /*connect(ui->CheckInsightsComp  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_5->setCurrentIndex(3);
     });
     connect(ui->GoBackCompanies  , &QPushButton::clicked, this, [=]() {
         ui->stackedWidget_5->setCurrentIndex(2);
-    });
+    });*/
     //++++
 
     /// Exit page
@@ -5787,6 +5794,556 @@ void appwindow::on_btn_schedule_2_clicked()
         on_btn_send_now_2_clicked();
     });
 }
+//whatsapp section **
+void appwindow::initWhatsAppSmsPage()
+{
+    // ── Alert type buttons behave as a radio group ────────────────────
+    // (they are checkable QPushButtons — make only one active at a time)
+    QList<QPushButton*> alertBtns = {
+        ui->atype_stock, ui->atype_closure,
+        ui->atype_price, ui->atype_port, ui->atype_pickup
+    };
+    for (QPushButton *btn : alertBtns) {
+        connect(btn, &QPushButton::clicked, this, [this, btn, alertBtns]() {
+            for (QPushButton *b : alertBtns)
+                b->setChecked(false);
+            btn->setChecked(true);
+        });
+    }
+
+    // ── Recipients radio buttons ──────────────────────────────────────
+    connect(ui->rec_all,      &QRadioButton::toggled, this, &appwindow::updateWaSmsRecipientCount);
+    connect(ui->rec_fish,     &QRadioButton::toggled, this, [this](bool checked) {
+        ui->combo_fish_filter->setEnabled(checked);
+        updateWaSmsRecipientCount();
+    });
+    connect(ui->rec_location, &QRadioButton::toggled, this, [this](bool checked) {
+        ui->combo_location_filter->setEnabled(checked);
+        updateWaSmsRecipientCount();
+    });
+    connect(ui->rec_custom,   &QRadioButton::toggled, this, &appwindow::updateWaSmsRecipientCount);
+
+    connect(ui->combo_fish_filter,     qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &appwindow::updateWaSmsRecipientCount);
+    connect(ui->combo_location_filter, qOverload<int>(&QComboBox::currentIndexChanged),
+            this, &appwindow::updateWaSmsRecipientCount);
+
+    // ── Channel radio buttons update char count hint ──────────────────
+    connect(ui->ch_whatsapp, &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
+    connect(ui->ch_sms,      &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
+    connect(ui->ch_both,     &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
+
+    // ── Message body → live char counter ─────────────────────────────
+    connect(ui->msg_body, &QTextEdit::textChanged, this, &appwindow::updateWaCharCount);
+
+    // ── Schedule radio buttons enable/disable datetime picker ────────
+    connect(ui->sched_now,   &QRadioButton::toggled, this, [this](bool checked) {
+        ui->schedule_datetime->setEnabled(!checked);
+    });
+    connect(ui->sched_later, &QRadioButton::toggled, this, [this](bool checked) {
+        ui->schedule_datetime->setEnabled(checked);
+    });
+    ui->schedule_datetime->setDateTime(QDateTime::currentDateTime().addDays(1));
+
+    // ── Quick template buttons ────────────────────────────────────────
+    connect(ui->tpl_stock_available, &QPushButton::clicked,
+            this, &appwindow::on_tpl_stock_available_clicked);
+    connect(ui->tpl_no_fish,         &QPushButton::clicked,
+            this, &appwindow::on_tpl_no_fish_clicked);
+    connect(ui->tpl_port_closed,     &QPushButton::clicked,
+            this, &appwindow::on_tpl_port_closed_clicked);
+    connect(ui->tpl_price_up,        &QPushButton::clicked,
+            this, &appwindow::on_tpl_price_up_clicked);
+    connect(ui->tpl_maintenance,     &QPushButton::clicked,
+            this, &appwindow::on_tpl_maintenance_clicked);
+    connect(ui->tpl_pickup_ready,    &QPushButton::clicked,
+            this, &appwindow::on_tpl_pickup_ready_clicked);
+
+    // ── Action buttons ────────────────────────────────────────────────
+    connect(ui->btn_preview_msg,    &QPushButton::clicked,
+            this, &appwindow::on_btn_preview_msg_clicked);
+    connect(ui->btn_clear_msg,      &QPushButton::clicked,
+            this, &appwindow::on_btn_clear_msg_clicked);
+    connect(ui->btn_send_alert,     &QPushButton::clicked,
+            this, &appwindow::on_btn_send_alert_clicked);
+    connect(ui->btn_schedule_alert, &QPushButton::clicked,
+            this, &appwindow::on_btn_schedule_alert_clicked);
+
+    // ── Init counts ───────────────────────────────────────────────────
+    updateWaSmsRecipientCount();
+    updateWaCharCount();
+}
+
+// ─────────────────────────────────────────────
+//  Normalize phone → international format
+//  Tunisian 8-digit numbers → +216XXXXXXXX
+// ─────────────────────────────────────────────
+QString appwindow::normalizePhoneNumber(const QString &phone, const QString &countryCode)
+{
+    QString cleaned = phone;
+    cleaned.remove(' ').remove('-').remove('(').remove(')').remove('.');
+
+    if (cleaned.isEmpty())   return {};
+    if (cleaned.startsWith('+')) return cleaned;
+    if (cleaned.startsWith("00")) return "+" + cleaned.mid(2);
+
+    return countryCode + cleaned;   // prepend +216 for local numbers
+}
+
+// ─────────────────────────────────────────────
+//  Build filtered company list from UI state
+// ─────────────────────────────────────────────
+QList<Company> appwindow::getWaSmsTargetCompanies()
+{
+    Company obj;
+    QList<Company> all = obj.afficher_liste();
+    QList<Company> result;
+
+    for (const Company &c : all) {
+        // Fish filter
+        if (ui->rec_fish->isChecked()) {
+            QString fish = ui->combo_fish_filter->currentText();
+            if (fish != "All Fish Types" &&
+                !c.getPreferredFish().contains(fish, Qt::CaseInsensitive))
+                continue;
+        }
+        // Location filter
+        if (ui->rec_location->isChecked()) {
+            QString loc = ui->combo_location_filter->currentText();
+            if (loc != "All Locations" &&
+                !c.getLocation().contains(loc, Qt::CaseInsensitive))
+                continue;
+        }
+        // rec_all and rec_custom → include everyone
+        result.append(c);
+    }
+    return result;
+}
+
+// ─────────────────────────────────────────────
+//  Update recipient count label
+// ─────────────────────────────────────────────
+void appwindow::updateWaSmsRecipientCount()
+{
+    QList<Company> targets = getWaSmsTargetCompanies();
+    int total = targets.size();
+
+    // Count how many have a usable phone number
+    int withPhone = 0;
+    for (const Company &c : targets)
+        if (!normalizePhoneNumber(c.getPhone()).isEmpty()) withPhone++;
+
+    QString filterLabel = "All companies";
+    if (ui->rec_fish->isChecked())
+        filterLabel = ui->combo_fish_filter->currentText();
+    else if (ui->rec_location->isChecked())
+        filterLabel = ui->combo_location_filter->currentText();
+    else if (ui->rec_custom->isChecked())
+        filterLabel = "Custom selection";
+
+    ui->lbl_recipient_count->setText(
+        QString("📊 Targeting: %1 — %2 compan%3, %4 with valid phone")
+            .arg(filterLabel)
+            .arg(total)
+            .arg(total == 1 ? "y" : "ies")
+            .arg(withPhone));
+}
+
+// ─────────────────────────────────────────────
+//  Live character counter (changes limit based on channel)
+// ─────────────────────────────────────────────
+void appwindow::updateWaCharCount()
+{
+    int len     = ui->msg_body->toPlainText().length();
+    int limit   = ui->ch_sms->isChecked() ? 160 : 1000;  // SMS=160, WA/Both=1000
+
+    QString style;
+    if (len > limit)
+        style = "color: #dc2626; font-size: 12px; font-weight: bold;";
+    else if (len > limit * 0.85)
+        style = "color: #d97706; font-size: 12px;";
+    else
+        style = "color: #64748b; font-size: 12px;";
+
+    ui->lbl_char_count->setStyleSheet(style);
+    ui->lbl_char_count->setText(
+        QString("%1 / %2 characters%3")
+            .arg(len).arg(limit)
+            .arg(len > limit ? "  ⚠️ Too long!" : ""));
+}
+
+// ─────────────────────────────────────────────
+//  Replace [placeholders] in message body
+// ─────────────────────────────────────────────
+QString appwindow::buildWaMessage(const Company &company, const QString &msgTemplate)
+{
+    QString body = msgTemplate;
+    body.replace("[Company Name]", company.getName());
+    body.replace("[Fish Type]",    company.getPreferredFish());
+    body.replace("[Price]",        "—");           // fill in if you have a price field
+    body.replace("[Date]",         QDate::currentDate().toString("dd/MM/yyyy"));
+    body.replace("[Port Name]",    "Hawata Marina");
+    return body;
+}
+
+// ─────────────────────────────────────────────
+//  Auto-shorten to ≤160 chars for SMS
+// ─────────────────────────────────────────────
+QString appwindow::buildSmsMessage(const Company &company, const QString &msgTemplate)
+{
+    QString body = buildWaMessage(company, msgTemplate);
+
+    const int maxLen = 157;
+    if (body.length() <= maxLen) return body;
+
+    QString truncated = body.left(maxLen);
+    int lastSpace = truncated.lastIndexOf(' ');
+    if (lastSpace > 80) truncated = truncated.left(lastSpace);
+    return truncated + "...";
+}
+
+// ─────────────────────────────────────────────
+//  Build wa.me URL
+// ─────────────────────────────────────────────
+QString appwindow::buildWhatsAppUrl(const QString &phone, const QString &message)
+{
+    QString cleanPhone = phone;
+    if (cleanPhone.startsWith('+')) cleanPhone.remove(0, 1);
+
+    return QString("https://wa.me/%1?text=%2")
+        .arg(cleanPhone)
+        .arg(QString(QUrl::toPercentEncoding(message)));
+}
+
+// =====================================================================
+//  QUICK TEMPLATE SLOTS
+// =====================================================================
+
+void appwindow::on_tpl_stock_available_clicked()
+{
+    ui->msg_body->setPlainText(
+        "Dear [Company Name], great news! [Fish Type] is now available at Hawata Marina. "
+        "Quantities are limited — contact us today to reserve your stock. "
+        "Date: [Date] | [Port Name]");
+    ui->atype_stock->setChecked(true);
+}
+
+void appwindow::on_tpl_no_fish_clicked()
+{
+    ui->msg_body->setPlainText(
+        "Dear [Company Name], unfortunately there is no [Fish Type] available today ([Date]). "
+        "We will notify you as soon as stock arrives. Apologies for any inconvenience. "
+        "— [Port Name]");
+    ui->atype_stock->setChecked(true);
+}
+
+void appwindow::on_tpl_port_closed_clicked()
+{
+    ui->msg_body->setPlainText(
+        "NOTICE — [Port Name]: The port will be closed on [Date] (Moon Day / Maintenance). "
+        "No fishing or pickup operations will be available. We will resume normal activity the following day.");
+    ui->atype_closure->setChecked(true);
+}
+
+void appwindow::on_tpl_price_up_clicked()
+{
+    ui->msg_body->setPlainText(
+        "PRICE ALERT — [Company Name]: Please note that the price of [Fish Type] has changed "
+        "as of [Date]. Contact [Port Name] for the updated price list before placing your next order.");
+    ui->atype_price->setChecked(true);
+}
+
+void appwindow::on_tpl_maintenance_clicked()
+{
+    ui->msg_body->setPlainText(
+        "MAINTENANCE NOTICE — [Port Name]: Scheduled dock maintenance on [Date]. "
+        "Access to certain docking areas will be restricted. "
+        "Please coordinate your pickup schedule with our team in advance.");
+    ui->atype_port->setChecked(true);
+}
+
+void appwindow::on_tpl_pickup_ready_clicked()
+{
+    ui->msg_body->setPlainText(
+        "READY FOR PICKUP — [Company Name]: Your order of [Fish Type] is now ready for collection "
+        "at [Port Name]. Please arrange pickup today. "
+        "Date: [Date]. Bring your order reference on arrival.");
+    ui->atype_pickup->setChecked(true);
+}
+
+// =====================================================================
+//  PREVIEW
+// =====================================================================
+
+void appwindow::on_btn_preview_msg_clicked()
+{
+    QString msgTemplate = ui->msg_body->toPlainText().trimmed();
+    if (msgTemplate.isEmpty()) {
+        QMessageBox::warning(this, "Empty Message",
+                             "Please type a message or choose a quick template first.");
+        return;
+    }
+
+    QList<Company> targets = getWaSmsTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Recipients",
+                             "No companies match the current filter.");
+        return;
+    }
+
+    Company sample  = targets.first();
+    QString waMsg   = buildWaMessage(sample, msgTemplate);
+    QString smsMsg  = buildSmsMessage(sample, msgTemplate);
+
+    bool doWa  = ui->ch_whatsapp->isChecked() || ui->ch_both->isChecked();
+    bool doSms = ui->ch_sms->isChecked()      || ui->ch_both->isChecked();
+
+    QDialog *dlg = new QDialog(this);
+    dlg->setWindowTitle("Message Preview");
+    dlg->setMinimumSize(720, 520);
+
+    QVBoxLayout *layout = new QVBoxLayout(dlg);
+    layout->setContentsMargins(16, 16, 16, 16);
+    layout->setSpacing(10);
+
+    // Info bar
+    QLabel *info = new QLabel(
+        QString("Preview for: <b>%1</b>  |  Phone: <b>%2</b>  |  "
+                "<b>%3</b> total recipient%4")
+            .arg(sample.getName(), sample.getPhone())
+            .arg(targets.size()).arg(targets.size() == 1 ? "" : "s"));
+    info->setStyleSheet(
+        "padding:8px; background:#e0f2fe; border-radius:5px; font-size:13px;");
+    layout->addWidget(info);
+
+    // WhatsApp preview
+    if (doWa) {
+        QLabel *waTitle = new QLabel("📱 <b>WhatsApp</b> (full text):");
+        waTitle->setStyleSheet("color:#075e54; font-size:13px; margin-top:6px;");
+        layout->addWidget(waTitle);
+
+        QTextEdit *waView = new QTextEdit();
+        waView->setPlainText(waMsg);
+        waView->setReadOnly(true);
+        waView->setMaximumHeight(160);
+        waView->setStyleSheet(
+            "font-size:13px; padding:8px; background:#dcf8c6;"
+            "border:1px solid #25d366; border-radius:6px;");
+        layout->addWidget(waView);
+
+        QLabel *waCount = new QLabel(QString("Characters: %1").arg(waMsg.length()));
+        waCount->setStyleSheet("color:#555; font-size:11px;");
+        layout->addWidget(waCount);
+    }
+
+    // SMS preview
+    if (doSms) {
+        QLabel *smsTitle = new QLabel("💬 <b>SMS</b> (auto-shortened ≤160 chars):");
+        smsTitle->setStyleSheet("color:#1a73e8; font-size:13px; margin-top:6px;");
+        layout->addWidget(smsTitle);
+
+        QTextEdit *smsView = new QTextEdit();
+        smsView->setPlainText(smsMsg);
+        smsView->setReadOnly(true);
+        smsView->setMaximumHeight(110);
+        bool over = smsMsg.length() > 160;
+        smsView->setStyleSheet(
+            QString("font-size:13px; padding:8px; background:%1;"
+                    "border:1px solid %2; border-radius:6px;")
+                .arg(over ? "#fff3cd" : "#e8f0fe",
+                     over ? "#ffc107" : "#1a73e8"));
+        layout->addWidget(smsView);
+
+        QLabel *smsCount = new QLabel(
+            QString("Characters: %1 / 160  %2")
+                .arg(smsMsg.length())
+                .arg(over ? "⚠️ 2 SMS units" : "✅ 1 SMS unit"));
+        smsCount->setStyleSheet(
+            over ? "color:#c0392b; font-size:11px;" : "color:#27ae60; font-size:11px;");
+        layout->addWidget(smsCount);
+    }
+
+    QPushButton *closeBtn = new QPushButton("Close");
+    closeBtn->setFixedHeight(36);
+    connect(closeBtn, &QPushButton::clicked, dlg, &QDialog::accept);
+    QHBoxLayout *btnRow = new QHBoxLayout();
+    btnRow->addStretch();
+    btnRow->addWidget(closeBtn);
+    layout->addLayout(btnRow);
+
+    dlg->exec();
+    delete dlg;
+}
+
+// =====================================================================
+//  CLEAR
+// =====================================================================
+
+void appwindow::on_btn_clear_msg_clicked()
+{
+    ui->msg_body->clear();
+    updateWaCharCount();
+}
+
+// =====================================================================
+//  SEND ALERT  (WhatsApp via wa.me / SMS via sms: URI)
+// =====================================================================
+
+void appwindow::on_btn_send_alert_clicked()
+{
+    QString msgTemplate = ui->msg_body->toPlainText().trimmed();
+    if (msgTemplate.isEmpty()) {
+        QMessageBox::warning(this, "Empty Message",
+                             "Please type a message or choose a quick template first.");
+        return;
+    }
+
+    QList<Company> targets = getWaSmsTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Recipients",
+                             "No companies match the current filter.");
+        return;
+    }
+
+    bool doWa  = ui->ch_whatsapp->isChecked() || ui->ch_both->isChecked();
+    bool doSms = ui->ch_sms->isChecked()      || ui->ch_both->isChecked();
+
+    // Count valid phones
+    int validPhones = 0;
+    for (const Company &c : targets)
+        if (!normalizePhoneNumber(c.getPhone()).isEmpty()) validPhones++;
+
+    if (validPhones == 0) {
+        QMessageBox::warning(this, "No Phone Numbers",
+                             "None of the target companies have a valid phone number.");
+        return;
+    }
+
+    // Priority prefix
+    QString priorityPrefix;
+    int pIdx = ui->combo_priority->currentIndex();
+    if (pIdx == 1) priorityPrefix = "⚠️ IMPORTANT: ";
+    else if (pIdx == 2) priorityPrefix = "🔴 URGENT: ";
+
+    QString channelLabel = doWa && doSms ? "WhatsApp + SMS"
+                         : doWa         ? "WhatsApp"
+                                        : "SMS";
+
+    QMessageBox::StandardButton reply = QMessageBox::question(
+        this, "Confirm Send",
+        QString("Send via %1 to %2 compan%3 (%4 with valid phone)?\n\n"
+                "Priority: %5")
+            .arg(channelLabel)
+            .arg(targets.size()).arg(targets.size() == 1 ? "y" : "ies")
+            .arg(validPhones)
+            .arg(ui->combo_priority->currentText()),
+        QMessageBox::Yes | QMessageBox::No);
+
+    if (reply != QMessageBox::Yes) return;
+
+    int waSent = 0, smsSent = 0, skipped = 0;
+
+    ui->btn_send_alert->setEnabled(false);
+    ui->btn_send_alert->setText("Sending...");
+    QApplication::processEvents();
+
+    for (const Company &company : targets) {
+        QString phone = normalizePhoneNumber(company.getPhone());
+        if (phone.isEmpty()) { skipped++; continue; }
+
+        if (doWa) {
+            QString msg = priorityPrefix + buildWaMessage(company, msgTemplate);
+            QString url = buildWhatsAppUrl(phone, msg);
+            QDesktopServices::openUrl(QUrl(url));
+            waSent++;
+            QThread::msleep(700);
+            QApplication::processEvents();
+        }
+
+        if (doSms) {
+            QString msg = priorityPrefix + buildSmsMessage(company, msgTemplate);
+            // Strip emoji from SMS (not all carriers support them)
+            msg.remove(QRegularExpression("[^\\x00-\\x7F]"));
+            QString encoded = QString(QUrl::toPercentEncoding(msg));
+            QDesktopServices::openUrl(QUrl(QString("sms:%1?body=%2").arg(phone, encoded)));
+            smsSent++;
+            QThread::msleep(500);
+            QApplication::processEvents();
+        }
+    }
+
+    ui->btn_send_alert->setEnabled(true);
+    ui->btn_send_alert->setText("📤 Send Alert");
+
+    QString summary;
+    if (doWa)  summary += QString("📱 WhatsApp opened: %1\n").arg(waSent);
+    if (doSms) summary += QString("💬 SMS opened:      %1\n").arg(smsSent);
+    summary += QString("⚠️  Skipped (no phone): %1").arg(skipped);
+
+    QMessageBox::information(this, "Alert Sent", summary);
+}
+
+// =====================================================================
+//  SCHEDULE ALERT
+// =====================================================================
+
+void appwindow::on_btn_schedule_alert_clicked()
+{
+    QString msgTemplate = ui->msg_body->toPlainText().trimmed();
+    if (msgTemplate.isEmpty()) {
+        QMessageBox::warning(this, "Empty Message",
+                             "Please type a message or choose a quick template first.");
+        return;
+    }
+
+    if (!ui->sched_later->isChecked()) {
+        QMessageBox::information(this, "Send Now Selected",
+                                 "You have 'Send Now' selected.\n"
+                                 "Select 'Schedule for:' and pick a future date/time first.");
+        return;
+    }
+
+    QDateTime scheduleAt = ui->schedule_datetime->dateTime();
+    if (scheduleAt <= QDateTime::currentDateTime()) {
+        QMessageBox::warning(this, "Invalid Time",
+                             "Please select a future date and time.");
+        return;
+    }
+
+    QList<Company> targets = getWaSmsTargetCompanies();
+    if (targets.isEmpty()) {
+        QMessageBox::warning(this, "No Recipients",
+                             "No companies match the current filter.");
+        return;
+    }
+
+    qint64 msDelay = QDateTime::currentDateTime().msecsTo(scheduleAt);
+
+    bool doWa  = ui->ch_whatsapp->isChecked() || ui->ch_both->isChecked();
+    bool doSms = ui->ch_sms->isChecked()      || ui->ch_both->isChecked();
+    QString channelLabel = doWa && doSms ? "WhatsApp + SMS"
+                         : doWa         ? "WhatsApp"
+                                        : "SMS";
+
+    QMessageBox::information(this, "Scheduled",
+                             QString("✅ Alert scheduled!\n\n"
+                                     "Channel:    %1\n"
+                                     "Recipients: %2 compan%3\n"
+                                     "Send time:  %4")
+                                 .arg(channelLabel)
+                                 .arg(targets.size())
+                                 .arg(targets.size() == 1 ? "y" : "ies")
+                                 .arg(scheduleAt.toString("dd/MM/yyyy  hh:mm")));
+
+    ui->btn_schedule_alert->setEnabled(false);
+    ui->btn_schedule_alert->setText("⏰ Scheduled...");
+
+    QTimer::singleShot(msDelay, this, [this]() {
+        ui->btn_schedule_alert->setEnabled(true);
+        ui->btn_schedule_alert->setText("⏰ Schedule");
+        on_btn_send_alert_clicked();
+    });
+}
 //boat new functionalities
 void appwindow::on_clearBoatButton_clicked()
 {
@@ -5806,6 +6363,7 @@ void appwindow::on_clearBoatButton_clicked()
         setBoatMode(BoatMode::Add);
     }
 }
+
 
 
 void appwindow::on_comboBox_15_currentIndexChanged(int index)

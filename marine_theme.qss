@@ -1247,168 +1247,310 @@ QChartView QScrollBar::handle {
     border-radius: 5px;
 }
 /* ================================================
-   TRENDS & INSIGHTS SECTION STYLING
+   WHATSAPP / SMS TAB — COMPLETE STYLING
    ================================================ */
 
-/* Refresh Button - Primary Blue */
-QPushButton#btn_refresh_trends {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #42a5f5, stop:1 #2196F3);
-    color: white;
-    font-weight: bold;
+QWidget#tab_3 QGroupBox {
+    margin-top: 8px;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: none;
 }
 
-QPushButton#btn_refresh_trends:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #64b5f6, stop:1 #42a5f5);
-}
-
-QPushButton#btn_refresh_trends:pressed {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #1976d2, stop:1 #1565c0);
-}
-
-/* Export PDF Button - Gradient Blue to Red */
-QPushButton#btn_export_trends_pdf {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #42a5f5, stop:1 #e57373);
-    color: white;
-    font-weight: bold;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: none;
-}
-
-QPushButton#btn_export_trends_pdf:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #e57373, stop:1 #42a5f5);
-}
-
-QPushButton#btn_export_trends_pdf:pressed {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #1976d2, stop:1 #1565c0);
-}
-
-/* Export CSV Button - Success Green */
-QPushButton#btn_export_trends_csv {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #66bb6a, stop:1 #4CAF50);
-    color: white;
-    font-weight: bold;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: none;
-}
-
-QPushButton#btn_export_trends_csv:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #81c784, stop:1 #66bb6a);
-}
-
-QPushButton#btn_export_trends_csv:pressed {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                stop:0 #388e3c, stop:1 #2e7d32);
-}
-
-/* Top Companies Table */
-QTableWidget#table_top_companies {
-    background-color: #ffffff;
-    border: 2px solid #0a4c73;
-    border-radius: 10px;
-    gridline-color: #d0d0d0;
-    font-size: 14px;
-}
-
-QTableWidget#table_top_companies::item {
-    padding: 5px;
-}
-
-QTableWidget#table_top_companies::item:selected {
-    background-color: #42a5f5;
-    color: white;
-}
-
-/* Main Chart View */
-QChartView#chartView_main {
-    border: 2px solid #0a4c73;
-    border-radius: 10px;
-    background-color: #f5f5f5;
-    padding: 10px;
-}
-
-/* Time Range ComboBox */
-QComboBox#combo_time_range,
-QComboBox#combo_chart_type {
-    border: 1px solid #0a4c73;
-    border-radius: 5px;
-    padding: 5px 10px;
-    font-size: 14px;
-    background-color: white;
-}
-
-QComboBox#combo_time_range::drop-down,
-QComboBox#combo_chart_type::drop-down {
-    border-left: 1px solid #0a4c73;
-}
-
-QComboBox#combo_time_range QAbstractItemView,
-QComboBox#combo_chart_type QAbstractItemView {
-    selection-background-color: #42a5f5;
-    background-color: white;
-}
-
-/* Labels */
-QLabel#label_time_range,
-QLabel#label_chart_type,
-QLabel#label_top_companies,
-QLabel#label_key_insights,
-QLabel#label_summary_title,
-QLabel#label_export {
-    font-weight: bold;
-    font-size: 14px;
-    color: #0a4c73;
-}
-
-QLabel#label_total_purchases,
-QLabel#label_active_companies,
-QLabel#label_avg_purchase {
-    font-size: 13px;
-    color: #333333;
-}
-
-/* Insights Text Edit */
-QTextEdit#text_insights {
-    border: 1px solid #0a4c73;
-    border-radius: 5px;
-    background-color: #ffffff;
-    font-size: 13px;
-    padding: 5px;
-}
-
-/* GroupBox */
-QGroupBox#groupBox_trends {
-    border: 2px solid #0a4c73;
-    border-radius: 10px;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 16px;
-    color: #0a4c73;
-}
-
-QGroupBox#groupBox_trends::title {
+QWidget#tab_3 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    padding: 5px 10px;
+    left: 10px;
+    color: #0a4c73;
+    font-size: 11px;
+    font-weight: bold;
     background-color: white;
+    padding: 0px 2px;
 }
 
+/* Alert type toggle buttons */
+QPushButton#atype_stock,
+QPushButton#atype_closure,
+QPushButton#atype_price,
+QPushButton#atype_port,
+QPushButton#atype_pickup {
+    background-color: #0a4c73;
+    color: white;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 5px 8px;
+    border: 2px solid #0a4c73;
+    min-height: 0px;
+}
 
+QPushButton#atype_stock:checked,
+QPushButton#atype_closure:checked,
+QPushButton#atype_price:checked,
+QPushButton#atype_port:checked,
+QPushButton#atype_pickup:checked {
+    background-color: #1a6fa3;
+    border-color: #38bdf8;
+}
+
+QPushButton#atype_stock:hover,
+QPushButton#atype_closure:hover,
+QPushButton#atype_price:hover,
+QPushButton#atype_port:hover,
+QPushButton#atype_pickup:hover {
+    background-color: #1a6fa3;
+}
+
+/* Recipients radio buttons and combos */
+QWidget#tab_3 QRadioButton {
+    font-size: 12px;
+    spacing: 6px;
+}
+
+QGroupBox#gb_recipients QComboBox {
+    padding: 3px 8px;
+    font-size: 12px;
+    min-height: 0px;
+}
+
+QLabel#lbl_recipient_count {
+    font-size: 11px;
+    padding: 0px;
+    color: #0a4c73;
+    font-weight: bold;
+}
+
+/* Quick template buttons */
+QPushButton#tpl_stock_available {
+    background-color: #14b8a6;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_stock_available:hover { background-color: #0d9488; }
+
+QPushButton#tpl_no_fish {
+    background-color: #ef4444;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_no_fish:hover { background-color: #dc2626; }
+
+QPushButton#tpl_port_closed {
+    background-color: #6366f1;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_port_closed:hover { background-color: #4f46e5; }
+
+QPushButton#tpl_price_up {
+    background-color: #f59e0b;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_price_up:hover { background-color: #d97706; }
+
+QPushButton#tpl_maintenance {
+    background-color: #64748b;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_maintenance:hover { background-color: #475569; }
+
+QPushButton#tpl_pickup_ready {
+    background-color: #0ea5e9;
+    color: white;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border: none;
+    min-height: 0px;
+}
+QPushButton#tpl_pickup_ready:hover { background-color: #0284c7; }
+
+/* Message label */
+QLabel#lbl_message {
+    font-size: 12px;
+    font-weight: bold;
+    color: #0a4c73;
+    padding: 0px;
+}
+
+/* Message body */
+QTextEdit#msg_body {
+    padding: 6px 8px;
+    font-size: 12px;
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+QTextEdit#msg_body:focus {
+    border-color: #0284c7;
+}
+
+/* Char counter */
+QLabel#lbl_char_count {
+    font-size: 11px;
+    color: #64748b;
+    padding: 0px;
+}
+
+/* Preview + Clear buttons */
+QPushButton#btn_preview_msg {
+    background-color: transparent;
+    color: #0a4c73;
+    border: 2px solid #0a4c73;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    min-height: 0px;
+}
+QPushButton#btn_preview_msg:hover { background-color: #e0f2fe; }
+
+QPushButton#btn_clear_msg {
+    background-color: transparent;
+    color: #94a3b8;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    min-height: 0px;
+}
+QPushButton#btn_clear_msg:hover {
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+
+/* Schedule row */
+QLabel#lbl_schedule {
+    font-size: 12px;
+    font-weight: bold;
+    color: #0a4c73;
+    padding: 0px;
+}
+
+QRadioButton#sched_now,
+QRadioButton#sched_later {
+    font-size: 12px;
+    spacing: 5px;
+}
+
+QDateTimeEdit#schedule_datetime {
+    padding: 3px 8px;
+    font-size: 12px;
+    min-height: 0px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+QDateTimeEdit#schedule_datetime:focus {
+    border-color: #0284c7;
+}
+
+/* Priority row */
+QLabel#lbl_priority {
+    font-size: 12px;
+    font-weight: bold;
+    color: #0a4c73;
+    padding: 0px;
+}
+
+QComboBox#combo_priority {
+    padding: 3px 8px;
+    font-size: 12px;
+    min-height: 0px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+QCheckBox#chk_confirm_read {
+    font-size: 11px;
+    spacing: 5px;
+    color: #334e68;
+}
+
+/* Send Alert — WhatsApp green */
+QPushButton#btn_send_alert {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #25d366, stop:1 #1da851);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    min-height: 0px;
+}
+QPushButton#btn_send_alert:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #34e87a, stop:1 #25d366);
+}
+QPushButton#btn_send_alert:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #128c3e, stop:1 #0e6b30);
+}
+
+/* Schedule — amber */
+QPushButton#btn_schedule_alert {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #f59e0b, stop:1 #d97706);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    min-height: 0px;
+}
+QPushButton#btn_schedule_alert:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #fbbf24, stop:1 #f59e0b);
+}
+QPushButton#btn_schedule_alert:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #b45309, stop:1 #92400e);
+}
+QWidget#tab_3 QGroupBox {
+    margin-top: 20px;
+}
+
+QWidget#tab_3 QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    top: -10px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #0a4c73;
+    background-color: rgba(240, 248, 255, 255);
+    padding: 0px px;
+}
 /* =========================
    AHMMED END SECTION
 ========================= */

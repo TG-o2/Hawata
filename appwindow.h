@@ -108,6 +108,24 @@ private slots:
     void on_btn_preview_2_clicked();
     void on_btn_send_now_2_clicked();
     void on_btn_schedule_2_clicked();
+    // WhatsApp / SMS Alert page
+    void initWhatsAppSmsPage();
+    void updateWaSmsRecipientCount();
+    void updateWaCharCount();
+
+    // Quick template buttons
+    void on_tpl_stock_available_clicked();
+    void on_tpl_no_fish_clicked();
+    void on_tpl_port_closed_clicked();
+    void on_tpl_price_up_clicked();
+    void on_tpl_maintenance_clicked();
+    void on_tpl_pickup_ready_clicked();
+
+    // Action buttons
+    void on_btn_preview_msg_clicked();
+    void on_btn_clear_msg_clicked();
+    void on_btn_send_alert_clicked();
+    void on_btn_schedule_alert_clicked();
 
 private:
     Ui::appwindow *ui;
@@ -183,6 +201,12 @@ private:
     void loadCompaniesTableFromList(const QList<Company> &records);
     void fillCompanyForm(int row);
     int selectedCompanyId = -1;
+    QList<Company> getWaSmsTargetCompanies();
+    QString normalizePhoneNumber(const QString &phone,
+                                 const QString &countryCode = "+216");
+    QString buildWaMessage(const Company &company, const QString &msgTemplate);
+    QString buildSmsMessage(const Company &company, const QString &msgTemplate);
+    QString buildWhatsAppUrl(const QString &phone, const QString &message);
 
     // product statistics
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);

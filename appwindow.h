@@ -10,6 +10,11 @@
 #include "manage.h"
 #include <QSettings>
 #include <QDialog>
+#include <QByteArray>
+
+QT_BEGIN_NAMESPACE
+class QSerialPort;
+QT_END_NAMESPACE
 
 class QModelIndex;
 class QSqlQueryModel;
@@ -70,6 +75,7 @@ private slots:
     void on_comboBox_18_currentIndexChanged(int index);
     void on_export_pdf_6_clicked();
     void on_pushButton_11_clicked();
+    void onArduinoSerialDataReady();
 
 
     // boats CRUD
@@ -159,9 +165,12 @@ private:
     Product productManager;
     int selectedProductId = -1;
     void loadProductTable();
+    void setupArduinoTemperatureReader();
     void refreshLowStockAlerts(bool showPopup = false);
     bool lowStockWarningShown = false;
     QList<ProductRecord> allProductRecords;
+    QSerialPort *arduinoSerial = nullptr;
+    QByteArray arduinoSerialBuffer;
 
     //boats
     enum class BoatMode { Add, Edit };

@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QList>
 
+#include <cmath>
+
 namespace {
 QDate parseProductDate(const QString &value)
 {
@@ -89,6 +91,7 @@ bool Product::createProduct(const QString &type,
                             const QString &status,
                             int quantity,
                             double price,
+                            double temperature,
                             const QDateTime &fishCaught,
                             const QDateTime &dateOfPurchase,
                             int boatId)
@@ -103,14 +106,15 @@ bool Product::createProduct(const QString &type,
     QSqlQuery query(db);
 
     query.prepare("INSERT INTO products "
-                  "(type, status, location, quantity, price, fish_caught, dateofpurchase, boatid) "
-                  "VALUES (:type, :status, :location, :quantity, :price, :fishCaught, :dateOfPurchase, :boatId)");
+                  "(type, status, location, quantity, price, temperature, fish_caught, dateofpurchase, boatid) "
+                  "VALUES (:type, :status, :location, :quantity, :price, :temperature, :fishCaught, :dateOfPurchase, :boatId)");
 
     query.bindValue(":type", type);
     query.bindValue(":status", status);
     query.bindValue(":location", location);
     query.bindValue(":quantity", quantity);
     query.bindValue(":price", price);
+    query.bindValue(":temperature", std::isnan(temperature) ? QVariant() : QVariant(temperature));
     query.bindValue(":fishCaught", fishCaught);
     query.bindValue(":dateOfPurchase", dateOfPurchase);
     query.bindValue(":boatId", boatId > 0 ? boatId : QVariant());
@@ -135,7 +139,7 @@ QList<ProductRecord> Product::getAllProducts()
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT productid, type, location, status, quantity, price, fish_caught, dateofpurchase FROM products");
+    query.prepare("SELECT productid, type, location, status, quantity, price, fish_caught, dateofpurchase, temperature FROM products");
 
     if (!query.exec()) {
         qDebug() << "Error fetching products:" << query.lastError().text();
@@ -150,6 +154,11 @@ QList<ProductRecord> Product::getAllProducts()
         record.status = query.value(3).toString();
         record.quantity = query.value(4).toInt();
         record.originalPrice = query.value(5).toDouble();
+        if (query.value(8).isNull()) {
+            record.temperature = std::numeric_limits<double>::quiet_NaN();
+        } else {
+            record.temperature = query.value(8).toDouble();
+        }
         record.discountedPrice = applyAgeDiscount(record.originalPrice, query.value(7).toString());
         record.price = record.discountedPrice;
         record.fishCaught = query.value(6).toString();
@@ -187,6 +196,7 @@ bool Product::updateProduct(int id,
                             const QString &status,
                             int quantity,
                             double price,
+                            double temperature,
                             const QDateTime &fishCaught,
                             const QDateTime &dateOfPurchase,
                             int boatId)
@@ -200,18 +210,19 @@ bool Product::updateProduct(int id,
 
     QSqlQuery query(db);
     query.prepare("UPDATE products SET type = :type, location = :location, status = :status, "
-                  "quantity = :quantity, price = :price, fish_caught = :fishCaught, "
+                  "quantity = :quantity, price = :price, temperature = :temperature, fish_caught = :fishCaught, "
                   "dateofpurchase = :dateOfPurchase, boatid = :boatId WHERE productid = :id");
 
-    query.addBindValue(type);
-    query.addBindValue(location);
-    query.addBindValue(status);
-    query.addBindValue(quantity);
-    query.addBindValue(price);
-    query.addBindValue(fishCaught);
-    query.addBindValue(dateOfPurchase);
-    query.addBindValue(boatId > 0 ? boatId : QVariant());
-    query.addBindValue(id);
+    query.bindValue(":type", type);
+    query.bindValue(":location", location);
+    query.bindValue(":status", status);
+    query.bindValue(":quantity", quantity);
+    query.bindValue(":price", price);
+    query.bindValue(":temperature", std::isnan(temperature) ? QVariant() : QVariant(temperature));
+    query.bindValue(":fishCaught", fishCaught);
+    query.bindValue(":dateOfPurchase", dateOfPurchase);
+    query.bindValue(":boatId", boatId > 0 ? boatId : QVariant());
+    query.bindValue(":id", id);
 
     if (!query.exec()) {
         qDebug() << "Error updating product:" << query.lastError().text();

@@ -53,6 +53,13 @@
 
 #include <QRandomGenerator>
 #include <QEventLoop>
+
+#include <QSerialPort>
+#include <QSerialPortInfo>
+
+#include <cmath>
+#include <limits>
+
 namespace {
 QString normalizeMonthAbbreviation(const QString &value)
 {
@@ -187,6 +194,36 @@ QColor statusColor(const QString &status)
 
     return QColor();
 }
+
+bool parseTemperatureFromArduinoLine(const QString &line, double &temperatureOut)
+{
+    const QRegularExpression labeledPattern(R"((?:TEMP(?:ERATURE)?\s*[:=]\s*)([-+]?\d+(?:[\.,]\d+)?))",
+                                            QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpressionMatch labeledMatch = labeledPattern.match(line);
+    QString token;
+
+    if (labeledMatch.hasMatch()) {
+        token = labeledMatch.captured(1);
+    } else {
+        const QRegularExpression numberPattern(R"(([-+]?\d+(?:[\.,]\d+)?))");
+        const QRegularExpressionMatch numberMatch = numberPattern.match(line);
+        if (!numberMatch.hasMatch()) {
+            return false;
+        }
+        token = numberMatch.captured(1);
+    }
+
+    token.replace(',', '.');
+
+    bool ok = false;
+    const double value = token.toDouble(&ok);
+    if (!ok) {
+        return false;
+    }
+
+    temperatureOut = value;
+    return true;
+}
 }
 
 appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentUserRole)
@@ -196,6 +233,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     , connectedUserRole(currentUserRole)
 {
     ui->setupUi(this);
+    setupArduinoTemperatureReader();
     currentlySelectedId = -1;
     loadDockingTable();
     loadUsersTable();
@@ -2339,6 +2377,67 @@ void appwindow::on_pushButton_8_clicked()
 
 ///PRODUCT
 
+void appwindow::setupArduinoTemperatureReader()
+{
+    ui->fishTemp->setPlaceholderText("Auto from Arduino or enter manually");
+    ui->tempSourceLabel->setText("Arduino: searching for device...");
+
+    arduinoSerial = new QSerialPort(this);
+
+    for (const QSerialPortInfo &port : QSerialPortInfo::availablePorts()) {
+        const QString signature = (port.description() + " " + port.manufacturer()).toLower();
+        const bool likelyArduino = signature.contains("arduino")
+                                   || signature.contains("ch340")
+                                   || signature.contains("usb serial");
+
+        if (!likelyArduino) {
+            continue;
+        }
+
+        arduinoSerial->setPort(port);
+        arduinoSerial->setBaudRate(QSerialPort::Baud9600);
+        arduinoSerial->setDataBits(QSerialPort::Data8);
+        arduinoSerial->setParity(QSerialPort::NoParity);
+        arduinoSerial->setStopBits(QSerialPort::OneStop);
+        arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
+
+        if (arduinoSerial->open(QIODevice::ReadOnly)) {
+            connect(arduinoSerial, &QSerialPort::readyRead,
+                    this, &appwindow::onArduinoSerialDataReady);
+            ui->tempSourceLabel->setText(QString("Arduino: connected on %1").arg(port.portName()));
+            return;
+        }
+    }
+
+    ui->tempSourceLabel->setText("Arduino: not found (manual temperature enabled)");
+}
+
+void appwindow::onArduinoSerialDataReady()
+{
+    if (!arduinoSerial) {
+        return;
+    }
+
+    arduinoSerialBuffer.append(arduinoSerial->readAll());
+
+    int newlineIndex = arduinoSerialBuffer.indexOf('\n');
+    while (newlineIndex >= 0) {
+        const QByteArray rawLine = arduinoSerialBuffer.left(newlineIndex);
+        arduinoSerialBuffer.remove(0, newlineIndex + 1);
+
+        const QString line = QString::fromUtf8(rawLine).trimmed();
+        if (!line.isEmpty()) {
+            double temperatureValue = 0.0;
+            if (parseTemperatureFromArduinoLine(line, temperatureValue)) {
+                ui->fishTemp->setText(QString::number(temperatureValue, 'f', 2));
+                ui->tempSourceLabel->setText(QString("Arduino: %1 C").arg(temperatureValue, 0, 'f', 2));
+            }
+        }
+
+        newlineIndex = arduinoSerialBuffer.indexOf('\n');
+    }
+}
+
 // Add product
 
 void appwindow::on_checkProductButton_2_clicked()
@@ -2348,6 +2447,7 @@ void appwindow::on_checkProductButton_2_clicked()
     QString quantity = ui->qtyfish->text();
     QString price = ui->fishprice->text();
     QString location = ui->locationfish->text();
+    QString temperatureText = ui->fishTemp->text().trimmed();
 
     if (type.isEmpty() || quantity.isEmpty() || price.isEmpty() || location.isEmpty()) {
         QMessageBox::warning(this, "Error", "Please fill in all required fields!");
@@ -2364,6 +2464,16 @@ void appwindow::on_checkProductButton_2_clicked()
     if (!ok) {
         QMessageBox::warning(this, "Error", "Price must be a number!");
         return;
+    }
+
+    double temperature = std::numeric_limits<double>::quiet_NaN();
+    if (!temperatureText.isEmpty()) {
+        temperatureText.replace(',', '.');
+        temperature = temperatureText.toDouble(&ok);
+        if (!ok) {
+            QMessageBox::warning(this, "Error", "Temperature must be a number!");
+            return;
+        }
     }
 
     // Get boat ID from input field
@@ -2386,6 +2496,7 @@ void appwindow::on_checkProductButton_2_clicked()
                                          status,
                                          qty,
                                          pr,
+                                         temperature,
                                          ui->fishdate1->dateTime(),
                                          ui->fishdate2->dateTime(),
                                          boatId)) {
@@ -2402,6 +2513,7 @@ void appwindow::on_checkProductButton_2_clicked()
                                           status,
                                           qty,
                                           pr,
+                                          temperature,
                                           ui->fishdate1->dateTime(),
                                           ui->fishdate2->dateTime(),
                                           boatId)) {
@@ -2416,6 +2528,7 @@ void appwindow::on_checkProductButton_2_clicked()
     ui->fishStatus->setCurrentIndex(0);
     ui->qtyfish->clear();
     ui->fishprice->clear();
+    ui->fishTemp->clear();
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->locationfish->clear();
@@ -2465,9 +2578,9 @@ void appwindow::loadProductTable()
 
     QTableWidget *table = ui->tableWidget_10;
     table->setRowCount(0);
-    table->setColumnCount(9);
+    table->setColumnCount(10);
     table->setHorizontalHeaderLabels(
-        {"ID", "Status", "Type", "Fish Caught", "Date Purchase", "Quantity", "Location", "Original Price", "Discounted Price"});
+        {"ID", "Status", "Type", "Fish Caught", "Date Purchase", "Quantity", "Location", "Temperature (C)", "Original Price", "Discounted Price"});
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode(QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -2482,8 +2595,11 @@ void appwindow::loadProductTable()
         table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
         table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
         table->setItem(row, 6, new QTableWidgetItem(r.location));
-        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
-        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
+        table->setItem(row, 7, new QTableWidgetItem(std::isnan(r.temperature)
+                                 ? "-"
+                                 : QString::number(r.temperature, 'f', 2)));
+        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
+        table->setItem(row, 9, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
     QHeaderView *header = table->horizontalHeader();
@@ -2496,8 +2612,9 @@ void appwindow::loadProductTable()
     table->setColumnWidth(4, 170);  // Date Purchase
     table->setColumnWidth(5, 100);  // Quantity
     table->setColumnWidth(6, 130);  // Location
-    table->setColumnWidth(7, 160);  // Original Price
-    table->setColumnWidth(8, 180);  // Discounted Price
+    table->setColumnWidth(7, 140);  // Temperature
+    table->setColumnWidth(8, 160);  // Original Price
+    table->setColumnWidth(9, 180);  // Discounted Price
 
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(records.size()));
@@ -2582,8 +2699,9 @@ void appwindow::on_tableWidget_10_cellDoubleClicked(int row, int /*column*/)
     // Fill the form fields for editing
     ui->fishtype->setText(table->item(row, 2)->text());
     ui->qtyfish->setText(table->item(row, 5)->text());
-    ui->fishprice->setText(table->item(row, 7)->text());
+    ui->fishprice->setText(table->item(row, 8)->text());
     ui->locationfish->setText(table->item(row, 6)->text());
+    ui->fishTemp->setText(table->item(row, 7)->text() == "-" ? "" : table->item(row, 7)->text());
 
     // Set status combobox
     int statusIdx = ui->fishStatus->findText(table->item(row, 1)->text());
@@ -2641,8 +2759,9 @@ void appwindow::on_edit_company_6_clicked()
     // Fill the form fields for editing
     ui->fishtype->setText(table->item(row, 2)->text());
     ui->qtyfish->setText(table->item(row, 5)->text());
-    ui->fishprice->setText(table->item(row, 7)->text());
+    ui->fishprice->setText(table->item(row, 8)->text());
     ui->locationfish->setText(table->item(row, 6)->text());
+    ui->fishTemp->setText(table->item(row, 7)->text() == "-" ? "" : table->item(row, 7)->text());
 
     // Set status combobox
     int statusIdx = ui->fishStatus->findText(table->item(row, 1)->text());
@@ -2695,6 +2814,7 @@ void appwindow::on_delete_company_6_clicked()
             ui->fishStatus->setCurrentIndex(0);
             ui->qtyfish->clear();
             ui->fishprice->clear();
+            ui->fishTemp->clear();
             ui->locationfish->clear();
             ui->boatCombo->clear();
             ui->fishdate1->setDateTime(QDateTime::currentDateTime());
@@ -2715,6 +2835,7 @@ void appwindow::on_clear_6_clicked()
     ui->fishStatus->setCurrentIndex(0);
     ui->qtyfish->clear();
     ui->fishprice->clear();
+    ui->fishTemp->clear();
     ui->locationfish->clear();
     ui->boatCombo->clear();
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
@@ -2808,8 +2929,11 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
         table->setItem(row, 4, new QTableWidgetItem(r.dateOfPurchase));
         table->setItem(row, 5, new QTableWidgetItem(QString::number(r.quantity)));
         table->setItem(row, 6, new QTableWidgetItem(r.location));
-        table->setItem(row, 7, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
-        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
+        table->setItem(row, 7, new QTableWidgetItem(std::isnan(r.temperature)
+                                 ? "-"
+                                 : QString::number(r.temperature, 'f', 2)));
+        table->setItem(row, 8, new QTableWidgetItem(QString::number(r.originalPrice, 'f', 2)));
+        table->setItem(row, 9, new QTableWidgetItem(QString::number(r.discountedPrice, 'f', 2)));
     }
 
     QHeaderView *header = table->horizontalHeader();
@@ -2822,8 +2946,9 @@ void appwindow::on_comboBox_18_currentIndexChanged(int index)
     table->setColumnWidth(4, 170);  // Date Purchase
     table->setColumnWidth(5, 100);  // Quantity
     table->setColumnWidth(6, 130);  // Location
-    table->setColumnWidth(7, 160);  // Original Price
-    table->setColumnWidth(8, 180);  // Discounted Price
+    table->setColumnWidth(7, 140);  // Temperature
+    table->setColumnWidth(8, 160);  // Original Price
+    table->setColumnWidth(9, 180);  // Discounted Price
 
     // Update the count label
     ui->labelResults_6->setText(QString("Showing %1 Products").arg(recordsToDisplay.size()));
@@ -3490,6 +3615,9 @@ void appwindow::on_DockCalender_clicked()
 ///END
 appwindow::~appwindow()
 {
+    if (arduinoSerial && arduinoSerial->isOpen()) {
+        arduinoSerial->close();
+    }
     delete ui;
 }
 

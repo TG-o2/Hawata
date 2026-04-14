@@ -4569,7 +4569,7 @@ border: none;
         <property name="geometry">
          <rect>
           <x>300</x>
-          <y>360</y>
+                    <y>430</y>
           <width>161</width>
           <height>51</height>
          </rect>
@@ -4770,7 +4770,7 @@ font-size: 35px;
          </rect>
         </property>
         <property name="text">
-         <string>Location</string>
+                 <string>Location:</string>
         </property>
        </widget>
        <widget class="QLineEdit" name="locationfish">
@@ -4783,6 +4783,42 @@ font-size: 35px;
          </rect>
         </property>
        </widget>
+             <widget class="QLabel" name="label_temp_fish">
+                <property name="geometry">
+                 <rect>
+                    <x>300</x>
+                    <y>320</y>
+                    <width>201</width>
+                    <height>20</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Temperature (C):</string>
+                </property>
+             </widget>
+             <widget class="QLineEdit" name="fishTemp">
+                <property name="geometry">
+                 <rect>
+                    <x>300</x>
+                    <y>350</y>
+                    <width>211</width>
+                    <height>31</height>
+                 </rect>
+                </property>
+             </widget>
+             <widget class="QLabel" name="tempSourceLabel">
+                <property name="geometry">
+                 <rect>
+                    <x>300</x>
+                    <y>390</y>
+                    <width>351</width>
+                    <height>20</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Arduino: waiting...</string>
+                </property>
+             </widget>
        <widget class="QLabel" name="label_boat">
         <property name="geometry">
          <rect>
@@ -5468,7 +5504,12 @@ QPushButton:pressed {
        </column>
        <column>
         <property name="text">
-         <string>Price</string>
+                 <string>Temperature (C)</string>
+                </property>
+             </column>
+             <column>
+                <property name="text">
+                 <string>Price</string>
         </property>
        </column>
       </widget>

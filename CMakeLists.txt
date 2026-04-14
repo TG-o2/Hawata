@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Qt modules - ADDED Network module
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network SerialPort)
 
 # List of project sources
 set(PROJECT_SOURCES
@@ -59,6 +59,7 @@ target_link_libraries(Sign_up PRIVATE
     Qt6::Charts
     Qt6::PrintSupport
     Qt6::Network
+    Qt6::SerialPort
 )
 
 # macOS bundle settings

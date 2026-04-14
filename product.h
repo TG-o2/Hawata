@@ -5,12 +5,15 @@
 #include <QDateTime>
 #include <QList>
 
+#include <limits>
+
 struct ProductRecord {
     int id;
     QString type;
     QString location;
     QString status;
     int quantity;
+    double temperature = std::numeric_limits<double>::quiet_NaN();
     double price;
     double originalPrice;
     double discountedPrice;
@@ -43,6 +46,7 @@ public:
                        const QString &status,
                        int quantity,
                        double price,
+                       double temperature,
                        const QDateTime &fishCaught,
                        const QDateTime &dateOfPurchase,
                        int boatId = -1);
@@ -57,6 +61,7 @@ public:
                        const QString &status,
                        int quantity,
                        double price,
+                       double temperature,
                        const QDateTime &fishCaught,
                        const QDateTime &dateOfPurchase,
                        int boatId = -1);

@@ -187,6 +187,7 @@ private:
     Product productManager;
     int selectedProductId = -1;
     void loadProductTable();
+    void loadProductBoatIds();
     void setupArduinoTemperatureReader();
     void refreshLowStockAlerts(bool showPopup = false);
     bool lowStockWarningShown = false;

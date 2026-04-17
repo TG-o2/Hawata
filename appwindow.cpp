@@ -392,6 +392,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     loadDockingTable();
     loadUsersTable();
     loadProductTable();    // Load product table on startup
+    loadProductBoatIds();
     loadCompaniesTable();
     initEmailCampaignPage();
     initWhatsAppSmsPage();
@@ -1846,7 +1847,7 @@ void appwindow::on_export_docking_clicked()
         // Header background
         painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
 
-        QFont headerFont("Arial", 13, QFont::Bold);
+        QFont headerFont("Arial", 10, QFont::Bold);
         painter.setFont(headerFont);
         painter.setPen(Qt::white);
 
@@ -2659,11 +2660,11 @@ void appwindow::on_checkProductButton_2_clicked()
         }
     }
 
-    // Get boat ID from input field
+    // Get boat ID from dropdown (foreign key values from BOAT table)
     int boatId = -1;
-    if (!ui->boatCombo->text().isEmpty()) {
+    if (!ui->boatCombo->currentText().trimmed().isEmpty()) {
         bool ok;
-        boatId = ui->boatCombo->text().toInt(&ok);
+        boatId = ui->boatCombo->currentText().trimmed().toInt(&ok);
         if (!ok) {
             QMessageBox::warning(this, "Error", "Boat ID must be a valid number!");
             return;
@@ -2715,7 +2716,7 @@ void appwindow::on_checkProductButton_2_clicked()
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     ui->locationfish->clear();
-    ui->boatCombo->clear();
+    ui->boatCombo->setCurrentIndex(0);
     selectedProductId = -1;
 
     // Reset button text back to "Add Product"
@@ -2753,8 +2754,45 @@ void appwindow::on_checkProductButton_clicked()
     loadProductTable();                        // Load the products
 }
 
+void appwindow::loadProductBoatIds()
+{
+    if (!ui->boatCombo) {
+        return;
+    }
+
+    const QString previous = ui->boatCombo->currentText().trimmed();
+
+    ui->boatCombo->blockSignals(true);
+    ui->boatCombo->clear();
+    ui->boatCombo->addItem("");
+
+    QSqlQuery query;
+    if (query.exec("SELECT BOATID FROM BOAT ORDER BY BOATID")) {
+        while (query.next()) {
+            ui->boatCombo->addItem(query.value(0).toString());
+        }
+    }
+
+    ui->boatCombo->setEditable(false);
+
+    if (!previous.isEmpty()) {
+        const int idx = ui->boatCombo->findText(previous);
+        if (idx >= 0) {
+            ui->boatCombo->setCurrentIndex(idx);
+        } else {
+            ui->boatCombo->setCurrentIndex(0);
+        }
+    } else {
+        ui->boatCombo->setCurrentIndex(0);
+    }
+
+    ui->boatCombo->blockSignals(false);
+}
+
 void appwindow::loadProductTable()
 {
+    loadProductBoatIds();
+
     QList<ProductRecord> records = productManager.getAllProducts();
     allProductRecords = records;  // Store all records for filtering
     qDebug() << "Product records fetched:" << records.size();
@@ -2910,6 +2948,24 @@ void appwindow::on_tableWidget_10_cellDoubleClicked(int row, int /*column*/)
         ui->fishdate2->setDateTime(dateOfPurchaseDt);
     }
 
+    // Load and set boat foreign key value
+    loadProductBoatIds();
+    QSqlQuery boatQuery;
+    boatQuery.prepare("SELECT boatid FROM products WHERE productid = :id");
+    boatQuery.bindValue(":id", selectedProductId);
+    if (boatQuery.exec() && boatQuery.next()) {
+        const QVariant boatIdValue = boatQuery.value(0);
+        if (!boatIdValue.isNull()) {
+            const QString boatIdText = boatIdValue.toString();
+            const int idx = ui->boatCombo->findText(boatIdText);
+            if (idx >= 0) {
+                ui->boatCombo->setCurrentIndex(idx);
+            }
+        } else {
+            ui->boatCombo->setCurrentIndex(0);
+        }
+    }
+
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
 
@@ -2970,6 +3026,24 @@ void appwindow::on_edit_company_6_clicked()
         ui->fishdate2->setDateTime(dateOfPurchaseDt);
     }
 
+    // Load and set boat foreign key value
+    loadProductBoatIds();
+    QSqlQuery boatQuery;
+    boatQuery.prepare("SELECT boatid FROM products WHERE productid = :id");
+    boatQuery.bindValue(":id", selectedProductId);
+    if (boatQuery.exec() && boatQuery.next()) {
+        const QVariant boatIdValue = boatQuery.value(0);
+        if (!boatIdValue.isNull()) {
+            const QString boatIdText = boatIdValue.toString();
+            const int idx = ui->boatCombo->findText(boatIdText);
+            if (idx >= 0) {
+                ui->boatCombo->setCurrentIndex(idx);
+            }
+        } else {
+            ui->boatCombo->setCurrentIndex(0);
+        }
+    }
+
     // Update button text to show we're editing
     ui->checkProductButton_2->setText("Edit Product");
 
@@ -2999,7 +3073,7 @@ void appwindow::on_delete_company_6_clicked()
             ui->fishprice->clear();
             ui->fishTemp->clear();
             ui->locationfish->clear();
-            ui->boatCombo->clear();
+            ui->boatCombo->setCurrentIndex(0);
             ui->fishdate1->setDateTime(QDateTime::currentDateTime());
             ui->fishdate2->setDateTime(QDateTime::currentDateTime());
             selectedProductId = -1;
@@ -3020,7 +3094,7 @@ void appwindow::on_clear_6_clicked()
     ui->fishprice->clear();
     ui->fishTemp->clear();
     ui->locationfish->clear();
-    ui->boatCombo->clear();
+    ui->boatCombo->setCurrentIndex(0);
     ui->fishdate1->setDateTime(QDateTime::currentDateTime());
     ui->fishdate2->setDateTime(QDateTime::currentDateTime());
     selectedProductId = -1;
@@ -3192,10 +3266,10 @@ void appwindow::on_export_pdf_6_clicked()
     int yPos = marginTop;
 
     // ٤?٤? TITLE BLOCK ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-    int titleBlockHeight = 120;
+    int titleBlockHeight = 96;
     painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
 
-    QFont titleFont("Arial", 32, QFont::Bold);
+    QFont titleFont("Arial", 28, QFont::Bold);
     painter.setFont(titleFont);
     painter.setPen(Qt::white);
     painter.drawText(marginLeft, yPos, contentWidth, titleBlockHeight,
@@ -3204,7 +3278,7 @@ void appwindow::on_export_pdf_6_clicked()
     yPos += titleBlockHeight + 30;
 
     // ٤?٤? DATE LINE ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-    QFont dateFont("Arial", 11);
+    QFont dateFont("Arial", 10);
     painter.setFont(dateFont);
     painter.setPen(QColor(100, 100, 100));
     painter.drawText(marginLeft, yPos,
@@ -3227,8 +3301,9 @@ void appwindow::on_export_pdf_6_clicked()
     }
 
     QVector<int> columnWidths;
-    if (columnCount == 9) {
-        // Give extra room to date/price columns to avoid clipping in PDF.
+    if (columnCount == 10) {
+        columnWidths = {70, 110, 110, 180, 200, 90, 140, 120, 140, 160};
+    } else if (columnCount == 9) {
         columnWidths = {60, 105, 105, 240, 250, 90, 115, 145, 165};
     } else {
         const int fallbackWidth = contentWidth / qMax(1, columnCount);
@@ -3259,12 +3334,12 @@ void appwindow::on_export_pdf_6_clicked()
         columnWidths[columnWidths.size() - 1] += (contentWidth - scaledSum);
     }
 
-    int headerHeight = 80;
+    int headerHeight = 96;
 
     auto drawHeader = [&]() {
         painter.fillRect(marginLeft, yPos, contentWidth, headerHeight, darkBlue);
 
-        QFont headerFont("Arial", 13, QFont::Bold);
+        QFont headerFont("Arial", 11, QFont::Bold);
         painter.setFont(headerFont);
         painter.setPen(Qt::white);
 
@@ -3274,7 +3349,7 @@ void appwindow::on_export_pdf_6_clicked()
             ? table->horizontalHeaderItem(col)->text()
             : "";
             const int currentWidth = columnWidths.value(col, 100);
-            painter.drawText(xPos + 8, yPos, currentWidth - 16, headerHeight,
+            painter.drawText(xPos + 6, yPos, currentWidth - 12, headerHeight,
                              Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
                              headerText);
 
@@ -3291,14 +3366,32 @@ void appwindow::on_export_pdf_6_clicked()
     drawHeader();
     yPos += headerHeight;
 
-    int rowHeight       = 75;
     int footerReserve   = 260; // Keep space for summary and signature area at the bottom.
 
-    QFont cellFont("Arial", 11);
+    QFont cellFont("Arial", 8);
     painter.setFont(cellFont);
+    const int cellPaddingX = 16;
+    const int cellPaddingY = 16;
+    const int minRowHeight = 76;
+
+    auto wrappedCellHeight = [&](const QString &text, int availableWidth) {
+        QFontMetrics fm(cellFont);
+        const QRect bounds = fm.boundingRect(QRect(0, 0, qMax(20, availableWidth), 2000),
+                                             Qt::TextWordWrap | Qt::AlignCenter,
+                                             text);
+        return qMax(minRowHeight, bounds.height() + (cellPaddingY * 2));
+    };
 
     for (int exportRow = 0; exportRow < rowCount; exportRow++) {
         const int row = selectedRows.at(exportRow);
+
+        int rowHeight = minRowHeight;
+        for (int col = 0; col < columnCount; col++) {
+            QTableWidgetItem *item = table->item(row, col);
+            const QString cellText = item ? item->text() : "";
+            const int currentWidth = columnWidths.value(col, 100);
+            rowHeight = qMax(rowHeight, wrappedCellHeight(cellText, currentWidth - (cellPaddingX * 2)));
+        }
 
         // ٤?٤? New page if needed ٤?٤?
         if (exportRow > 0 && (yPos + rowHeight + footerReserve) > pageHeight) {
@@ -3322,8 +3415,10 @@ void appwindow::on_export_pdf_6_clicked()
 
             painter.setPen(textColor);
             const int currentWidth = columnWidths.value(col, 100);
-            painter.drawText(xPos + 10, yPos, currentWidth - 20, rowHeight,
-                             Qt::AlignCenter | Qt::AlignVCenter | Qt::TextWordWrap,
+            QRect cellRect(xPos, yPos, currentWidth, rowHeight);
+            painter.drawText(cellRect.adjusted(cellPaddingX, cellPaddingY,
+                                               -cellPaddingX, -cellPaddingY),
+                             Qt::AlignCenter | Qt::TextWordWrap,
                              cellText);
 
             if (col < columnCount - 1) {

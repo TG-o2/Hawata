@@ -6031,9 +6031,9 @@ void appwindow::initEmailCampaignPage()
     updateTargetCount();
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Build filtered company list from UI state
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 QList<Company> appwindow::getTargetCompanies()
 {
     Company obj;
@@ -6045,21 +6045,21 @@ QList<Company> appwindow::getTargetCompanies()
 
     for (const Company &c : all) {
 
-        // ٤?٤? Status filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+        // ── Status filter ────────────────────────────────────────────
         if (ui->radio_inactive_2->isChecked()) {
             if (c.getStatus().toUpper() != "INACTIVE") continue;
         } else if (ui->radio_promotion_2->isChecked()) {
             if (c.getStatus().toUpper() != "ACTIVE") continue;
         }
-        // radio_custom_2 �?� no status filter
+        // radio_custom_2 → no status filter
 
-        // ٤?٤? Fish filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+        // ── Fish filter ──────────────────────────────────────────────
         if (fishFilter != "All Fish Types") {
             if (!c.getPreferredFish().contains(fishFilter, Qt::CaseInsensitive))
                 continue;
         }
 
-        // ٤?٤? Location filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+        // ── Location filter ──────────────────────────────────────────
         if (locationFilter != "All Locations") {
             if (!c.getLocation().contains(locationFilter, Qt::CaseInsensitive))
                 continue;
@@ -6070,9 +6070,9 @@ QList<Company> appwindow::getTargetCompanies()
     return result;
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Update "Target: X companies" label
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::updateTargetCount()
 {
     int count = getTargetCompanies().size();
@@ -6082,9 +6082,9 @@ void appwindow::updateTargetCount()
             .arg(count == 1 ? "y" : "ies"));
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Replace [placeholders] for one company
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 QString appwindow::buildEmailBody(const Company &company, const QString &templateText)
 {
     QString body = templateText;
@@ -6095,9 +6095,9 @@ QString appwindow::buildEmailBody(const Company &company, const QString &templat
     return body;
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Template buttons  (random pick from vector)
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::on_btn_template_inactive_2_clicked()
 {
     static const QVector<QPair<QString,QString>> inactiveTemplates = {
@@ -6112,22 +6112,22 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "Warm regards,\nHawata Marina Team"
         },
         {
-            "A Special Offer to Welcome You Back �?� [Company Name]",
+            "A Special Offer to Welcome You Back – [Company Name]",
             "Dear [Company Name],\n\n"
             "It has been some time since your last visit and we genuinely value our relationship with you.\n\n"
             "To show our appreciation, we are offering an exclusive discount on your next order of "
-            "[Preferred Fish] �?� a product we know your business depends on.\n\n"
+            "[Preferred Fish] – a product we know your business depends on.\n\n"
             "Your location in [Location] puts you perfectly within our delivery range, and we are "
             "ready to fulfil your needs faster than ever.\n\n"
             "Let us know if you are interested and we will get things moving right away.\n\n"
             "Best wishes,\nHawata Marina Team"
         },
         {
-            "Checking In �?� How Can We Help, [Company Name]?",
+            "Checking In – How Can We Help, [Company Name]?",
             "Hello [Company Name],\n\n"
             "We have not heard from you in a while and we just wanted to check in.\n\n"
-            "If there is anything that caused a pause in our partnership �?� whether it is pricing, "
-            "availability of [Preferred Fish], or anything else �?� we would love to hear your feedback "
+            "If there is anything that caused a pause in our partnership – whether it is pricing, "
+            "availability of [Preferred Fish], or anything else – we would love to hear your feedback "
             "and work together to find a solution.\n\n"
             "Your satisfaction is our priority, and we are here whenever you are ready.\n\n"
             "Looking forward to hearing from you,\nHawata Marina Team"
@@ -6139,7 +6139,7 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "would be of interest to your operations in [Location].\n\n"
             "Given our previous partnership, we wanted to give you early access before "
             "opening stock to the wider market.\n\n"
-            "Quantities are limited �?� reach out today to secure your allocation.\n\n"
+            "Quantities are limited – reach out today to secure your allocation.\n\n"
             "Kind regards,\nHawata Marina Team"
         },
         {
@@ -6149,7 +6149,7 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "we are still meeting your expectations.\n\n"
             "We noticed your last interaction with us was some time ago. Our team is ready to "
             "resume deliveries of [Preferred Fish] to [Location] at competitive prices.\n\n"
-            "Please feel free to reply to this message �?� we would be happy to reconnect at your convenience.\n\n"
+            "Please feel free to reply to this message – we would be happy to reconnect at your convenience.\n\n"
             "Sincerely,\nHawata Marina Team"
         }
     };
@@ -6169,12 +6169,12 @@ void appwindow::on_btn_template_promo_2_clicked()
             "seasonal promotion on [Preferred Fish].\n\n"
             "For a limited time, we are offering priority pricing and guaranteed stock "
             "reservations for companies in [Location].\n\n"
-            "Take advantage of this offer before it expires �?� quantities are limited and our "
+            "Take advantage of this offer before it expires – quantities are limited and our "
             "loyal partners always come first.\n\n"
             "Best regards,\nHawata Marina Team"
         },
         {
-            "New Arrivals �?� [Preferred Fish] Now in Stock!",
+            "New Arrivals – [Preferred Fish] Now in Stock!",
             "Hello [Company Name],\n\n"
             "We are excited to announce that our latest catch of [Preferred Fish] has just arrived "
             "and is ready for immediate dispatch to [Location].\n\n"
@@ -6183,33 +6183,33 @@ void appwindow::on_btn_template_promo_2_clicked()
             "Warm regards,\nHawata Marina Team"
         },
         {
-            "Bulk Order Discount �?� Just for You, [Company Name]",
+            "Bulk Order Discount – Just for You, [Company Name]",
             "Dear [Company Name],\n\n"
             "We know how important cost efficiency is to your business, which is why we are "
             "launching a special bulk discount programme exclusively for our active partners.\n\n"
             "Order a qualifying quantity of [Preferred Fish] and receive a significant price reduction "
-            "�?� delivered directly to [Location] on your schedule.\n\n"
+            "– delivered directly to [Location] on your schedule.\n\n"
             "Reply to this email to learn more and lock in your rate.\n\n"
             "Looking forward to serving you,\nHawata Marina Team"
         },
         {
-            "A Thank You from the Marina Team �?� Special Reward Inside",
+            "A Thank You from the Marina Team – Special Reward Inside",
             "Dear [Company Name],\n\n"
             "Your continued trust and partnership means everything to us.\n\n"
             "As a token of our appreciation, we are offering [Company Name] an exclusive "
             "loyalty reward on your next shipment of [Preferred Fish] to [Location].\n\n"
-            "No action is required �?� simply place your order as usual and the discount "
+            "No action is required – simply place your order as usual and the discount "
             "will be applied automatically.\n\n"
             "Thank you for being an outstanding partner.\n\n"
             "With gratitude,\nHawata Marina Team"
         },
         {
-            "Weekend Flash Sale �?� [Preferred Fish] at Special Rates",
+            "Weekend Flash Sale – [Preferred Fish] at Special Rates",
             "Hello [Company Name],\n\n"
             "This weekend only, we are running a flash promotion on [Preferred Fish] "
             "for our active partners across [Location] and beyond.\n\n"
             "Prices are reduced, stock is fresh, and delivery slots are available immediately.\n\n"
-            "This offer expires Sunday midnight �?� do not miss out!\n\n"
+            "This offer expires Sunday midnight – do not miss out!\n\n"
             "Act fast and reply to this email to reserve your order.\n\n"
             "Hawata Marina Team"
         }
@@ -6226,9 +6226,9 @@ void appwindow::on_btn_template_clear_2_clicked()
     ui->email_template_2->clear();
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-//  Preview �?� QDialog with rendered email
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
+//  Preview – QDialog with rendered email
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::on_btn_preview_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -6257,7 +6257,7 @@ void appwindow::on_btn_preview_2_clicked()
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
     QLabel *infoLabel = new QLabel(
-        QString("Sample preview for: <b>%1</b>  �?�  "
+        QString("Sample preview for: <b>%1</b>  |  "
                 "<b>%2</b> total recipient%3")
             .arg(sample.getName())
             .arg(targets.size())
@@ -6290,9 +6290,9 @@ void appwindow::on_btn_preview_2_clicked()
     delete dlg;
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Send Now
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::on_btn_send_now_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -6364,18 +6364,18 @@ void appwindow::on_btn_send_now_2_clicked()
     }
 
     ui->btn_send_now_2->setEnabled(true);
-    ui->btn_send_now_2->setText("?��� Send Now");
+    ui->btn_send_now_2->setText("📧 Send Now");
 
     QMessageBox::information(this, "Campaign Complete",
-                             QString("٣� Sent:     %1\n"
-                                     "��� Failed:   %2\n"
-                                     "����?? Skipped:  %3  (invalid/missing email)")
+                             QString("✅ Sent:     %1\n"
+                                     "❌ Failed:   %2\n"
+                                     "⚠️  Skipped:  %3  (invalid/missing email)")
                                  .arg(sent).arg(failed).arg(skipped));
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Schedule
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::on_btn_schedule_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -6410,19 +6410,23 @@ void appwindow::on_btn_schedule_2_clicked()
                                  .arg(targets.size() == 1 ? "y" : "ies"));
 
     ui->btn_schedule_2->setEnabled(false);
-    ui->btn_schedule_2->setText("�?? Scheduled");
+    ui->btn_schedule_2->setText("⏰ Scheduled");
 
     QTimer::singleShot(msDelay, this, [this]() {
         ui->btn_schedule_2->setEnabled(true);
-        ui->btn_schedule_2->setText("�?? Schedule");
+        ui->btn_schedule_2->setText("⏰ Schedule");
         on_btn_send_now_2_clicked();
     });
 }
-//whatsapp section **
+
+// =====================================================================
+//  WhatsApp / SMS SECTION
+// =====================================================================
+
 void appwindow::initWhatsAppSmsPage()
 {
-    // ٤?٤? Alert type buttons behave as a radio group ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-    // (they are checkable QPushButtons �?� make only one active at a time)
+    // ── Alert type buttons behave as a radio group ───────────────────
+    // (they are checkable QPushButtons – make only one active at a time)
     QList<QPushButton*> alertBtns = {
         ui->atype_stock, ui->atype_closure,
         ui->atype_price, ui->atype_port, ui->atype_pickup
@@ -6435,7 +6439,7 @@ void appwindow::initWhatsAppSmsPage()
         });
     }
 
-    // ٤?٤? Recipients radio buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Recipients radio buttons ─────────────────────────────────────
     connect(ui->rec_all,      &QRadioButton::toggled, this, &appwindow::updateWaSmsRecipientCount);
     connect(ui->rec_fish,     &QRadioButton::toggled, this, [this](bool checked) {
         ui->combo_fish_filter->setEnabled(checked);
@@ -6452,15 +6456,15 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->combo_location_filter, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &appwindow::updateWaSmsRecipientCount);
 
-    // ٤?٤? Channel radio buttons update char count hint ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Channel radio buttons update char count hint ─────────────────
     connect(ui->ch_whatsapp, &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
     connect(ui->ch_sms,      &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
     connect(ui->ch_both,     &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
 
-    // ٤?٤? Message body �?� live char counter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Message body – live char counter ─────────────────────────────
     connect(ui->msg_body, &QTextEdit::textChanged, this, &appwindow::updateWaCharCount);
 
-    // ٤?٤? Schedule radio buttons enable/disable datetime picker ٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Schedule radio buttons enable/disable datetime picker ────────
     connect(ui->sched_now,   &QRadioButton::toggled, this, [this](bool checked) {
         ui->schedule_datetime->setEnabled(!checked);
     });
@@ -6469,7 +6473,7 @@ void appwindow::initWhatsAppSmsPage()
     });
     ui->schedule_datetime->setDateTime(QDateTime::currentDateTime().addDays(1));
 
-    // ٤?٤? Quick template buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Quick template buttons ────────────────────────────────────────
     connect(ui->tpl_stock_available, &QPushButton::clicked,
             this, &appwindow::on_tpl_stock_available_clicked);
     connect(ui->tpl_no_fish,         &QPushButton::clicked,
@@ -6483,7 +6487,7 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->tpl_pickup_ready,    &QPushButton::clicked,
             this, &appwindow::on_tpl_pickup_ready_clicked);
 
-    // ٤?٤? Action buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Action buttons ────────────────────────────────────────────────
     connect(ui->btn_preview_msg,    &QPushButton::clicked,
             this, &appwindow::on_btn_preview_msg_clicked);
     connect(ui->btn_clear_msg,      &QPushButton::clicked,
@@ -6493,30 +6497,30 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->btn_schedule_alert, &QPushButton::clicked,
             this, &appwindow::on_btn_schedule_alert_clicked);
 
-    // ٤?٤? Init counts ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // ── Init counts ───────────────────────────────────────────────────
     updateWaSmsRecipientCount();
     updateWaCharCount();
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-//  Normalize phone �?� international format
-//  Tunisian 8-digit numbers �?� +216XXXXXXXX
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
+//  Normalize phone – international format
+//  Tunisian 8-digit numbers → +216XXXXXXXX
+// ─────────────────────────────────────────────────────────────────────
 QString appwindow::normalizePhoneNumber(const QString &phone, const QString &countryCode)
 {
     QString cleaned = phone;
     cleaned.remove(' ').remove('-').remove('(').remove(')').remove('.');
 
-    if (cleaned.isEmpty())   return {};
-    if (cleaned.startsWith('+')) return cleaned;
-    if (cleaned.startsWith("00")) return "+" + cleaned.mid(2);
+    if (cleaned.isEmpty())            return {};
+    if (cleaned.startsWith('+'))      return cleaned;
+    if (cleaned.startsWith("00"))     return "+" + cleaned.mid(2);
 
     return countryCode + cleaned;   // prepend +216 for local numbers
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Build filtered company list from UI state
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 QList<Company> appwindow::getWaSmsTargetCompanies()
 {
     Company obj;
@@ -6538,15 +6542,15 @@ QList<Company> appwindow::getWaSmsTargetCompanies()
                 !c.getLocation().contains(loc, Qt::CaseInsensitive))
                 continue;
         }
-        // rec_all and rec_custom �?� include everyone
+        // rec_all and rec_custom → include everyone
         result.append(c);
     }
     return result;
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Update recipient count label
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::updateWaSmsRecipientCount()
 {
     QList<Company> targets = getWaSmsTargetCompanies();
@@ -6566,20 +6570,20 @@ void appwindow::updateWaSmsRecipientCount()
         filterLabel = "Custom selection";
 
     ui->lbl_recipient_count->setText(
-        QString("?��� Targeting: %1 �?� %2 compan%3, %4 with valid phone")
+        QString("Targeting: %1  |  %2 compan%3, %4 with valid phone")
             .arg(filterLabel)
             .arg(total)
             .arg(total == 1 ? "y" : "ies")
             .arg(withPhone));
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Live character counter (changes limit based on channel)
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 void appwindow::updateWaCharCount()
 {
-    int len     = ui->msg_body->toPlainText().length();
-    int limit   = ui->ch_sms->isChecked() ? 160 : 1000;  // SMS=160, WA/Both=1000
+    int len   = ui->msg_body->toPlainText().length();
+    int limit = ui->ch_sms->isChecked() ? 160 : 1000;  // SMS=160, WA/Both=1000
 
     QString style;
     if (len > limit)
@@ -6593,26 +6597,26 @@ void appwindow::updateWaCharCount()
     ui->lbl_char_count->setText(
         QString("%1 / %2 characters%3")
             .arg(len).arg(limit)
-            .arg(len > limit ? "  ����?? Too long!" : ""));
+            .arg(len > limit ? " — Too long!" : ""));
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 //  Replace [placeholders] in message body
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// ─────────────────────────────────────────────────────────────────────
 QString appwindow::buildWaMessage(const Company &company, const QString &msgTemplate)
 {
     QString body = msgTemplate;
     body.replace("[Company Name]", company.getName());
     body.replace("[Fish Type]",    company.getPreferredFish());
-    body.replace("[Price]",        "�?�");           // fill in if you have a price field
+    body.replace("[Price]",        "N/A");           // fill in if you have a price field
     body.replace("[Date]",         QDate::currentDate().toString("dd/MM/yyyy"));
     body.replace("[Port Name]",    "Hawata Marina");
     return body;
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
-//  Auto-shorten to ���160 chars for SMS
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// =====================================================================
+//  Auto-shorten to ≤160 chars for SMS
+// =====================================================================
 QString appwindow::buildSmsMessage(const Company &company, const QString &msgTemplate)
 {
     QString body = buildWaMessage(company, msgTemplate);
@@ -6626,9 +6630,9 @@ QString appwindow::buildSmsMessage(const Company &company, const QString &msgTem
     return truncated + "...";
 }
 
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// =====================================================================
 //  Build wa.me URL
-// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+// =====================================================================
 QString appwindow::buildWhatsAppUrl(const QString &phone, const QString &message)
 {
     QString cleanPhone = phone;
@@ -6647,7 +6651,7 @@ void appwindow::on_tpl_stock_available_clicked()
 {
     ui->msg_body->setPlainText(
         "Dear [Company Name], great news! [Fish Type] is now available at Hawata Marina. "
-        "Quantities are limited �?� contact us today to reserve your stock. "
+        "Quantities are limited – contact us today to reserve your stock. "
         "Date: [Date] | [Port Name]");
     ui->atype_stock->setChecked(true);
 }
@@ -6657,14 +6661,14 @@ void appwindow::on_tpl_no_fish_clicked()
     ui->msg_body->setPlainText(
         "Dear [Company Name], unfortunately there is no [Fish Type] available today ([Date]). "
         "We will notify you as soon as stock arrives. Apologies for any inconvenience. "
-        "�?� [Port Name]");
+        "– [Port Name]");
     ui->atype_stock->setChecked(true);
 }
 
 void appwindow::on_tpl_port_closed_clicked()
 {
     ui->msg_body->setPlainText(
-        "NOTICE �?� [Port Name]: The port will be closed on [Date] (Moon Day / Maintenance). "
+        "NOTICE – [Port Name]: The port will be closed on [Date] (Moon Day / Maintenance). "
         "No fishing or pickup operations will be available. We will resume normal activity the following day.");
     ui->atype_closure->setChecked(true);
 }
@@ -6672,7 +6676,7 @@ void appwindow::on_tpl_port_closed_clicked()
 void appwindow::on_tpl_price_up_clicked()
 {
     ui->msg_body->setPlainText(
-        "PRICE ALERT �?� [Company Name]: Please note that the price of [Fish Type] has changed "
+        "PRICE ALERT – [Company Name]: Please note that the price of [Fish Type] has changed "
         "as of [Date]. Contact [Port Name] for the updated price list before placing your next order.");
     ui->atype_price->setChecked(true);
 }
@@ -6680,7 +6684,7 @@ void appwindow::on_tpl_price_up_clicked()
 void appwindow::on_tpl_maintenance_clicked()
 {
     ui->msg_body->setPlainText(
-        "MAINTENANCE NOTICE �?� [Port Name]: Scheduled dock maintenance on [Date]. "
+        "MAINTENANCE NOTICE – [Port Name]: Scheduled dock maintenance on [Date]. "
         "Access to certain docking areas will be restricted. "
         "Please coordinate your pickup schedule with our team in advance.");
     ui->atype_port->setChecked(true);
@@ -6689,7 +6693,7 @@ void appwindow::on_tpl_maintenance_clicked()
 void appwindow::on_tpl_pickup_ready_clicked()
 {
     ui->msg_body->setPlainText(
-        "READY FOR PICKUP �?� [Company Name]: Your order of [Fish Type] is now ready for collection "
+        "READY FOR PICKUP – [Company Name]: Your order of [Fish Type] is now ready for collection "
         "at [Port Name]. Please arrange pickup today. "
         "Date: [Date]. Bring your order reference on arrival.");
     ui->atype_pickup->setChecked(true);
@@ -6742,7 +6746,7 @@ void appwindow::on_btn_preview_msg_clicked()
 
     // WhatsApp preview
     if (doWa) {
-        QLabel *waTitle = new QLabel("?��? <b>WhatsApp</b> (full text):");
+        QLabel *waTitle = new QLabel("💬 <b>WhatsApp</b> (full text):");
         waTitle->setStyleSheet("color:#075e54; font-size:13px; margin-top:6px;");
         layout->addWidget(waTitle);
 
@@ -6762,7 +6766,7 @@ void appwindow::on_btn_preview_msg_clicked()
 
     // SMS preview
     if (doSms) {
-        QLabel *smsTitle = new QLabel("?��� <b>SMS</b> (auto-shortened ���160 chars):");
+        QLabel *smsTitle = new QLabel("📱 <b>SMS</b> (auto-shortened ≤160 chars):");
         smsTitle->setStyleSheet("color:#1a73e8; font-size:13px; margin-top:6px;");
         layout->addWidget(smsTitle);
 
@@ -6781,7 +6785,7 @@ void appwindow::on_btn_preview_msg_clicked()
         QLabel *smsCount = new QLabel(
             QString("Characters: %1 / 160  %2")
                 .arg(smsMsg.length())
-                .arg(over ? "����?? 2 SMS units" : "٣� 1 SMS unit"));
+                .arg(over ? "⚠️ 2 SMS units" : "✅ 1 SMS unit"));
         smsCount->setStyleSheet(
             over ? "color:#c0392b; font-size:11px;" : "color:#27ae60; font-size:11px;");
         layout->addWidget(smsCount);
@@ -6846,8 +6850,8 @@ void appwindow::on_btn_send_alert_clicked()
     // Priority prefix
     QString priorityPrefix;
     int pIdx = ui->combo_priority->currentIndex();
-    if (pIdx == 1) priorityPrefix = "����?? IMPORTANT: ";
-    else if (pIdx == 2) priorityPrefix = "?Ǥ? URGENT: ";
+    if (pIdx == 1) priorityPrefix = "⚠️ IMPORTANT: ";
+    else if (pIdx == 2) priorityPrefix = "🚨 URGENT: ";
 
     QString channelLabel = doWa && doSms ? "WhatsApp + SMS"
                          : doWa         ? "WhatsApp"
@@ -6897,12 +6901,12 @@ void appwindow::on_btn_send_alert_clicked()
     }
 
     ui->btn_send_alert->setEnabled(true);
-    ui->btn_send_alert->setText("?��� Send Alert");
+    ui->btn_send_alert->setText("📤 Send Alert");
 
     QString summary;
-    if (doWa)  summary += QString("?��? WhatsApp opened: %1\n").arg(waSent);
-    if (doSms) summary += QString("?��� SMS opened:      %1\n").arg(smsSent);
-    summary += QString("����??  Skipped (no phone): %1").arg(skipped);
+    if (doWa)  summary += QString("💬 WhatsApp opened: %1\n").arg(waSent);
+    if (doSms) summary += QString("📱 SMS opened:      %1\n").arg(smsSent);
+    summary += QString("⚠️  Skipped (no phone): %1").arg(skipped);
 
     QMessageBox::information(this, "Alert Sent", summary);
 }
@@ -6950,7 +6954,7 @@ void appwindow::on_btn_schedule_alert_clicked()
                                         : "SMS";
 
     QMessageBox::information(this, "Scheduled",
-                             QString("٣� Alert scheduled!\n\n"
+                             QString("✅ Alert scheduled!\n\n"
                                      "Channel:    %1\n"
                                      "Recipients: %2 compan%3\n"
                                      "Send time:  %4")
@@ -6960,11 +6964,11 @@ void appwindow::on_btn_schedule_alert_clicked()
                                  .arg(scheduleAt.toString("dd/MM/yyyy  hh:mm")));
 
     ui->btn_schedule_alert->setEnabled(false);
-    ui->btn_schedule_alert->setText("�?? Scheduled...");
+    ui->btn_schedule_alert->setText("⏰ Scheduled...");
 
     QTimer::singleShot(msDelay, this, [this]() {
         ui->btn_schedule_alert->setEnabled(true);
-        ui->btn_schedule_alert->setText("�?? Schedule");
+        ui->btn_schedule_alert->setText("⏰ Schedule");
         on_btn_send_alert_clicked();
     });
 }

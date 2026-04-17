@@ -8,8 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find Qt modules - ADDED Network module
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network SerialPort)
+# Find Qt modules
+find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network SerialPort QuickWidgets WebView)
 
 # List of project sources
 set(PROJECT_SOURCES
@@ -52,7 +52,7 @@ qt_add_executable(Sign_up
 
 )
 
-# Link Qt libraries - ADDED Qt6::Network
+# Link Qt libraries
 target_link_libraries(Sign_up PRIVATE
     Qt6::Widgets
     Qt6::Sql
@@ -60,6 +60,8 @@ target_link_libraries(Sign_up PRIVATE
     Qt6::PrintSupport
     Qt6::Network
     Qt6::SerialPort
+    Qt6::QuickWidgets
+    Qt6::WebView
 )
 
 # macOS bundle settings

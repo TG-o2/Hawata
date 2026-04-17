@@ -1,3 +1,4 @@
+
 #ifndef APPWINDOW_H
 #define APPWINDOW_H
 
@@ -11,9 +12,24 @@
 #include <QSettings>
 #include <QDialog>
 #include <QByteArray>
+#include <QQuickWidget>
+
+// WebEngine includes disabled - Qt6 WebEngineWidgets not installed
+// #include <QWebEngineView>
+// #include <QWebChannel>
+// #include <QWebEngineProfile>
+// #include <QWebEngineSettings>
+#include <QTimer>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QTextStream>
+#include <QDir>
 
 QT_BEGIN_NAMESPACE
 class QSerialPort;
+class QQuickWidget;
 QT_END_NAMESPACE
 
 class QModelIndex;
@@ -89,6 +105,12 @@ private slots:
     //boat special features
     void onCheckMaintenanceReminders();
     void on_export_pdf_5_clicked();
+
+    //boat map
+    void onUpdateBoatPositions();
+    void on_pushButton_trackBoat_clicked();
+    void on_pushButton_trackAll_clicked();
+    void on_comboBox_selectBoat_currentIndexChanged(int index);
 
     // companies CRUD
     void on_tableWidget_11_cellClicked(int row, int column);
@@ -200,6 +222,24 @@ private:
     QTimer *maintenanceCheckTimer;
     //status bar
     void updateBoatStatusProgressBar();
+
+    // Boat tracking members
+    QQuickWidget *boatMapView = nullptr;
+    QTimer *locationUpdateTimer = nullptr;
+    int currentTrackingBoatId = -1;
+    double currentLatitude = 0.0;
+    double currentLongitude = 0.0;
+    QStringList trackedBoats;  // Store multiple boat IDs for tracking
+
+    //Boat Map functions
+    void setupGoogleMap();
+    void updateBoatMapView(double latitude, double longitude);
+    void populateBoatComboBox();
+    void updateAllBoatPositions();
+    void updateSingleBoatPosition(int boatId);
+    bool getBoatCoordinates(int boatId, double &latitude, double &longitude, QString &boatName, QString &boatStatus);
+    QString generateMapHTML();
+    void injectJavaScript(const QString &script);
     
 
 

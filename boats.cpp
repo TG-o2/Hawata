@@ -45,10 +45,19 @@ bool Boats::create(int dockId)
     }
 
     // Updated INSERT to include DOCKID
-    query.prepare("INSERT INTO BOAT (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
-                  "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH, DOCKID) "
-                  "VALUES (:id, :size, :location, :ownerName, :ownerEmail, "
-                  ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish, :dockId)");
+    // Build SQL dynamically: if no dock, use literal NULL; otherwise use parameter
+    QString insertSql = "INSERT INTO BOAT (BOATID, SIZEBOAT, LOCATION, OWNERNAME, "
+                        "OWNERMAIL, STATUS, TYPE, LASTMAINTENANCEDATE, TOTALTRIPS, TOTALFISH, DOCKID) "
+                        "VALUES (:id, :size, :location, :ownerName, :ownerEmail, "
+                        ":status, :type, TO_DATE(:lastMaintenanceDate, 'YYYY-MM-DD'), :totalTrips, :totalFish, ";
+    
+    if (dockId > 0) {
+        insertSql += ":dockId)";
+    } else {
+        insertSql += "NULL)";
+    }
+    
+    query.prepare(insertSql);
 
     query.bindValue(":id", id);
     query.bindValue(":size", size);
@@ -60,7 +69,11 @@ bool Boats::create(int dockId)
     query.bindValue(":lastMaintenanceDate", lastMaintenanceDate);
     query.bindValue(":totalTrips", totalTrips);
     query.bindValue(":totalFish", totalFish);
-    query.bindValue(":dockId", dockId);  // Bind the dock ID
+    
+    // Only bind :dockId if there is a valid dock
+    if (dockId > 0) {
+        query.bindValue(":dockId", dockId);
+    }
 
     if (!query.exec()) {
         lastError = query.lastError().text();

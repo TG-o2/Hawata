@@ -56,6 +56,12 @@
 
 #include <QSerialPort>
 #include <QSerialPortInfo>
+#include <QtWebView/QtWebView>
+#include <QQuickItem>
+#include <QQmlError>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 #include <cmath>
 #include <limits>
@@ -86,6 +92,153 @@ QDate normalizeTwoDigitYear(QDate date)
     }
 
     return date;
+}
+
+QString generateRandomTunisSeaLocation()
+{
+    // Random Tunisian place names only; no coordinates needed for stored location text.
+    static const char *locations[] = {
+        "Tunis",
+        "La Goulette",
+        "Rades",
+        "Bizerte",
+        "Tabarka",
+        "Kelibia",
+        "Nabeul",
+        "Hammamet",
+        "Sousse",
+        "Monastir",
+        "Mahdia",
+        "Sfax",
+        "Kerkennah",
+        "Gabes",
+        "Djerba",
+        "Houmt Souk",
+        "Zarzis",
+        "Port El Kantaoui",
+        "Chebba",
+        "Kuriat",
+        "Marsa",
+        "Mahres",
+        "Sidi Bou Said",
+        "Mateur"
+    };
+
+    static const int count = sizeof(locations) / sizeof(locations[0]);
+    const int randomIdx = QRandomGenerator::global()->bounded(count);
+    return QString(locations[randomIdx]);
+}
+
+bool parseLocationCoordinates(const QString &location, double &latitude, double &longitude)
+{
+    QString normalized = location.trimmed();
+    if (normalized.isEmpty()) {
+        return false;
+    }
+
+    const QString lower = normalized.toLower();
+
+    // Map known Tunisian coastal site names to nearby sea coordinates.
+    struct NamedSeaPoint {
+        const char *keyword;
+        double lat;
+        double lon;
+    };
+
+    static const NamedSeaPoint tunisianSeaPoints[] = {
+        {"tunis", 36.900000, 10.380000},
+        {"esprit college", 36.845000, 10.190000},
+        {"malles", 36.840000, 10.170000},
+        {"la goulette", 36.819000, 10.305000},
+        {"la marsa", 36.878000, 10.325000},
+        {"sidi bou said", 36.870000, 10.345000},
+        {"rades", 36.770000, 10.290000},
+        {"bizerte", 37.315000, 9.930000},
+        {"bizerta", 37.315000, 9.930000},
+        {"tabarka", 36.995000, 8.760000},
+        {"kelibia", 36.865000, 11.120000},
+        {"nabeul", 36.485000, 10.790000},
+        {"hammamet", 36.340000, 10.590000},
+        {"sousse", 35.925000, 10.700000},
+        {"monastir", 35.790000, 10.850000},
+        {"mahdia", 35.535000, 11.070000},
+        {"sfax", 34.745000, 10.780000},
+        {"kerkennah", 34.700000, 11.200000},
+        {"gabes", 33.980000, 10.300000},
+        {"djerba", 33.930000, 10.920000},
+        {"houmt souk", 33.880000, 10.860000},
+        {"zarzis", 33.520000, 11.130000},
+        {"warehouse", 36.820000, 10.305000},
+        {"warehouses", 36.820000, 10.305000},
+        {"depot", 36.820000, 10.305000},
+        {"storage", 36.820000, 10.305000},
+        {"dock", 36.819000, 10.305000},
+        {"port", 36.819000, 10.305000}
+    };
+
+    for (const NamedSeaPoint &point : tunisianSeaPoints) {
+        if (lower.contains(QLatin1String(point.keyword))) {
+            latitude = point.lat;
+            longitude = point.lon;
+            return true;
+        }
+    }
+
+    // If the location is text but not recognized, place it in Tunis gulf area
+    // so tracking keeps working instead of failing with "invalid coordinates".
+    bool hasLetters = false;
+    for (QChar c : normalized) {
+        if (c.isLetter()) {
+            hasLetters = true;
+            break;
+        }
+    }
+    if (hasLetters) {
+        const uint h = qHash(lower);
+        const double latOffset = static_cast<double>(h % 25) / 1000.0;          // 0.000 .. 0.024
+        const double lonOffset = static_cast<double>((h / 25) % 40) / 1000.0;   // 0.000 .. 0.039
+        latitude = 36.880000 + latOffset;
+        longitude = 10.320000 + lonOffset;
+        return true;
+    }
+
+    // Accept formats such as "36.80,10.18", "lat:36.80 lon:10.18", "(36.80 10.18)", etc.
+    const QRegularExpression numberPattern(R"([-+]?\d+(?:[\.,]\d+)?)");
+    QRegularExpressionMatchIterator it = numberPattern.globalMatch(normalized);
+
+    QList<double> values;
+    while (it.hasNext()) {
+        QString token = it.next().captured(0);
+        token.replace(',', '.');
+        bool ok = false;
+        const double v = token.toDouble(&ok);
+        if (ok) {
+            values.append(v);
+        }
+    }
+
+    if (values.size() < 2) {
+        return false;
+    }
+
+    latitude = values[0];
+    longitude = values[1];
+
+    auto validLatLon = [](double lat, double lon) {
+        return lat >= -90.0 && lat <= 90.0 && lon >= -180.0 && lon <= 180.0;
+    };
+
+    if (validLatLon(latitude, longitude)) {
+        return true;
+    }
+
+    // Handle swapped values (lon,lat)
+    if (validLatLon(longitude, latitude)) {
+        std::swap(latitude, longitude);
+        return true;
+    }
+
+    return false;
 }
 
 QDate parseDockingDate(const QString &value)
@@ -233,6 +386,7 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     , connectedUserRole(currentUserRole)
 {
     ui->setupUi(this);
+    QtWebView::initialize();
     setupArduinoTemperatureReader();
     currentlySelectedId = -1;
     loadDockingTable();
@@ -244,10 +398,37 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     generateDockingStatistics();
     loadDockingHistoryView();
 
+    // Normalize a few demo boats to named Tunis locations in the database.
+    {
+        QSqlQuery locationUpdate;
+        locationUpdate.prepare("UPDATE BOAT SET LOCATION = :location WHERE BOATID = :boatId");
+
+        struct BoatLocationSeed {
+            int boatId;
+            const char *location;
+        };
+
+        static const BoatLocationSeed seeds[] = {
+            {1, "Esprit College"},
+            {5, "Malles"},
+            {6, "La Marsa"},
+            {8, "Sidi Bou Said"},
+            {9, "La Goulette"}
+        };
+
+        for (const BoatLocationSeed &seed : seeds) {
+            locationUpdate.bindValue(":location", seed.location);
+            locationUpdate.bindValue(":boatId", seed.boatId);
+            locationUpdate.exec();
+        }
+    }
+
     //load boat table
     displayBoats();
     connect(ui->comboBox_15, &QComboBox::currentIndexChanged,
             this, &appwindow::on_comboBox_15_currentIndexChanged);
+    connect(ui->pushButton, &QPushButton::clicked, this, &appwindow::on_pushButton_trackBoat_clicked);
+    connect(ui->lineEdit, &QLineEdit::returnPressed, this, &appwindow::on_pushButton_trackBoat_clicked);
 
     connect(ui->pushButton_10, &QPushButton::clicked, this, &appwindow::on_pushButton_10_clicked);
     updateBoatStatusProgressBar();
@@ -625,11 +806,11 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
         );
     ///=============web / pages titles START================
 
-    ui->WebBrowsing->setTabText(1, "👨‍💻 Users");
-    ui->WebBrowsing->setTabText(2, "🛳️ Manage Dock");
-    ui->WebBrowsing->setTabText(3, "⛵ Boats Admission");
-    ui->WebBrowsing->setTabText(4, "🐟  Product Restock");
-    ui->WebBrowsing->setTabText(5, "🏢  Companies");
+    ui->WebBrowsing->setTabText(1, "Users");
+    ui->WebBrowsing->setTabText(2, "Manage Dock");
+    ui->WebBrowsing->setTabText(3, "Boats Admission");
+    ui->WebBrowsing->setTabText(4, "Product Restock");
+    ui->WebBrowsing->setTabText(5, "Companies");
 
     ///=============web / pages titles END================
 
@@ -942,6 +1123,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     maintenanceCheckTimer = new QTimer(this);
     connect(maintenanceCheckTimer, &QTimer::timeout, this, &appwindow::onCheckMaintenanceReminders);
     maintenanceCheckTimer->start(86400000);
+
+    setupGoogleMap();
 
 
     QTimer::singleShot(5000, this, &appwindow::onCheckMaintenanceReminders); // Check after 5 seconds
@@ -1259,11 +1442,11 @@ void appwindow::on_tabdocking_cellClicked(int row, int /*column*/)
 {
     if (row < 0) return;
     QString id = ui->tabdocking->item(row, 0)->text();
-    ui->selected_id->setText(id);           // ✅ shows ID in your line edit
+    ui->selected_id->setText(id);           // ٣� shows ID in your line edit
     selectedDockingId = id.toInt();
 }
 
-// Double click → fill form and go to edit page
+// Double click �?� fill form and go to edit page
 void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
 {
     QTableWidget *table = ui->tabdocking;
@@ -1272,7 +1455,7 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
     selectedDockingId = table->item(row, 0)->text().toInt();
     ui->selected_id->setText(QString::number(selectedDockingId));
 
-    // Fill the form fields — column order: ID, Status, DateStart, DateEnd, Location, Length, Height, Capacity
+    // Fill the form fields �?� column order: ID, Status, DateStart, DateEnd, Location, Length, Height, Capacity
     int idx = ui->status->findText(table->item(row, 1)->text());
     if (idx >= 0) ui->status->setCurrentIndex(idx);
 
@@ -1328,9 +1511,9 @@ void appwindow::on_tabdocking_cellDoubleClicked(int row, int /*column*/)
 }
 
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Edit / Update button
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_edit_Docking_clicked()
 {
     if (selectedDockingId == -1) {
@@ -1446,9 +1629,9 @@ void appwindow::on_edit_Docking_clicked()
     }
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Delete button
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_delete_docking_clicked()
 {
     QTableWidget *table = ui->tabdocking;
@@ -1479,9 +1662,9 @@ void appwindow::on_delete_docking_clicked()
     }
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Clear button
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_clear_docking_clicked()
 {
     ui->location->clear();
@@ -1617,7 +1800,7 @@ void appwindow::on_export_docking_clicked()
 
     int yPos = marginTop;
 
-    // ── TITLE BLOCK ──────────────────────────────────────────────────────────
+    // ٤?٤? TITLE BLOCK ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     int titleBlockHeight = 120;
     // Background banner
     painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
@@ -1631,7 +1814,7 @@ void appwindow::on_export_docking_clicked()
 
     yPos += titleBlockHeight + 30; // gap after banner
 
-    // ── DATE LINE ────────────────────────────────────────────────────────────
+    // ٤?٤? DATE LINE ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     QFont dateFont("Arial", 11);
     painter.setFont(dateFont);
     painter.setPen(QColor(100, 100, 100));
@@ -1641,7 +1824,7 @@ void appwindow::on_export_docking_clicked()
                                   .toString("yyyy-MM-dd  hh:mm:ss")));
     yPos += 50;
 
-    // ── TABLE ─────────────────────────────────────────────────────────────────
+    // ٤?٤? TABLE ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     QTableWidget *table = ui->tabdocking;
     int rowCount    = table->rowCount();
     int columnCount = table->columnCount();
@@ -1690,7 +1873,7 @@ void appwindow::on_export_docking_clicked()
     drawHeader();
     yPos += headerHeight;
 
-    // Row sizing — fill available vertical space nicely
+    // Row sizing �?� fill available vertical space nicely
     int rowHeight    = 75;
     int footerHeight = 80;
     int rowsPerPage  = (pageHeight - yPos - footerHeight) / rowHeight;
@@ -1700,7 +1883,7 @@ void appwindow::on_export_docking_clicked()
 
     for (int row = 0; row < rowCount; row++) {
 
-        // ── New page if needed ──
+        // ٤?٤? New page if needed ٤?٤?
         if (row > 0 && row % rowsPerPage == 0) {
             pdfWriter.newPage();
             yPos = marginTop;
@@ -1739,7 +1922,7 @@ void appwindow::on_export_docking_clicked()
         yPos += rowHeight;
     }
 
-    // ── FOOTER ───────────────────────────────────────────────────────────────
+    // ٤?٤? FOOTER ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     yPos += 30;
 
     // Thin separator line
@@ -1846,7 +2029,7 @@ void appwindow::on_UPDUser_clicked()
         ui->salary->clear();
         ui->startShift->setDateTime(QDateTime::currentDateTime());
         ui->endShift->setDateTime(QDateTime::currentDateTime());
-        ui->UPDUser->setText("Create User 💫");
+        ui->UPDUser->setText("Create User ?���");
         selectedUserId = -1;
         loadUsersTable();
         if (isEditMode) {
@@ -2087,7 +2270,7 @@ void appwindow::on_clear_3_clicked()
     ui->comboBox_11->setCurrentIndex(0);
 
     selectedUserId = -1;
-    ui->UPDUser->setText("Create User 💫");
+    ui->UPDUser->setText("Create User ?���");
     if (ui->usersTable->selectionModel()) {
         ui->usersTable->selectionModel()->clearSelection();
     }
@@ -3008,7 +3191,7 @@ void appwindow::on_export_pdf_6_clicked()
 
     int yPos = marginTop;
 
-    // ── TITLE BLOCK ──────────────────────────────────────────────────────────
+    // ٤?٤? TITLE BLOCK ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     int titleBlockHeight = 120;
     painter.fillRect(marginLeft, yPos, contentWidth, titleBlockHeight, darkBlue);
 
@@ -3020,7 +3203,7 @@ void appwindow::on_export_pdf_6_clicked()
 
     yPos += titleBlockHeight + 30;
 
-    // ── DATE LINE ────────────────────────────────────────────────────────────
+    // ٤?٤? DATE LINE ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     QFont dateFont("Arial", 11);
     painter.setFont(dateFont);
     painter.setPen(QColor(100, 100, 100));
@@ -3030,7 +3213,7 @@ void appwindow::on_export_pdf_6_clicked()
                                   .toString("yyyy-MM-dd  hh:mm:ss")));
     yPos += 50;
 
-    // ── TABLE ─────────────────────────────────────────────────────────────────
+    // ٤?٤? TABLE ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     int rowCount    = selectedRows.size();
     int columnCount = table->columnCount();
 
@@ -3117,7 +3300,7 @@ void appwindow::on_export_pdf_6_clicked()
     for (int exportRow = 0; exportRow < rowCount; exportRow++) {
         const int row = selectedRows.at(exportRow);
 
-        // ── New page if needed ──
+        // ٤?٤? New page if needed ٤?٤?
         if (exportRow > 0 && (yPos + rowHeight + footerReserve) > pageHeight) {
             pdfWriter.newPage();
             yPos = marginTop;
@@ -3154,7 +3337,7 @@ void appwindow::on_export_pdf_6_clicked()
         yPos += rowHeight;
     }
 
-    // ── FOOTER ───────────────────────────────────────────────────────────────
+    // ٤?٤? FOOTER ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     const int summaryBlockHeight = 90;
     const int signatureBlockHeight = 420;
     const int gapBeforeSignature = 190;
@@ -3683,9 +3866,9 @@ void appwindow::setBoatMode(BoatMode mode)
     }
 }
 
-// ─────────────────────────────────────────────
-//  Shared helper — loads a boat into the form fields
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  Shared helper �?� loads a boat into the form fields
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::populateBoatForm(int boatId)
 {
     boatsTmp.setId(boatId);
@@ -3706,11 +3889,11 @@ void appwindow::populateBoatForm(int boatId)
     ui->boatStatusComboBox->setCurrentIndex(boatsTmp.getStatus());
     ui->boatTypeLineEdit->setText(boatsTmp.getType());
 
-    // ── DATE PARSING ──────────────────────────────────────────
+    // ٤?٤? DATE PARSING ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     QString rawDate = boatsTmp.getLastMaintenanceDate();
     QDate date;
 
-    // Oracle returns month in all-caps (e.g. "23/MAR/17") — normalize to "23/Mar/17"
+    // Oracle returns month in all-caps (e.g. "23/MAR/17") �?� normalize to "23/Mar/17"
     QStringList parts = rawDate.split('/');
     QString normalizedDate = rawDate;
     if (parts.size() == 3) {
@@ -3734,7 +3917,7 @@ void appwindow::populateBoatForm(int boatId)
         qDebug() << "Could not parse date:" << rawDate;
         ui->boatMaintenanceDateEdit->setDate(QDate::currentDate());
     }
-    // ── END DATE PARSING ──────────────────────────────────────
+    // ٤?٤? END DATE PARSING ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 
     ui->boatTripsSpinBox->setValue(boatsTmp.getTotalTrips());
     ui->boatFishSpinBox->setValue(boatsTmp.getTotalFish());
@@ -3833,9 +4016,9 @@ void appwindow::on_Boatwidget_2_itemSelectionChanged()
     }
 }
 
-// ─────────────────────────────────────────────
-//  Double-click → populate form and switch to Edit mode
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  Double-click �?� populate form and switch to Edit mode
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_Boatwidget_2_itemDoubleClicked(QTableWidgetItem *item)
 {
     if (!item) return;
@@ -3878,63 +4061,54 @@ void appwindow::on_addBoatButton_clicked()
         return;
     }
 
-    // ===== NEW: Check for available dock =====
-    if (!isAnyDockAvailable()) {
-        QMessageBox::warning(this, "No Dock Available",
-                             "Cannot add boat: No available docks found.\n\n"
-                             "Please add a dock with 'Available' status first.");
-        return;
-    }
-
-    // Find an available dock
+    // If there is an available dock we use it, otherwise allow creation without dock.
     int availableDockId = findAvailableDock();
-    if (availableDockId == -1) {
-        QMessageBox::warning(this, "No Dock Available",
-                             "Cannot add boat: No available docks found.\n\n"
-                             "Please add a dock with 'Available' status first.");
-        return;
+
+    QString finalLocation = ui->boatLocationLineEdit->text().trimmed();
+    if (availableDockId <= 0) {
+        finalLocation = generateRandomTunisSeaLocation();
     }
 
-    // Create boats object with input data
     Boats newBoat(
         0, // ID auto-generated
-        ui->boatSizeLineEdit->text(),
-        ui->boatLocationLineEdit->text(),
-        ui->boatOwnerNameLineEdit->text(),
-        ui->boatOwnerEmailLineEdit->text(),
+        ui->boatSizeLineEdit->text().trimmed(),
+        finalLocation,
+        ui->boatOwnerNameLineEdit->text().trimmed(),
+        ui->boatOwnerEmailLineEdit->text().trimmed(),
         ui->boatStatusComboBox->currentIndex(),
-        ui->boatTypeLineEdit->text(),
+        ui->boatTypeLineEdit->text().trimmed(),
         ui->boatMaintenanceDateEdit->date().toString("yyyy-MM-dd"),
         ui->boatTripsSpinBox->value(),
         ui->boatFishSpinBox->value()
     );
 
-    // Call create method (you'll need to modify this to include DOCKID)
-    if (newBoat.create(availableDockId)) {  // Pass the dock ID
-        QMessageBox::information(this, "Success",
-                                 QString("Boat added successfully with ID: %1\n"
-                                         "Assigned to Dock ID: %2")
-                                         .arg(newBoat.getId())
-                                         .arg(availableDockId));
+    if (newBoat.create(availableDockId)) {
+        QString successMessage = QString("Boat added successfully with ID: %1").arg(newBoat.getId());
+        if (availableDockId > 0) {
+            successMessage += QString("\nAssigned to Dock ID: %1").arg(availableDockId);
 
-        // Update the dock status to Occupied
-        QSqlQuery updateDock;
-        updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
-        updateDock.bindValue(":dockId", availableDockId);
-        updateDock.exec();
+            QSqlQuery updateDock;
+            updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
+            updateDock.bindValue(":dockId", availableDockId);
+            updateDock.exec();
+        } else {
+            successMessage += QString("\nNo dock available, random sea location used: %1").arg(finalLocation);
+        }
+
+        QMessageBox::information(this, "Success", successMessage);
 
         clearBoatInputs();
         displayBoats();
         updateBoatStatusProgressBar();
-        loadDockingTable();  // Refresh docking table to show updated status
+        loadDockingTable();
     } else {
         QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());
     }
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  "Save Changes" button on the form (Edit mode only)
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_editBoatButton_clicked()
 {
     if (currentlySelectedId <= 0) {
@@ -3967,36 +4141,24 @@ void appwindow::on_editBoatButton_clicked()
         currentDockId = checkCurrentDock.value(0).toInt();
     }
 
-    // If the boat doesn't have a dock assigned, check for available dock
-    if (currentDockId == -1 || currentDockId == 0) {
-        if (!isAnyDockAvailable()) {
-            QMessageBox::warning(this, "No Dock Available",
-                                 "Cannot assign boat: No available docks found.\n\n"
-                                 "Please add a dock with 'Available' status first.");
-            return;
-        }
-
+    // If no dock is currently assigned, try to assign one if available.
+    // If none are available, continue editing without blocking the user.
+    if (currentDockId <= 0) {
         int newDockId = findAvailableDock();
-        if (newDockId == -1) {
-            QMessageBox::warning(this, "No Dock Available",
-                                 "Cannot assign boat: No available docks found.");
-            return;
+        if (newDockId > 0) {
+            QSqlQuery updateBoatDock;
+            updateBoatDock.prepare("UPDATE BOAT SET DOCKID = :dockId WHERE BOATID = :boatId");
+            updateBoatDock.bindValue(":dockId", newDockId);
+            updateBoatDock.bindValue(":boatId", currentlySelectedId);
+            updateBoatDock.exec();
+
+            QSqlQuery updateDock;
+            updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
+            updateDock.bindValue(":dockId", newDockId);
+            updateDock.exec();
+
+            currentDockId = newDockId;
         }
-
-        // Update boat with new dock ID
-        QSqlQuery updateBoatDock;
-        updateBoatDock.prepare("UPDATE BOAT SET DOCKID = :dockId WHERE BOATID = :boatId");
-        updateBoatDock.bindValue(":dockId", newDockId);
-        updateBoatDock.bindValue(":boatId", currentlySelectedId);
-        updateBoatDock.exec();
-
-        // Update dock status
-        QSqlQuery updateDock;
-        updateDock.prepare("UPDATE DOCKING SET STATUS = 'Occupied' WHERE DOCKID = :dockId");
-        updateDock.bindValue(":dockId", newDockId);
-        updateDock.exec();
-
-        currentDockId = newDockId;
     }
 
     // Proceed with boat update (existing code)
@@ -4051,9 +4213,13 @@ void appwindow::on_editBoatButton_clicked()
         return;
     }
 
-    QMessageBox::information(this, "Success",
-                             QString("Boat updated successfully!\nAssigned to Dock ID: %1")
-                                 .arg(currentDockId));
+    QString updateMessage = "Boat updated successfully!";
+    if (currentDockId > 0) {
+        updateMessage += QString("\nAssigned to Dock ID: %1").arg(currentDockId);
+    } else {
+        updateMessage += "\nNo dock assigned.";
+    }
+    QMessageBox::information(this, "Success", updateMessage);
 
     displayBoats();
     setBoatMode(BoatMode::Add);
@@ -4109,9 +4275,9 @@ void appwindow::on_deleteBoatButton_clicked()
 
     updateBoatStatusProgressBar();
 }
-// ─────────────────────────────────────────────
-//  "Edit" button on the list page → navigate to form in Edit mode
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  "Edit" button on the list page �?� navigate to form in Edit mode
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_updateBoatButton_clicked()
 {
     if (currentlySelectedId <= 0) {
@@ -4361,7 +4527,7 @@ QDate appwindow::parseBoatMaintenanceDate(const QString &rawDate)
     QString normalized = rawDate;
     QStringList parts = normalized.split('/');
     if (parts.size() == 3) {
-        // Convert "2/FEB/2027" → "2/Feb/2027" (month first letter capital, rest lower)
+        // Convert "2/FEB/2027" �?� "2/Feb/2027" (month first letter capital, rest lower)
         QString month = parts[1];
         month = month[0].toUpper() + month.mid(1).toLower();
         normalized = parts[0] + "/" + month + "/" + parts[2];
@@ -4871,9 +5037,9 @@ void appwindow::on_export_pdf_5_clicked()
     yPos += (int)(5 * scale);
 
     QStringList insights;
-    insights << "• Top performing boats identified for recognition";
-    insights << QString("• %1 boats currently at sea - peak operational status").arg(boatsOut);
-    insights << QString("• Fleet maintenance tracking: %1 boats need review").arg(boatsInPort / 2);
+    insights << "�?� Top performing boats identified for recognition";
+    insights << QString("�?� %1 boats currently at sea - peak operational status").arg(boatsOut);
+    insights << QString("�?� Fleet maintenance tracking: %1 boats need review").arg(boatsInPort / 2);
 
     painter.setFont(QFont("Arial", 6));
     painter.setPen(QColor(100, 100, 100));
@@ -4930,10 +5096,10 @@ void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QS
                    "Last Maintenance Date: %4\n"
                    "Current Status: OVERDUE BY 1 YEAR\n\n"
                    "Regular maintenance is crucial for:\n"
-                   "✓ Ensuring safety of your vessel and crew\n"
-                   "✓ Preventing costly repairs in the future\n"
-                   "✓ Maintaining optimal performance\n"
-                   "✓ Compliance with marina regulations\n\n"
+                   "٣� Ensuring safety of your vessel and crew\n"
+                   "٣� Preventing costly repairs in the future\n"
+                   "٣� Maintaining optimal performance\n"
+                   "٣� Compliance with marina regulations\n\n"
                    "Please contact our maintenance department immediately to schedule your appointment.\n\n"
                    "To schedule maintenance, please reply to this email or call us at +216 XX XXX XXX.\n\n"
                    "Thank you for your prompt attention to this matter.\n\n"
@@ -4948,8 +5114,8 @@ void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QS
                    "Overdue By: %4 week%5\n\n"
                    "Please schedule your maintenance appointment as soon as possible.\n\n"
                    "To schedule your maintenance, please contact us at:\n"
-                   "📞 Phone: +216 XX XXX XXX\n"
-                   "📧 Email: maintenance@hawatamarina.com\n\n"
+                   "?��� Phone: +216 XX XXX XXX\n"
+                   "?��� Email: maintenance@hawatamarina.com\n\n"
                    "We look forward to serving you.\n\n"
                    "Best regards,\n"
                    "Hawata Marina Maintenance Team"
@@ -4975,7 +5141,7 @@ void appwindow::sendMaintenanceReminderEmail(const QString &ownerEmail, const QS
     smtp->setUsername(emailUser);
     smtp->setPassword(emailPass);
 
-    // ✅ FIX: Use a flag to ensure we only handle ONE signal
+    // ٣� FIX: Use a flag to ensure we only handle ONE signal
     bool *handled = new bool(false);
 
     connect(smtp, &SmtpClient::mailSent, this, [this, ownerEmail, subject, smtp, handled](bool success, const QString &error) {
@@ -5025,6 +5191,227 @@ QDate appwindow::getNextMaintenanceDate(const QDate &lastMaintenanceDate)
 void appwindow::onCheckMaintenanceReminders()
 {
     checkAndSendMaintenanceReminders();
+}
+
+void appwindow::setupGoogleMap()
+{
+    if (!ui->listView || !ui->listView->viewport()) {
+        return;
+    }
+
+    QWidget *container = ui->listView->viewport();
+    QLabel *mapLabel = container->findChild<QLabel*>("boatMapImageLabel");
+    if (!mapLabel) {
+        mapLabel = new QLabel(container);
+        mapLabel->setObjectName("boatMapImageLabel");
+        mapLabel->setAlignment(Qt::AlignCenter);
+        mapLabel->setText("Loading map...");
+        mapLabel->show();
+    }
+
+    mapLabel->setGeometry(container->rect());
+    mapLabel->setStyleSheet("background: #ffffff; border: 1px solid #d7dce4;");
+    container->setStyleSheet("background: white; border: 1px solid #c7d2e0; border-radius: 12px;");
+
+    if (!locationUpdateTimer) {
+        locationUpdateTimer = new QTimer(this);
+        locationUpdateTimer->setInterval(10000);
+        connect(locationUpdateTimer, &QTimer::timeout, this, &appwindow::onUpdateBoatPositions);
+    }
+
+    updateBoatMapView(36.8065, 10.1815);
+}
+
+void appwindow::updateBoatMapView(double latitude, double longitude)
+{
+    if (!ui->listView || !ui->listView->viewport()) {
+        return;
+    }
+
+    QLabel *mapLabel = ui->listView->viewport()->findChild<QLabel*>("boatMapImageLabel");
+    if (!mapLabel) {
+        return;
+    }
+
+    mapLabel->setGeometry(ui->listView->viewport()->rect());
+
+    const int width = qMax(256, mapLabel->width());
+    const int height = qMax(192, mapLabel->height());
+    const QString url = QString("https://static-maps.yandex.ru/1.x/?lang=en-US&ll=%1,%2&z=14&l=map&size=%3,%4&pt=%1,%2,pm2rdm")
+                            .arg(longitude, 0, 'f', 6)
+                            .arg(latitude, 0, 'f', 6)
+                            .arg(width)
+                            .arg(height);
+
+    QNetworkAccessManager manager;
+    QEventLoop loop;
+    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl(url)));
+    connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        mapLabel->setText(QString("Map failed to load\n%1\nLat:%2 Lon:%3")
+                              .arg(reply->errorString())
+                              .arg(latitude, 0, 'f', 6)
+                              .arg(longitude, 0, 'f', 6));
+        reply->deleteLater();
+        return;
+    }
+
+    const QByteArray imageData = reply->readAll();
+    reply->deleteLater();
+
+    QPixmap mapPixmap;
+    if (!mapPixmap.loadFromData(imageData)) {
+        mapLabel->setText("Invalid map image");
+        return;
+    }
+
+    mapLabel->setPixmap(mapPixmap.scaled(mapLabel->size(), Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    mapLabel->setText(QString());
+}
+
+void appwindow::populateBoatComboBox()
+{
+    // No combo box for tracking in current UI; uses lineEdit + pushButton instead.
+}
+
+bool appwindow::getBoatCoordinates(int boatId, double &latitude, double &longitude,
+                                   QString &boatName, QString &boatStatus)
+{
+    QSqlQuery query;
+    query.prepare("SELECT BOATID, LOCATION, OWNERNAME, STATUS, DOCKID FROM BOAT WHERE BOATID = :boatId");
+    query.bindValue(":boatId", boatId);
+
+    if (!query.exec() || !query.next()) {
+        return false;
+    }
+
+    const QString locationStr = query.value(1).toString();
+    boatName = QString("Boat %1 - %2").arg(boatId).arg(query.value(2).toString());
+    boatStatus = query.value(3).toString();
+    const int dockId = query.value(4).toInt();
+
+    if (parseLocationCoordinates(locationStr, latitude, longitude)) {
+        return true;
+    }
+
+    // If boat LOCATION is not usable, fallback to linked dock LOCATION.
+    if (dockId > 0) {
+        QSqlQuery dockQuery;
+        dockQuery.prepare("SELECT LOCATION FROM DOCKING WHERE DOCKID = :dockId");
+        dockQuery.bindValue(":dockId", dockId);
+        if (dockQuery.exec() && dockQuery.next()) {
+            const QString dockLocation = dockQuery.value(0).toString();
+            if (parseLocationCoordinates(dockLocation, latitude, longitude)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void appwindow::updateAllBoatPositions()
+{
+    QSqlQuery query = Boats::getAll();
+    if (!query.isActive()) {
+        return;
+    }
+
+    while (query.next()) {
+        const QString locationStr = query.value(2).toString();
+        double latitude = 0.0;
+        double longitude = 0.0;
+        if (parseLocationCoordinates(locationStr, latitude, longitude)) {
+            updateBoatMapView(latitude, longitude);
+            return;
+        }
+    }
+}
+
+void appwindow::updateSingleBoatPosition(int boatId)
+{
+    double latitude = 0.0;
+    double longitude = 0.0;
+    QString boatName;
+    QString boatStatus;
+
+    if (getBoatCoordinates(boatId, latitude, longitude, boatName, boatStatus)) {
+        currentLatitude = latitude;
+        currentLongitude = longitude;
+        updateBoatMapView(latitude, longitude);
+    }
+}
+
+void appwindow::onUpdateBoatPositions()
+{
+    if (currentTrackingBoatId > 0) {
+        updateSingleBoatPosition(currentTrackingBoatId);
+    } else {
+        updateAllBoatPositions();
+    }
+}
+
+void appwindow::on_pushButton_trackBoat_clicked()
+{
+    if (ui->listView && ui->listView->viewport()) {
+        QLabel *mapLabel = ui->listView->viewport()->findChild<QLabel*>("boatMapImageLabel");
+        if (mapLabel) {
+            mapLabel->setGeometry(ui->listView->viewport()->rect());
+        }
+    }
+
+    bool ok = false;
+    const int selectedBoatId = ui->lineEdit->text().trimmed().toInt(&ok);
+    if (!ok || selectedBoatId <= 0) {
+        QMessageBox::warning(this, "Selection Error", "Please enter a valid boat ID.");
+        return;
+    }
+
+    double latitude = 0.0;
+    double longitude = 0.0;
+    QString boatName;
+    QString boatStatus;
+    if (!getBoatCoordinates(selectedBoatId, latitude, longitude, boatName, boatStatus)) {
+        QString rawLocation;
+        QSqlQuery rawQuery;
+        rawQuery.prepare("SELECT LOCATION FROM BOAT WHERE BOATID = :boatId");
+        rawQuery.bindValue(":boatId", selectedBoatId);
+        if (rawQuery.exec() && rawQuery.next()) {
+            rawLocation = rawQuery.value(0).toString();
+        }
+
+        QMessageBox::warning(this, "Location Error",
+                             QString("Boat %1 has no valid coordinates.\n"
+                                     "Stored LOCATION: %2\n"
+                                     "Use format: latitude,longitude")
+                                 .arg(selectedBoatId)
+                                 .arg(rawLocation.isEmpty() ? "(empty)" : rawLocation));
+        return;
+    }
+
+    currentTrackingBoatId = selectedBoatId;
+    currentLatitude = latitude;
+    currentLongitude = longitude;
+    updateBoatMapView(latitude, longitude);
+    if (locationUpdateTimer) {
+        locationUpdateTimer->start();
+    }
+}
+
+void appwindow::on_pushButton_trackAll_clicked()
+{
+    currentTrackingBoatId = -1;
+    updateAllBoatPositions();
+    if (locationUpdateTimer) {
+        locationUpdateTimer->start();
+    }
+}
+
+void appwindow::on_comboBox_selectBoat_currentIndexChanged(int index)
+{
+    Q_UNUSED(index);
 }
 
 
@@ -5549,9 +5936,9 @@ void appwindow::initEmailCampaignPage()
     updateTargetCount();
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Build filtered company list from UI state
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QList<Company> appwindow::getTargetCompanies()
 {
     Company obj;
@@ -5563,21 +5950,21 @@ QList<Company> appwindow::getTargetCompanies()
 
     for (const Company &c : all) {
 
-        // ── Status filter ─────────────────────────────
+        // ٤?٤? Status filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
         if (ui->radio_inactive_2->isChecked()) {
             if (c.getStatus().toUpper() != "INACTIVE") continue;
         } else if (ui->radio_promotion_2->isChecked()) {
             if (c.getStatus().toUpper() != "ACTIVE") continue;
         }
-        // radio_custom_2 → no status filter
+        // radio_custom_2 �?� no status filter
 
-        // ── Fish filter ───────────────────────────────
+        // ٤?٤? Fish filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
         if (fishFilter != "All Fish Types") {
             if (!c.getPreferredFish().contains(fishFilter, Qt::CaseInsensitive))
                 continue;
         }
 
-        // ── Location filter ───────────────────────────
+        // ٤?٤? Location filter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
         if (locationFilter != "All Locations") {
             if (!c.getLocation().contains(locationFilter, Qt::CaseInsensitive))
                 continue;
@@ -5588,9 +5975,9 @@ QList<Company> appwindow::getTargetCompanies()
     return result;
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Update "Target: X companies" label
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::updateTargetCount()
 {
     int count = getTargetCompanies().size();
@@ -5600,9 +5987,9 @@ void appwindow::updateTargetCount()
             .arg(count == 1 ? "y" : "ies"));
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Replace [placeholders] for one company
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QString appwindow::buildEmailBody(const Company &company, const QString &templateText)
 {
     QString body = templateText;
@@ -5613,9 +6000,9 @@ QString appwindow::buildEmailBody(const Company &company, const QString &templat
     return body;
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Template buttons  (random pick from vector)
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_btn_template_inactive_2_clicked()
 {
     static const QVector<QPair<QString,QString>> inactiveTemplates = {
@@ -5630,22 +6017,22 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "Warm regards,\nHawata Marina Team"
         },
         {
-            "A Special Offer to Welcome You Back – [Company Name]",
+            "A Special Offer to Welcome You Back �?� [Company Name]",
             "Dear [Company Name],\n\n"
             "It has been some time since your last visit and we genuinely value our relationship with you.\n\n"
             "To show our appreciation, we are offering an exclusive discount on your next order of "
-            "[Preferred Fish] — a product we know your business depends on.\n\n"
+            "[Preferred Fish] �?� a product we know your business depends on.\n\n"
             "Your location in [Location] puts you perfectly within our delivery range, and we are "
             "ready to fulfil your needs faster than ever.\n\n"
             "Let us know if you are interested and we will get things moving right away.\n\n"
             "Best wishes,\nHawata Marina Team"
         },
         {
-            "Checking In — How Can We Help, [Company Name]?",
+            "Checking In �?� How Can We Help, [Company Name]?",
             "Hello [Company Name],\n\n"
             "We have not heard from you in a while and we just wanted to check in.\n\n"
-            "If there is anything that caused a pause in our partnership — whether it is pricing, "
-            "availability of [Preferred Fish], or anything else — we would love to hear your feedback "
+            "If there is anything that caused a pause in our partnership �?� whether it is pricing, "
+            "availability of [Preferred Fish], or anything else �?� we would love to hear your feedback "
             "and work together to find a solution.\n\n"
             "Your satisfaction is our priority, and we are here whenever you are ready.\n\n"
             "Looking forward to hearing from you,\nHawata Marina Team"
@@ -5657,7 +6044,7 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "would be of interest to your operations in [Location].\n\n"
             "Given our previous partnership, we wanted to give you early access before "
             "opening stock to the wider market.\n\n"
-            "Quantities are limited — reach out today to secure your allocation.\n\n"
+            "Quantities are limited �?� reach out today to secure your allocation.\n\n"
             "Kind regards,\nHawata Marina Team"
         },
         {
@@ -5667,7 +6054,7 @@ void appwindow::on_btn_template_inactive_2_clicked()
             "we are still meeting your expectations.\n\n"
             "We noticed your last interaction with us was some time ago. Our team is ready to "
             "resume deliveries of [Preferred Fish] to [Location] at competitive prices.\n\n"
-            "Please feel free to reply to this message — we would be happy to reconnect at your convenience.\n\n"
+            "Please feel free to reply to this message �?� we would be happy to reconnect at your convenience.\n\n"
             "Sincerely,\nHawata Marina Team"
         }
     };
@@ -5687,12 +6074,12 @@ void appwindow::on_btn_template_promo_2_clicked()
             "seasonal promotion on [Preferred Fish].\n\n"
             "For a limited time, we are offering priority pricing and guaranteed stock "
             "reservations for companies in [Location].\n\n"
-            "Take advantage of this offer before it expires — quantities are limited and our "
+            "Take advantage of this offer before it expires �?� quantities are limited and our "
             "loyal partners always come first.\n\n"
             "Best regards,\nHawata Marina Team"
         },
         {
-            "New Arrivals — [Preferred Fish] Now in Stock!",
+            "New Arrivals �?� [Preferred Fish] Now in Stock!",
             "Hello [Company Name],\n\n"
             "We are excited to announce that our latest catch of [Preferred Fish] has just arrived "
             "and is ready for immediate dispatch to [Location].\n\n"
@@ -5701,33 +6088,33 @@ void appwindow::on_btn_template_promo_2_clicked()
             "Warm regards,\nHawata Marina Team"
         },
         {
-            "Bulk Order Discount — Just for You, [Company Name]",
+            "Bulk Order Discount �?� Just for You, [Company Name]",
             "Dear [Company Name],\n\n"
             "We know how important cost efficiency is to your business, which is why we are "
             "launching a special bulk discount programme exclusively for our active partners.\n\n"
             "Order a qualifying quantity of [Preferred Fish] and receive a significant price reduction "
-            "— delivered directly to [Location] on your schedule.\n\n"
+            "�?� delivered directly to [Location] on your schedule.\n\n"
             "Reply to this email to learn more and lock in your rate.\n\n"
             "Looking forward to serving you,\nHawata Marina Team"
         },
         {
-            "A Thank You from the Marina Team — Special Reward Inside",
+            "A Thank You from the Marina Team �?� Special Reward Inside",
             "Dear [Company Name],\n\n"
             "Your continued trust and partnership means everything to us.\n\n"
             "As a token of our appreciation, we are offering [Company Name] an exclusive "
             "loyalty reward on your next shipment of [Preferred Fish] to [Location].\n\n"
-            "No action is required — simply place your order as usual and the discount "
+            "No action is required �?� simply place your order as usual and the discount "
             "will be applied automatically.\n\n"
             "Thank you for being an outstanding partner.\n\n"
             "With gratitude,\nHawata Marina Team"
         },
         {
-            "Weekend Flash Sale — [Preferred Fish] at Special Rates",
+            "Weekend Flash Sale �?� [Preferred Fish] at Special Rates",
             "Hello [Company Name],\n\n"
             "This weekend only, we are running a flash promotion on [Preferred Fish] "
             "for our active partners across [Location] and beyond.\n\n"
             "Prices are reduced, stock is fresh, and delivery slots are available immediately.\n\n"
-            "This offer expires Sunday midnight — do not miss out!\n\n"
+            "This offer expires Sunday midnight �?� do not miss out!\n\n"
             "Act fast and reply to this email to reserve your order.\n\n"
             "Hawata Marina Team"
         }
@@ -5744,9 +6131,9 @@ void appwindow::on_btn_template_clear_2_clicked()
     ui->email_template_2->clear();
 }
 
-// ─────────────────────────────────────────────
-//  Preview → QDialog with rendered email
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  Preview �?� QDialog with rendered email
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_btn_preview_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -5775,7 +6162,7 @@ void appwindow::on_btn_preview_2_clicked()
     QVBoxLayout *layout = new QVBoxLayout(dlg);
 
     QLabel *infoLabel = new QLabel(
-        QString("Sample preview for: <b>%1</b>  —  "
+        QString("Sample preview for: <b>%1</b>  �?�  "
                 "<b>%2</b> total recipient%3")
             .arg(sample.getName())
             .arg(targets.size())
@@ -5808,9 +6195,9 @@ void appwindow::on_btn_preview_2_clicked()
     delete dlg;
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Send Now
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_btn_send_now_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -5882,18 +6269,18 @@ void appwindow::on_btn_send_now_2_clicked()
     }
 
     ui->btn_send_now_2->setEnabled(true);
-    ui->btn_send_now_2->setText("📧 Send Now");
+    ui->btn_send_now_2->setText("?��� Send Now");
 
     QMessageBox::information(this, "Campaign Complete",
-                             QString("✅ Sent:     %1\n"
-                                     "❌ Failed:   %2\n"
-                                     "⚠️ Skipped:  %3  (invalid/missing email)")
+                             QString("٣� Sent:     %1\n"
+                                     "��� Failed:   %2\n"
+                                     "����?? Skipped:  %3  (invalid/missing email)")
                                  .arg(sent).arg(failed).arg(skipped));
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Schedule
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::on_btn_schedule_2_clicked()
 {
     QString subject      = ui->input_subject_2->text().trimmed();
@@ -5928,19 +6315,19 @@ void appwindow::on_btn_schedule_2_clicked()
                                  .arg(targets.size() == 1 ? "y" : "ies"));
 
     ui->btn_schedule_2->setEnabled(false);
-    ui->btn_schedule_2->setText("⏰ Scheduled");
+    ui->btn_schedule_2->setText("�?? Scheduled");
 
     QTimer::singleShot(msDelay, this, [this]() {
         ui->btn_schedule_2->setEnabled(true);
-        ui->btn_schedule_2->setText("⏰ Schedule");
+        ui->btn_schedule_2->setText("�?? Schedule");
         on_btn_send_now_2_clicked();
     });
 }
 //whatsapp section **
 void appwindow::initWhatsAppSmsPage()
 {
-    // ── Alert type buttons behave as a radio group ────────────────────
-    // (they are checkable QPushButtons — make only one active at a time)
+    // ٤?٤? Alert type buttons behave as a radio group ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+    // (they are checkable QPushButtons �?� make only one active at a time)
     QList<QPushButton*> alertBtns = {
         ui->atype_stock, ui->atype_closure,
         ui->atype_price, ui->atype_port, ui->atype_pickup
@@ -5953,7 +6340,7 @@ void appwindow::initWhatsAppSmsPage()
         });
     }
 
-    // ── Recipients radio buttons ──────────────────────────────────────
+    // ٤?٤? Recipients radio buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->rec_all,      &QRadioButton::toggled, this, &appwindow::updateWaSmsRecipientCount);
     connect(ui->rec_fish,     &QRadioButton::toggled, this, [this](bool checked) {
         ui->combo_fish_filter->setEnabled(checked);
@@ -5970,15 +6357,15 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->combo_location_filter, qOverload<int>(&QComboBox::currentIndexChanged),
             this, &appwindow::updateWaSmsRecipientCount);
 
-    // ── Channel radio buttons update char count hint ──────────────────
+    // ٤?٤? Channel radio buttons update char count hint ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->ch_whatsapp, &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
     connect(ui->ch_sms,      &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
     connect(ui->ch_both,     &QRadioButton::toggled, this, &appwindow::updateWaCharCount);
 
-    // ── Message body → live char counter ─────────────────────────────
+    // ٤?٤? Message body �?� live char counter ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->msg_body, &QTextEdit::textChanged, this, &appwindow::updateWaCharCount);
 
-    // ── Schedule radio buttons enable/disable datetime picker ────────
+    // ٤?٤? Schedule radio buttons enable/disable datetime picker ٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->sched_now,   &QRadioButton::toggled, this, [this](bool checked) {
         ui->schedule_datetime->setEnabled(!checked);
     });
@@ -5987,7 +6374,7 @@ void appwindow::initWhatsAppSmsPage()
     });
     ui->schedule_datetime->setDateTime(QDateTime::currentDateTime().addDays(1));
 
-    // ── Quick template buttons ────────────────────────────────────────
+    // ٤?٤? Quick template buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->tpl_stock_available, &QPushButton::clicked,
             this, &appwindow::on_tpl_stock_available_clicked);
     connect(ui->tpl_no_fish,         &QPushButton::clicked,
@@ -6001,7 +6388,7 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->tpl_pickup_ready,    &QPushButton::clicked,
             this, &appwindow::on_tpl_pickup_ready_clicked);
 
-    // ── Action buttons ────────────────────────────────────────────────
+    // ٤?٤? Action buttons ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     connect(ui->btn_preview_msg,    &QPushButton::clicked,
             this, &appwindow::on_btn_preview_msg_clicked);
     connect(ui->btn_clear_msg,      &QPushButton::clicked,
@@ -6011,15 +6398,15 @@ void appwindow::initWhatsAppSmsPage()
     connect(ui->btn_schedule_alert, &QPushButton::clicked,
             this, &appwindow::on_btn_schedule_alert_clicked);
 
-    // ── Init counts ───────────────────────────────────────────────────
+    // ٤?٤? Init counts ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
     updateWaSmsRecipientCount();
     updateWaCharCount();
 }
 
-// ─────────────────────────────────────────────
-//  Normalize phone → international format
-//  Tunisian 8-digit numbers → +216XXXXXXXX
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  Normalize phone �?� international format
+//  Tunisian 8-digit numbers �?� +216XXXXXXXX
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QString appwindow::normalizePhoneNumber(const QString &phone, const QString &countryCode)
 {
     QString cleaned = phone;
@@ -6032,9 +6419,9 @@ QString appwindow::normalizePhoneNumber(const QString &phone, const QString &cou
     return countryCode + cleaned;   // prepend +216 for local numbers
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Build filtered company list from UI state
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QList<Company> appwindow::getWaSmsTargetCompanies()
 {
     Company obj;
@@ -6056,15 +6443,15 @@ QList<Company> appwindow::getWaSmsTargetCompanies()
                 !c.getLocation().contains(loc, Qt::CaseInsensitive))
                 continue;
         }
-        // rec_all and rec_custom → include everyone
+        // rec_all and rec_custom �?� include everyone
         result.append(c);
     }
     return result;
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Update recipient count label
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::updateWaSmsRecipientCount()
 {
     QList<Company> targets = getWaSmsTargetCompanies();
@@ -6084,16 +6471,16 @@ void appwindow::updateWaSmsRecipientCount()
         filterLabel = "Custom selection";
 
     ui->lbl_recipient_count->setText(
-        QString("📊 Targeting: %1 — %2 compan%3, %4 with valid phone")
+        QString("?��� Targeting: %1 �?� %2 compan%3, %4 with valid phone")
             .arg(filterLabel)
             .arg(total)
             .arg(total == 1 ? "y" : "ies")
             .arg(withPhone));
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Live character counter (changes limit based on channel)
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 void appwindow::updateWaCharCount()
 {
     int len     = ui->msg_body->toPlainText().length();
@@ -6111,26 +6498,26 @@ void appwindow::updateWaCharCount()
     ui->lbl_char_count->setText(
         QString("%1 / %2 characters%3")
             .arg(len).arg(limit)
-            .arg(len > limit ? "  ⚠️ Too long!" : ""));
+            .arg(len > limit ? "  ����?? Too long!" : ""));
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Replace [placeholders] in message body
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QString appwindow::buildWaMessage(const Company &company, const QString &msgTemplate)
 {
     QString body = msgTemplate;
     body.replace("[Company Name]", company.getName());
     body.replace("[Fish Type]",    company.getPreferredFish());
-    body.replace("[Price]",        "—");           // fill in if you have a price field
+    body.replace("[Price]",        "�?�");           // fill in if you have a price field
     body.replace("[Date]",         QDate::currentDate().toString("dd/MM/yyyy"));
     body.replace("[Port Name]",    "Hawata Marina");
     return body;
 }
 
-// ─────────────────────────────────────────────
-//  Auto-shorten to ≤160 chars for SMS
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
+//  Auto-shorten to ���160 chars for SMS
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QString appwindow::buildSmsMessage(const Company &company, const QString &msgTemplate)
 {
     QString body = buildWaMessage(company, msgTemplate);
@@ -6144,9 +6531,9 @@ QString appwindow::buildSmsMessage(const Company &company, const QString &msgTem
     return truncated + "...";
 }
 
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  Build wa.me URL
-// ─────────────────────────────────────────────
+// ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 QString appwindow::buildWhatsAppUrl(const QString &phone, const QString &message)
 {
     QString cleanPhone = phone;
@@ -6165,7 +6552,7 @@ void appwindow::on_tpl_stock_available_clicked()
 {
     ui->msg_body->setPlainText(
         "Dear [Company Name], great news! [Fish Type] is now available at Hawata Marina. "
-        "Quantities are limited — contact us today to reserve your stock. "
+        "Quantities are limited �?� contact us today to reserve your stock. "
         "Date: [Date] | [Port Name]");
     ui->atype_stock->setChecked(true);
 }
@@ -6175,14 +6562,14 @@ void appwindow::on_tpl_no_fish_clicked()
     ui->msg_body->setPlainText(
         "Dear [Company Name], unfortunately there is no [Fish Type] available today ([Date]). "
         "We will notify you as soon as stock arrives. Apologies for any inconvenience. "
-        "— [Port Name]");
+        "�?� [Port Name]");
     ui->atype_stock->setChecked(true);
 }
 
 void appwindow::on_tpl_port_closed_clicked()
 {
     ui->msg_body->setPlainText(
-        "NOTICE — [Port Name]: The port will be closed on [Date] (Moon Day / Maintenance). "
+        "NOTICE �?� [Port Name]: The port will be closed on [Date] (Moon Day / Maintenance). "
         "No fishing or pickup operations will be available. We will resume normal activity the following day.");
     ui->atype_closure->setChecked(true);
 }
@@ -6190,7 +6577,7 @@ void appwindow::on_tpl_port_closed_clicked()
 void appwindow::on_tpl_price_up_clicked()
 {
     ui->msg_body->setPlainText(
-        "PRICE ALERT — [Company Name]: Please note that the price of [Fish Type] has changed "
+        "PRICE ALERT �?� [Company Name]: Please note that the price of [Fish Type] has changed "
         "as of [Date]. Contact [Port Name] for the updated price list before placing your next order.");
     ui->atype_price->setChecked(true);
 }
@@ -6198,7 +6585,7 @@ void appwindow::on_tpl_price_up_clicked()
 void appwindow::on_tpl_maintenance_clicked()
 {
     ui->msg_body->setPlainText(
-        "MAINTENANCE NOTICE — [Port Name]: Scheduled dock maintenance on [Date]. "
+        "MAINTENANCE NOTICE �?� [Port Name]: Scheduled dock maintenance on [Date]. "
         "Access to certain docking areas will be restricted. "
         "Please coordinate your pickup schedule with our team in advance.");
     ui->atype_port->setChecked(true);
@@ -6207,7 +6594,7 @@ void appwindow::on_tpl_maintenance_clicked()
 void appwindow::on_tpl_pickup_ready_clicked()
 {
     ui->msg_body->setPlainText(
-        "READY FOR PICKUP — [Company Name]: Your order of [Fish Type] is now ready for collection "
+        "READY FOR PICKUP �?� [Company Name]: Your order of [Fish Type] is now ready for collection "
         "at [Port Name]. Please arrange pickup today. "
         "Date: [Date]. Bring your order reference on arrival.");
     ui->atype_pickup->setChecked(true);
@@ -6260,7 +6647,7 @@ void appwindow::on_btn_preview_msg_clicked()
 
     // WhatsApp preview
     if (doWa) {
-        QLabel *waTitle = new QLabel("📱 <b>WhatsApp</b> (full text):");
+        QLabel *waTitle = new QLabel("?��? <b>WhatsApp</b> (full text):");
         waTitle->setStyleSheet("color:#075e54; font-size:13px; margin-top:6px;");
         layout->addWidget(waTitle);
 
@@ -6280,7 +6667,7 @@ void appwindow::on_btn_preview_msg_clicked()
 
     // SMS preview
     if (doSms) {
-        QLabel *smsTitle = new QLabel("💬 <b>SMS</b> (auto-shortened ≤160 chars):");
+        QLabel *smsTitle = new QLabel("?��� <b>SMS</b> (auto-shortened ���160 chars):");
         smsTitle->setStyleSheet("color:#1a73e8; font-size:13px; margin-top:6px;");
         layout->addWidget(smsTitle);
 
@@ -6299,7 +6686,7 @@ void appwindow::on_btn_preview_msg_clicked()
         QLabel *smsCount = new QLabel(
             QString("Characters: %1 / 160  %2")
                 .arg(smsMsg.length())
-                .arg(over ? "⚠️ 2 SMS units" : "✅ 1 SMS unit"));
+                .arg(over ? "����?? 2 SMS units" : "٣� 1 SMS unit"));
         smsCount->setStyleSheet(
             over ? "color:#c0392b; font-size:11px;" : "color:#27ae60; font-size:11px;");
         layout->addWidget(smsCount);
@@ -6364,8 +6751,8 @@ void appwindow::on_btn_send_alert_clicked()
     // Priority prefix
     QString priorityPrefix;
     int pIdx = ui->combo_priority->currentIndex();
-    if (pIdx == 1) priorityPrefix = "⚠️ IMPORTANT: ";
-    else if (pIdx == 2) priorityPrefix = "🔴 URGENT: ";
+    if (pIdx == 1) priorityPrefix = "����?? IMPORTANT: ";
+    else if (pIdx == 2) priorityPrefix = "?Ǥ? URGENT: ";
 
     QString channelLabel = doWa && doSms ? "WhatsApp + SMS"
                          : doWa         ? "WhatsApp"
@@ -6415,12 +6802,12 @@ void appwindow::on_btn_send_alert_clicked()
     }
 
     ui->btn_send_alert->setEnabled(true);
-    ui->btn_send_alert->setText("📤 Send Alert");
+    ui->btn_send_alert->setText("?��� Send Alert");
 
     QString summary;
-    if (doWa)  summary += QString("📱 WhatsApp opened: %1\n").arg(waSent);
-    if (doSms) summary += QString("💬 SMS opened:      %1\n").arg(smsSent);
-    summary += QString("⚠️  Skipped (no phone): %1").arg(skipped);
+    if (doWa)  summary += QString("?��? WhatsApp opened: %1\n").arg(waSent);
+    if (doSms) summary += QString("?��� SMS opened:      %1\n").arg(smsSent);
+    summary += QString("����??  Skipped (no phone): %1").arg(skipped);
 
     QMessageBox::information(this, "Alert Sent", summary);
 }
@@ -6468,7 +6855,7 @@ void appwindow::on_btn_schedule_alert_clicked()
                                         : "SMS";
 
     QMessageBox::information(this, "Scheduled",
-                             QString("✅ Alert scheduled!\n\n"
+                             QString("٣� Alert scheduled!\n\n"
                                      "Channel:    %1\n"
                                      "Recipients: %2 compan%3\n"
                                      "Send time:  %4")
@@ -6478,11 +6865,11 @@ void appwindow::on_btn_schedule_alert_clicked()
                                  .arg(scheduleAt.toString("dd/MM/yyyy  hh:mm")));
 
     ui->btn_schedule_alert->setEnabled(false);
-    ui->btn_schedule_alert->setText("⏰ Scheduled...");
+    ui->btn_schedule_alert->setText("�?? Scheduled...");
 
     QTimer::singleShot(msDelay, this, [this]() {
         ui->btn_schedule_alert->setEnabled(true);
-        ui->btn_schedule_alert->setText("⏰ Schedule");
+        ui->btn_schedule_alert->setText("�?? Schedule");
         on_btn_send_alert_clicked();
     });
 }

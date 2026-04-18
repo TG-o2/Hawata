@@ -1,77 +1,31 @@
 # ninja log v6
-1019	4027	7967651835350616	CMakeFiles/Sign_up.dir/main.cpp.obj	d3210977c7427e55
-61	148	7967651823074929	CMakeFiles/clean.additional	baedbe210acaa455
-89	444	7967652772287812	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-149	201	7967651823960030	clean	577b940aee94fbd7
-89	444	7967652772287812	Sign_up_autogen/timestamp	b40bd04424a0c932
-845	1015	7967651835220602	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
-445	2970	7967652775845203	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-845	1015	7967651835220602	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
-89	444	7967652772287812	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-89	444	7967652772287812	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-1040	3503	7967651835560626	CMakeFiles/Sign_up.dir/connection.cpp.obj	3350c6618c05e0b1
-448	3029	7967652775885197	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-1049	3416	7967651835650638	CMakeFiles/Sign_up.dir/boats.cpp.obj	4a2428a80b03e587
-1045	3714	7967651835600616	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-1026	3739	7967651835420621	CMakeFiles/Sign_up.dir/user.cpp.obj	be3e62dce1aedb89
-829	916	7967651834210612	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
-1029	3907	7967651835450674	CMakeFiles/Sign_up.dir/product.cpp.obj	f28a179064bdf48e
-1053	3750	7967651835690618	CMakeFiles/Sign_up.dir/company.cpp.obj	3b9d801efb609a6d
-1015	3968	7967651835310624	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-452	7553	7967652775915191	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-1070	1867	7967651835860631	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	4471eaef5596675
-7553	9623	7967652846919524	Sign_up.exe	4a2179f54b30aaaa
-829	916	7967651834210612	Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
-836	931	7967651834370649	Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
-836	931	7967651834370649	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
-1062	1324	7967651835770621	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp.obj	b776f53f8f61a648
-1066	1348	7967651835810634	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp.obj	79b861670fe1aa64
-1057	3389	7967651835730636	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-50	1039	7967665978682356	Sign_up_autogen/timestamp	b40bd04424a0c932
-50	1039	7967665978682356	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-50	1039	7967665978682356	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-50	1039	7967665978682356	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-1093	1210	7967665980154524	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp.obj	79b861670fe1aa64
-1088	1231	7967665980109242	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp.obj	b776f53f8f61a648
-1098	1861	7967665980209639	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	4471eaef5596675
-1084	3195	7967665980069240	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-1077	3352	7967665979997149	CMakeFiles/Sign_up.dir/boats.cpp.obj	4a2428a80b03e587
-1069	3390	7967665979911998	CMakeFiles/Sign_up.dir/connection.cpp.obj	3350c6618c05e0b1
-1052	3495	7967665979755196	CMakeFiles/Sign_up.dir/user.cpp.obj	be3e62dce1aedb89
-1073	3544	7967665979957158	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-1056	3568	7967665979785207	CMakeFiles/Sign_up.dir/product.cpp.obj	f28a179064bdf48e
-1080	3599	7967665980027175	CMakeFiles/Sign_up.dir/company.cpp.obj	3b9d801efb609a6d
-1040	3783	7967665979628573	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-1045	3850	7967665979670015	CMakeFiles/Sign_up.dir/main.cpp.obj	d3210977c7427e55
-1049	4218	7967665979719851	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-1061	4225	7967665979840357	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-1065	8701	7967665979880359	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-8701	10661	7967666056241033	Sign_up.exe	4a2179f54b30aaaa
+1844	7757	7982446755602021	CMakeFiles/Sign_up.dir/main.cpp.obj	c70a19f950e15cc7
 9	73	7982438208154361	CMakeFiles/clean.additional	baedbe210acaa455
+71	1631	7982446751757907	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
 74	98	7982438208806544	clean	577b940aee94fbd7
-41	1387	7982438222863858	Sign_up_autogen/timestamp	b40bd04424a0c932
-41	1387	7982438222863858	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
-41	1387	7982438222863858	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/timestamp	b40bd04424a0c932
-41	1387	7982438222863858	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+71	1631	7982446751757907	Sign_up_autogen/timestamp	b40bd04424a0c932
+1668	1839	7982446755421995	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
+1852	9101	7982446755681666	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	9ee0bd0724d18144
+1668	1839	7982446755421995	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
+71	1631	7982446751757907	Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+71	1631	7982446751757907	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/mocs_compilation.cpp	b40bd04424a0c932
+1899	6333	7982446756146948	CMakeFiles/Sign_up.dir/connection.cpp.obj	badbba02ce7841d0
+1879	8374	7982446755949030	CMakeFiles/Sign_up.dir/createacc.cpp.obj	77ff56c6aca42035
+1918	6512	7982446756340221	CMakeFiles/Sign_up.dir/boats.cpp.obj	185f6839da4df526
+1909	6890	7982446756252138	CMakeFiles/Sign_up.dir/Docking.cpp.obj	273b6266bbaf0c62
+1861	6988	7982446755767682	CMakeFiles/Sign_up.dir/user.cpp.obj	c93e0b51ce3f7134
+1644	1778	7982446754762168	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
+1872	7142	7982446755875582	CMakeFiles/Sign_up.dir/product.cpp.obj	1b2e5f5e95725f48
+1927	7101	7982446756434355	CMakeFiles/Sign_up.dir/company.cpp.obj	b081afe61ef829f
+1840	9128	7982446755556351	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	f3b5767224bfcb45
+1890	16947	7982446756063602	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	3fa93af4b833e349
+1994	3550	7982446757106330	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	9ba95554bce08013
+16949	20931	7982446906655661	Sign_up.exe	4a52b68cc96f8677
+1644	1778	7982446754762168	Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
 1402	1560	7982438225574007	Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
 1402	1560	7982438225574007	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp	35b405859e0cafbd
-1389	1564	7982438225603989	Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
-1389	1564	7982438225603989	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp	b522b40ac3412c49
-1423	1724	7982438227233134	Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
-1423	1724	7982438227233134	C:/Users/USER/Downloads/Project (1)/Sign_up/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp	d85684ea1f5afdd1
-1866	4071	7982438228817999	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp.obj	79b861670fe1aa64
-1852	4073	7982438228685575	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp.obj	b776f53f8f61a648
-1877	4215	7982438228934734	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_style.cpp.obj	4471eaef5596675
-1834	6265	7982438228494244	CMakeFiles/Sign_up.dir/manage.cpp.obj	f1e5f50d5dd7a2bd
-1815	6359	7982438228303303	CMakeFiles/Sign_up.dir/boats.cpp.obj	4a2428a80b03e587
-1793	6419	7982438228086894	CMakeFiles/Sign_up.dir/connection.cpp.obj	3350c6618c05e0b1
-1760	6736	7982438227765052	CMakeFiles/Sign_up.dir/product.cpp.obj	f28a179064bdf48e
-1801	6863	7982438228167491	CMakeFiles/Sign_up.dir/Docking.cpp.obj	673125d41bbac11
-1750	6879	7982438227664108	CMakeFiles/Sign_up.dir/user.cpp.obj	be3e62dce1aedb89
-1825	7082	7982438228408753	CMakeFiles/Sign_up.dir/company.cpp.obj	3b9d801efb609a6d
-1725	7291	7982438227405556	CMakeFiles/Sign_up.dir/Sign_up_autogen/mocs_compilation.cpp.obj	c503783c592dbedb
-1731	7571	7982438227463866	CMakeFiles/Sign_up.dir/main.cpp.obj	d3210977c7427e55
-1769	8132	7982438227846345	CMakeFiles/Sign_up.dir/createacc.cpp.obj	846afbe180e5e8ed
-1740	8170	7982438227563507	CMakeFiles/Sign_up.dir/mainwindow.cpp.obj	f4b4a0b9df6b4470
-1778	14221	7982438227935704	CMakeFiles/Sign_up.dir/appwindow.cpp.obj	9d90c059bae5e288
-14221	17439	7982438352364621	Sign_up.exe	4a2179f54b30aaaa
+1971	2268	7982446756865841	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_fancyui.cpp.obj	45681a98d4d8f624
+1982	2313	7982446756984340	CMakeFiles/Sign_up.dir/Sign_up_autogen/EWIEGA46WW/qrc_images.cpp.obj	5599208dcf31e92b
+1939	6335	7982446756544603	CMakeFiles/Sign_up.dir/manage.cpp.obj	353d4202b9ed568b
+1948	6913	7982446756642363	CMakeFiles/Sign_up.dir/smtpclient.cpp.obj	b03a21835009b09
+1961	7009	7982446756774738	CMakeFiles/Sign_up.dir/emailsender.cpp.obj	bc446589d96deb66

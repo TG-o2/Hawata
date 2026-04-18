@@ -82,6 +82,3 @@ install(TARGETS Sign_up
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-# Finalize executable (Qt6)
-qt_finalize_executable(Sign_up)

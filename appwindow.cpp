@@ -129,6 +129,81 @@ QString generateRandomTunisSeaLocation()
     return QString(locations[randomIdx]);
 }
 
+// Convert DDMM.MMMM format (Degrees Minutes.DecimalMinutes) to decimal degrees
+// Used for Neo-6M GPS coordinates
+// For latitude: DDMM.MMMM where DD=degrees(00-89), MM=minutes(00-59), MMMM=decimal minutes
+// For longitude: DDDMM.MMMM where DDD=degrees(000-179), MM=minutes(00-59), MMMM=decimal minutes
+bool convertDDMMtoDecimal(const QString &ddmm, double &decimal)
+{
+    QString normalized = ddmm.trimmed();
+    normalized.replace(',', '.');
+    
+    bool ok = false;
+    double value = normalized.toDouble(&ok);
+    if (!ok || value < 0) {
+        return false;
+    }
+    
+    // Determine if this is latitude (2-digit degrees) or longitude (3-digit degrees)
+    // by finding the decimal point position
+    int dotPos = normalized.indexOf('.');
+    int minutesStart;
+    
+    if (dotPos < 0) {
+        // No decimal point; assume format is DDMM or DDDMM with trailing zeros
+        if (normalized.length() >= 4) {
+            minutesStart = normalized.length() - 2;  // Last 2 digits are minutes
+        } else {
+            return false;
+        }
+    } else {
+        // Format: DDMM.MMMM or DDDMM.MMMM
+        // Digits before decimal: degrees + 2 minutes digits
+        // So: beforeDecimal.length() - 2 = degrees digits
+        minutesStart = dotPos - 2;
+        if (minutesStart < 0) {
+            return false;
+        }
+    }
+    
+    // Extract degree and minute parts
+    QString degreePart = normalized.left(minutesStart);
+    QString minutePart = normalized.mid(minutesStart);
+    
+    bool degOk = false, minOk = false;
+    int degrees = degreePart.toInt(&degOk);
+    double minutes = minutePart.toDouble(&minOk);
+    
+    if (!degOk || !minOk) {
+        return false;
+    }
+    
+    // Validate ranges
+    if (minutes < 0 || minutes >= 60) {
+        return false;
+    }
+    
+    // For Tunisia: latitude ~30-37°N, longitude ~8-12°E
+    bool isLatitude = degrees < 90;  // Latitude max is 89
+    bool isLongitude = degrees < 180; // Longitude max is 179
+    
+    if (isLatitude && degrees <= 89 && degrees >= 30) {
+        // Likely latitude for Tunisia
+        decimal = degrees + (minutes / 60.0);
+        return true;
+    } else if (isLongitude && degrees <= 179 && degrees >= 8) {
+        // Likely longitude for Tunisia
+        decimal = degrees + (minutes / 60.0);
+        return true;
+    } else if (isLatitude && degrees <= 89) {
+        // Accept any valid latitude format
+        decimal = degrees + (minutes / 60.0);
+        return true;
+    }
+    
+    return false;
+}
+
 bool parseLocationCoordinates(const QString &location, double &latitude, double &longitude)
 {
     QString normalized = location.trimmed();
@@ -137,6 +212,23 @@ bool parseLocationCoordinates(const QString &location, double &latitude, double 
     }
 
     const QString lower = normalized.toLower();
+
+    // Try to parse as DDMM.MMMM format (Neo-6M GPS) first
+    // Expected format: "DDMM.MMMM,DDDMM.MMMM" or "DDMM.MMMM DDDMM.MMMM"
+    QRegularExpression gpsFormatPattern(R"((\d+\.?\d*)\s*[,\s]\s*(\d+\.?\d*))");
+    QRegularExpressionMatch gpsMatch = gpsFormatPattern.match(normalized);
+    
+    if (gpsMatch.hasMatch()) {
+        QString latStr = gpsMatch.captured(1);
+        QString lonStr = gpsMatch.captured(2);
+        
+        double tempLat, tempLon;
+        if (convertDDMMtoDecimal(latStr, tempLat) && convertDDMMtoDecimal(lonStr, tempLon)) {
+            latitude = tempLat;
+            longitude = tempLon;
+            return true;
+        }
+    }
 
     // Map known Tunisian coastal site names to nearby sea coordinates.
     struct NamedSeaPoint {
@@ -4159,10 +4251,8 @@ void appwindow::on_addBoatButton_clicked()
     // If there is an available dock we use it, otherwise allow creation without dock.
     int availableDockId = findAvailableDock();
 
+    // Use the location provided by the user (GPS or named location)
     QString finalLocation = ui->boatLocationLineEdit->text().trimmed();
-    if (availableDockId <= 0) {
-        finalLocation = generateRandomTunisSeaLocation();
-    }
 
     Boats newBoat(
         0, // ID auto-generated
@@ -4195,6 +4285,7 @@ void appwindow::on_addBoatButton_clicked()
         clearBoatInputs();
         displayBoats();
         updateBoatStatusProgressBar();
+        loadProductBoatIds();
         loadDockingTable();
     } else {
         QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());

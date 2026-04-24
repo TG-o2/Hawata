@@ -1,18 +1,29 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-//#include "createacc.h"
 #include "appwindow.h"
 #include "emailsender.h"
+#include "arduino.h"
 
 
 //libraries
+#include <QApplication>
 #include <QPixmap>
 #include <QFontDatabase>
 #include <QDebug>
 #include <QFile>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QTextStream>
 #include <QMessageBox>
-
+#include <QTimer>
+QString normalizeUID(QString uid)
+{
+    return uid.toUpper()
+    .remove(" ")
+        .remove(":")
+        .remove("-");
+}
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -57,6 +68,62 @@ MainWindow::MainWindow(QWidget *parent)
         openAppWindow(userId, role);
     }
 
+
+
+
+    //*************arduino with rfid***********
+
+        arduino = new Arduino(this);
+        const int arduinoStatus = arduino->connectArduino();
+        qDebug() << "Arduino connect status:" << arduinoStatus;
+
+        connect(arduino, &Arduino::cardScanned,
+            this, [this](QString uid)
+            {
+                if (rfidBusy) return; 
+                rfidBusy = true;
+
+                uid = normalizeUID(uid);
+                qDebug() << "RFID UID:" << uid;
+
+                QSqlQuery debug("SELECT CardID FROM USERS");
+                while (debug.next()) {
+                    qDebug() << "DB UID:" << debug.value(0).toString();
+                }
+                qDebug() << "Checking UID in DB:" << uid;
+
+                QSqlQuery query;
+                query.prepare(
+                    "SELECT USERID, ROLE FROM USERS "
+                    "WHERE UPPER(REPLACE(REPLACE(REPLACE(CardID,' ',''),'-',''),':','')) = :uid"
+                    );
+
+                query.bindValue(":uid", uid);
+                if (query.exec() && query.next()) {
+
+                    int userId = query.value(0).toInt();
+                    QString role = query.value(1).toString();
+
+                    qDebug() << "Access GRANTED";
+                    qDebug() << "Sending GRANTED to Arduino:" << arduino;
+                    arduino->sendResponse("GRANTED");
+
+                    QTimer::singleShot(300, this, [=]() {
+                        openAppWindow(userId, role);
+                    });
+
+                } else {
+
+                    qDebug() << "Access DENIED";
+                    if (!query.lastError().text().isEmpty()) {
+                        qDebug() << "RFID query error:" << query.lastError().text();
+                    }
+
+                    arduino->sendResponse("DENIED");
+
+                    rfidBusy = false; // allow retry
+                }
+            });
 
 
 }

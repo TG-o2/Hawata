@@ -1,6 +1,7 @@
 #ifndef ARDUINO_H
 #define ARDUINO_H
 
+#include <QObject>
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QByteArray>
@@ -18,10 +19,12 @@
  *   getserial()            — accessor for the underlying QSerialPort*
  *   getarduino_port_name() — accessor for the detected port name
  */
-class Arduino
+class Arduino : public QObject
 {
+    Q_OBJECT
+
 public:
-    Arduino();
+    explicit Arduino(QObject *parent = nullptr);
     ~Arduino();
 
     /**
@@ -35,6 +38,7 @@ public:
      *  -1  — Arduino not found on any port
      */
     int connect_arduino();
+    int connectArduino() { return connect_arduino(); }
 
     /**
      * Closes the serial port if it is currently open.
@@ -47,6 +51,8 @@ public:
      * No-op (with qDebug warning) if the port is not writable.
      */
     int write_to_arduino(QByteArray d);
+    void sendResponse(const QString &response);
+
 
     /**
      * Reads all available bytes from the Arduino.
@@ -60,15 +66,22 @@ public:
     /** Returns the name of the port the Arduino was found on (e.g. "COM3", "/dev/ttyUSB0"). */
     QString getarduino_port_name();
 
+signals:
+    void cardScanned(const QString &uid);
+
+private slots:
+    void handleReadyRead();
+
 private:
     // ── Vendor / product identifiers for Arduino UNO ──────────────────
     static const quint16 arduino_uno_vendor_id  = 9025;   // 0x2341
     static const quint16 arduino_uno_product_id = 67;     // 0x0043
 
-    QSerialPort *serial;            ///< Serial-port object (heap-allocated in ctor)
-    QString      arduino_port_name; ///< Name of the detected port
+    QSerialPort *serial;               ///< Serial-port object (heap-allocated in ctor)
+    QString      arduino_port_name;    ///< Name of the detected port
     bool         arduino_is_available; ///< True once a matching port is found
-    QByteArray   data;              ///< Buffer for data read from Arduino
+    QByteArray   data;                 ///< Buffer for data read from Arduino
+    QByteArray   pendingInput;         ///< Raw bytes collected from readyRead()
 };
 
 #endif // ARDUINO_H

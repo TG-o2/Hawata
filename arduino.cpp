@@ -1,20 +1,22 @@
 #include "arduino.h"
+
 #include <QDebug>
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Constructor / Destructor
 // ─────────────────────────────────────────────────────────────────────────────
 
-Arduino::Arduino()
-    : serial(new QSerialPort()),
-    arduino_is_available(false)
+Arduino::Arduino(QObject *parent)
+    : QObject(parent)
+    , serial(new QSerialPort(this))
+    , arduino_is_available(false)
 {
+    qDebug() << "Arduino serial pointer:" << serial;
 }
 
 Arduino::~Arduino()
 {
     close_arduino();
-    delete serial;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -26,6 +28,11 @@ int Arduino::connect_arduino()
 {
     arduino_is_available = false;
     arduino_port_name.clear();
+    pendingInput.clear();
+
+    if (serial->isOpen()) {
+        serial->close();
+    }
 
     // ── 1. Try to identify the board by vendor / product ID ──────────
     foreach (const QSerialPortInfo &serial_port_info, QSerialPortInfo::availablePorts()) {
@@ -64,6 +71,10 @@ int Arduino::connect_arduino()
             serial->setParity(QSerialPort::NoParity);     // 1 optional parity bit
             serial->setStopBits(QSerialPort::OneStop);    // number of stop bits: 1
             serial->setFlowControl(QSerialPort::NoFlowControl);
+
+            QObject::disconnect(serial, nullptr, this, nullptr);
+            QObject::connect(serial, &QSerialPort::readyRead,
+                             this, &Arduino::handleReadyRead);
             return 0;  // connected successfully
         }
         return 1;      // found but could not open
@@ -102,8 +113,14 @@ int Arduino::write_to_arduino(QByteArray d)
 // ─────────────────────────────────────────────────────────────────────────────
 QByteArray Arduino::read_from_arduino()
 {
+    if (!pendingInput.isEmpty()) {
+        data = pendingInput;
+        pendingInput.clear();
+        return data;
+    }
+
     if (serial->isReadable()) {
-        data = serial->readAll();   // recuperate the received data
+        data = serial->readAll();
         return data;
     }
     return QByteArray();
@@ -117,7 +134,32 @@ QSerialPort *Arduino::getserial()
     return serial;
 }
 
+
 QString Arduino::getarduino_port_name()
 {
     return arduino_port_name;
+}
+
+void Arduino::handleReadyRead()
+{
+    pendingInput.append(serial->readAll());
+
+    int lineEnd = -1;
+    while ((lineEnd = pendingInput.indexOf('\n')) != -1) {
+        QByteArray line = pendingInput.left(lineEnd);
+        pendingInput.remove(0, lineEnd + 1);
+
+        QString uid = QString::fromUtf8(line).trimmed();
+        if (!uid.isEmpty()) {
+            emit cardScanned(uid);
+        }
+    }
+}
+void Arduino::sendResponse(const QString &response)
+{
+    if (serial->isOpen()) {
+        QByteArray data = response.toUtf8() + "\n";
+        serial->write(data);
+        serial->flush(); 
+    }
 }

@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="currentIndex">
-    <number>4</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="tab_6">
     <attribute name="title">
@@ -279,7 +279,7 @@ QPushButton:pressed {
       </rect>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="user_page1_2">
       <widget class="QWidget" name="user_page1" native="true">
@@ -4832,7 +4832,7 @@ font-size: 35px;
          <string>Boat ID</string>
         </property>
        </widget>
-    <widget class="QComboBox" name="boatCombo">
+       <widget class="QComboBox" name="boatCombo">
         <property name="geometry">
          <rect>
           <x>20</x>
@@ -4846,8 +4846,8 @@ font-size: 35px;
       <widget class="QWidget" name="BackFrame_23" native="true">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>0</x>
+         <y>20</y>
          <width>201</width>
          <height>741</height>
         </rect>

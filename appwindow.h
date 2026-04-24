@@ -4,6 +4,7 @@
 
 #include "user.h"
 #include "connection.h"
+#include "arduino.h"
 #include "product.h"
 #include "boats.h"
 #include "company.h"
@@ -91,7 +92,7 @@ private slots:
     void on_comboBox_18_currentIndexChanged(int index);
     void on_export_pdf_6_clicked();
     void on_pushButton_11_clicked();
-    void onArduinoSerialDataReady();
+    void update_label();
 
 
     // boats CRUD
@@ -188,12 +189,22 @@ private:
     int selectedProductId = -1;
     void loadProductTable();
     void loadProductBoatIds();
-    void setupArduinoTemperatureReader();
     void refreshLowStockAlerts(bool showPopup = false);
     bool lowStockWarningShown = false;
     QList<ProductRecord> allProductRecords;
-    QSerialPort *arduinoSerial = nullptr;
-    QByteArray arduinoSerialBuffer;
+    /**
+     * Arduino integration (slide pattern).
+     *
+     * A  — the Arduino object (replaces the old raw arduinoSerial pointer).
+     * arduinoSerialBuffer — accumulates partial lines received via readyRead.
+     *
+     * Connection wired in setupArduinoTemperatureReader():
+     *   QObject::connect(A.getserial(), SIGNAL(readyRead()), this, SLOT(update_label()));
+     */
+    Arduino    A;                       // ← replaces QSerialPort *arduinoSerial
+    QByteArray arduinoSerialBuffer;     // line-assembly buffer
+    void setupArduinoTemperatureReader();
+
 
     //boats
     enum class BoatMode { Add, Edit };

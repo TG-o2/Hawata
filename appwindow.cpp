@@ -2653,66 +2653,6 @@ void appwindow::on_pushButton_8_clicked()
 
 ///PRODUCT
 
-void appwindow::setupArduinoTemperatureReader()
-{
-    ui->fishTemp->setPlaceholderText("Auto from Arduino or enter manually");
-    ui->tempSourceLabel->setText("Arduino: searching for device...");
-
-    arduinoSerial = new QSerialPort(this);
-
-    for (const QSerialPortInfo &port : QSerialPortInfo::availablePorts()) {
-        const QString signature = (port.description() + " " + port.manufacturer()).toLower();
-        const bool likelyArduino = signature.contains("arduino")
-                                   || signature.contains("ch340")
-                                   || signature.contains("usb serial");
-
-        if (!likelyArduino) {
-            continue;
-        }
-
-        arduinoSerial->setPort(port);
-        arduinoSerial->setBaudRate(QSerialPort::Baud9600);
-        arduinoSerial->setDataBits(QSerialPort::Data8);
-        arduinoSerial->setParity(QSerialPort::NoParity);
-        arduinoSerial->setStopBits(QSerialPort::OneStop);
-        arduinoSerial->setFlowControl(QSerialPort::NoFlowControl);
-
-        if (arduinoSerial->open(QIODevice::ReadOnly)) {
-            connect(arduinoSerial, &QSerialPort::readyRead,
-                    this, &appwindow::onArduinoSerialDataReady);
-            ui->tempSourceLabel->setText(QString("Arduino: connected on %1").arg(port.portName()));
-            return;
-        }
-    }
-
-    ui->tempSourceLabel->setText("Arduino: not found (manual temperature enabled)");
-}
-
-void appwindow::onArduinoSerialDataReady()
-{
-    if (!arduinoSerial) {
-        return;
-    }
-
-    arduinoSerialBuffer.append(arduinoSerial->readAll());
-
-    int newlineIndex = arduinoSerialBuffer.indexOf('\n');
-    while (newlineIndex >= 0) {
-        const QByteArray rawLine = arduinoSerialBuffer.left(newlineIndex);
-        arduinoSerialBuffer.remove(0, newlineIndex + 1);
-
-        const QString line = QString::fromUtf8(rawLine).trimmed();
-        if (!line.isEmpty()) {
-            double temperatureValue = 0.0;
-            if (parseTemperatureFromArduinoLine(line, temperatureValue)) {
-                ui->fishTemp->setText(QString::number(temperatureValue, 'f', 2));
-                ui->tempSourceLabel->setText(QString("Arduino: %1 C").arg(temperatureValue, 0, 'f', 2));
-            }
-        }
-
-        newlineIndex = arduinoSerialBuffer.indexOf('\n');
-    }
-}
 
 // Add product
 
@@ -3983,13 +3923,7 @@ void appwindow::on_DockCalender_clicked()
 }
 
 ///END
-appwindow::~appwindow()
-{
-    if (arduinoSerial && arduinoSerial->isOpen()) {
-        arduinoSerial->close();
-    }
-    delete ui;
-}
+
 
 
 
@@ -7107,7 +7041,123 @@ void appwindow::on_logout_clicked()
     login->show();
     this->close();
 }
+// =====================================================================
+// ============  ARDUINO / TEMPERATURE INTEGRATION  ====================
+// =====================================================================
+//
+// Implementation follows the slide pattern exactly:
+//
+//   Arduino A;          — declared in appwindow.h
+//   A.connect_arduino() — called here to open the port
+//   A.getserial()       — used to wire readyRead → update_label()
+//   update_label()      — slot that reads and displays the temperature
+//
+// The Arduino sketch sends lines like:
+//   "Temperature: 27.50 °C - Fan OFF"
+//   "Temperature: 31.00 °C - Fan ON  <<<<"
+//
+// The slot parses the numeric value and updates ui->fishTemp.
+// =====================================================================
 
+/**
+ * setupArduinoTemperatureReader()
+ *
+ * Called once from the appwindow constructor.
+ * Connects the Arduino, reports the result in the status label, and wires
+ * the readyRead signal (slide pattern) to the update_label() slot.
+ */
+void appwindow::setupArduinoTemperatureReader()
+{
+    ui->fishTemp->setPlaceholderText("Auto from Arduino or enter manually");
+    ui->tempSourceLabel->setText("Arduino: searching for device...");
 
+    // ── Launch the connection to Arduino (mirrors Mainwindow.cpp slide) ──
+    int ret = A.connect_arduino();
 
+    switch (ret) {
+    case 0:
+        qDebug() << "arduino is available and connected to :" << A.getarduino_port_name();
+        ui->tempSourceLabel->setText(
+            QString("Arduino: connected on %1").arg(A.getarduino_port_name()));
+
+        // Wire readyRead → update_label  (slide: QObject::connect(A.getserial(), SIGNAL(readyRead()), …))
+        QObject::connect(A.getserial(), SIGNAL(readyRead()),
+                         this,          SLOT(update_label()));
+        break;
+
+    case 1:
+        qDebug() << "arduino is available but not connected to :" << A.getarduino_port_name();
+        ui->tempSourceLabel->setText(
+            QString("Arduino: found on %1 but could not open port (manual input enabled)")
+                .arg(A.getarduino_port_name()));
+        break;
+
+    case -1:
+    default:
+        qDebug() << "arduino is not available";
+        ui->tempSourceLabel->setText("Arduino: not found (manual temperature enabled)");
+        break;
+    }
+}
+
+/**
+ * update_label()  — slot for readyRead signal  (slide pattern)
+ *
+ * Reads all available bytes from the Arduino, assembles complete lines,
+ * parses the temperature value, and pushes it into the UI.
+ *
+ * Arduino DHT11 sketch output format:
+ *   "Temperature: 27.50 °C - Fan OFF"
+ *   "Temperature: 31.00 °C - Fan ON  <<<<"
+ *   "ERROR: DHT11 not working!"
+ */
+void appwindow::update_label()
+{
+    arduinoSerialBuffer.append(A.read_from_arduino());
+
+    int newlineIndex = arduinoSerialBuffer.indexOf('\n');
+    while (newlineIndex >= 0) {
+        const QByteArray rawLine = arduinoSerialBuffer.left(newlineIndex);
+        arduinoSerialBuffer.remove(0, newlineIndex + 1);
+
+        const QString line = QString::fromUtf8(rawLine).trimmed();
+
+        if (line.isEmpty()) {
+            newlineIndex = arduinoSerialBuffer.indexOf('\n');
+            continue;
+        }
+
+        if (line.startsWith("ERROR")) {
+            ui->tempSourceLabel->setText("Arduino: DHT11 sensor error — check wiring");
+            newlineIndex = arduinoSerialBuffer.indexOf('\n');
+            continue;
+        }
+
+        // ── Temperature line only ─────────────────────────────────────
+        const QRegularExpression labeledPattern(
+            R"((?:TEMP(?:ERATURE)?\s*[:=]\s*)([-+]?\d+(?:[\.,]\d+)?))",
+            QRegularExpression::CaseInsensitiveOption);
+        const QRegularExpressionMatch m = labeledPattern.match(line);
+
+        if (m.hasMatch()) {
+            QString token = m.captured(1);
+            token.replace(',', '.');
+            bool ok = false;
+            const double v = token.toDouble(&ok);
+            if (ok) {
+                ui->fishTemp->setText(QString::number(v, 'f', 2));
+                ui->tempSourceLabel->setText(
+                    QString("Arduino: %1 C").arg(v, 0, 'f', 2));
+            }
+        }
+
+        newlineIndex = arduinoSerialBuffer.indexOf('\n');
+    }
+}
+
+appwindow::~appwindow()
+{
+    A.close_arduino();   // cleanly close the serial port via Arduino class
+    delete ui;
+}
 

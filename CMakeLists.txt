@@ -49,6 +49,7 @@ qt_add_executable(Sign_up
     smtpclient.h
     smtpclient.cpp
     emailsender.h emailsender.cpp
+    arduino.h arduino.cpp
 
 )
 

@@ -3970,7 +3970,7 @@ bool appwindow::isAnyDockAvailable()
     return false;
 }
 
-// CRUD
+// Boat CRUD
 void appwindow::setBoatMode(BoatMode mode)
 {
     currentBoatMode = mode;
@@ -7081,9 +7081,14 @@ void appwindow::setupArduinoTemperatureReader()
             QString("Arduino: connected on %1").arg(A.getarduino_port_name()));
 
         // Wire readyRead → update_label  (slide: QObject::connect(A.getserial(), SIGNAL(readyRead()), …))
-        QObject::connect(A.getserial(), SIGNAL(readyRead()),
-                         this,          SLOT(update_label()));
-        break;
+        //QObject::connect(A.getserial(), SIGNAL(readyRead()),
+          //               this,          SLOT(update_label()));
+        // Disconnect any previous connection to be safe
+        disconnect(A.getserial(), &QSerialPort::readyRead, this, nullptr);
+        // Connect to the new coordinate‑handling slot
+        connect(A.getserial(), &QSerialPort::readyRead,
+            this, &appwindow::update_boat_location_arduino);
+            break;
 
     case 1:
         qDebug() << "arduino is available but not connected to :" << A.getarduino_port_name();
@@ -7161,3 +7166,85 @@ appwindow::~appwindow()
     delete ui;
 }
 
+
+void appwindow::update_boat_location_arduino()
+{
+    qDebug() << "update_boat_location_arduino() triggered";
+
+    QByteArray rawData = A.read_from_arduino();
+    if (rawData.isEmpty()) {
+        qDebug() << "No data from Arduino";
+        return;
+    }
+
+    static QByteArray buffer;
+    buffer.append(rawData);
+
+    // Split on both \r and \n
+    int splitPos;
+    while ((splitPos = buffer.indexOf('\r')) != -1 || (splitPos = buffer.indexOf('\n')) != -1) {
+        QByteArray lineBytes = buffer.left(splitPos).trimmed();
+        buffer.remove(0, splitPos + 1);
+
+        QString line = QString::fromUtf8(lineBytes);
+        if (line.isEmpty()) continue;
+
+        qDebug() << "Line received:" << line;
+
+        // Skip lines that don't contain "GPS:"
+        if (!line.contains("GPS:")) continue;
+
+        // Extract everything after "GPS:"
+        int colonIdx = line.indexOf(':');
+        if (colonIdx == -1) continue;
+        QString coordPart = line.mid(colonIdx + 1).trimmed();
+
+        // Remove trailing ">>" or extra spaces (just in case)
+        coordPart.remove(QRegularExpression(">>$")).trimmed();
+
+        // Split latitude and longitude (they may be separated by comma + space)
+        QStringList parts = coordPart.split(',', Qt::SkipEmptyParts);
+        if (parts.size() != 2) continue;
+
+        bool latOk, lonOk;
+        double latDeg = parts[0].trimmed().toDouble(&latOk);
+        double lonDeg = parts[1].trimmed().toDouble(&lonOk);
+        if (!latOk || !lonOk) continue;
+
+        // Convert decimal degrees to ddmm.mmmm format
+        auto toDdmm = [](double deg, bool isLat) -> QString {
+            int degrees = static_cast<int>(deg);
+            double minutes = (deg - degrees) * 60.0;
+            if (isLat) {
+                // Latitude: 2 digits for degrees (0-90)
+                return QString("%1%2").arg(degrees, 2, 10, QChar('0'))
+                                      .arg(minutes, 7, 'f', 4, QChar('0'));
+            } else {
+                // Longitude: 3 digits for degrees (0-180)
+                return QString("%1%2").arg(degrees, 3, 10, QChar('0'))
+                                      .arg(minutes, 7, 'f', 4, QChar('0'));
+            }
+        };
+
+        QString formattedCoord = toDdmm(latDeg, true) + "," + toDdmm(lonDeg, false);
+        qDebug() << "Converted to ddmm.mmmm:" << formattedCoord;
+
+        // Update boat ID 1 in the database
+        QSqlDatabase db = QSqlDatabase::database();
+        if (!db.isOpen()) {
+            qDebug() << "Database not open – cannot update boat location";
+            return;
+        }
+
+        QSqlQuery updateQuery(db);
+        updateQuery.prepare("UPDATE BOAT SET LOCATION = :coord WHERE BOATID = 1");
+        updateQuery.bindValue(":coord", formattedCoord);
+
+        if (updateQuery.exec()) {
+            qDebug() << "✅ Boat 1 location updated to:" << formattedCoord;
+            displayBoats();  // refresh table
+        } else {
+            qDebug() << "❌ Failed to update boat location:" << updateQuery.lastError().text();
+        }
+    }
+}

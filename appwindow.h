@@ -113,6 +113,9 @@ private slots:
     void on_pushButton_trackAll_clicked();
     void on_comboBox_selectBoat_currentIndexChanged(int index);
 
+    //arduino
+    void update_boat_location_arduino();   // new slot for Arduino GPS coordinates (boat ID 1)
+
     // companies CRUD
     void on_tableWidget_11_cellClicked(int row, int column);
     void on_tableWidget_11_cellDoubleClicked(int row, int column);

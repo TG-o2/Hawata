@@ -29,6 +29,7 @@ int Arduino::connect_arduino()
     arduino_is_available = false;
     arduino_port_name.clear();
     pendingInput.clear();
+    cardScanBuffer.clear();
 
     if (serial->isOpen()) {
         serial->close();
@@ -142,12 +143,21 @@ QString Arduino::getarduino_port_name()
 
 void Arduino::handleReadyRead()
 {
-    pendingInput.append(serial->readAll());
+    const QByteArray chunk = serial->readAll();
+    if (chunk.isEmpty()) {
+        return;
+    }
+
+    // Keep a full raw stream for consumers that call read_from_arduino().
+    pendingInput.append(chunk);
+
+    // Parse card lines from a dedicated buffer so we do not consume pendingInput.
+    cardScanBuffer.append(chunk);
 
     int lineEnd = -1;
-    while ((lineEnd = pendingInput.indexOf('\n')) != -1) {
-        QByteArray line = pendingInput.left(lineEnd);
-        pendingInput.remove(0, lineEnd + 1);
+    while ((lineEnd = cardScanBuffer.indexOf('\n')) != -1) {
+        QByteArray line = cardScanBuffer.left(lineEnd);
+        cardScanBuffer.remove(0, lineEnd + 1);
 
         QString uid = QString::fromUtf8(line).trimmed();
         if (!uid.isEmpty()) {

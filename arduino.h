@@ -82,6 +82,7 @@ private:
     bool         arduino_is_available; ///< True once a matching port is found
     QByteArray   data;                 ///< Buffer for data read from Arduino
     QByteArray   pendingInput;         ///< Raw bytes collected from readyRead()
+    QByteArray   cardScanBuffer;       ///< Line buffer dedicated to cardScanned parsing
 };
 
 #endif // ARDUINO_H

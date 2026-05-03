@@ -7191,6 +7191,21 @@ void appwindow::update_boat_location_arduino()
 
         qDebug() << "Line received:" << line;
 
+        // Handle DHT11 error lines from Arduino sketch.
+        if (line.startsWith("ERROR", Qt::CaseInsensitive)) {
+            ui->tempSourceLabel->setText("Arduino: DHT11 sensor error - check wiring");
+            continue;
+        }
+
+        // Parse and display temperature lines (e.g. "TEMPERATURE: 26.0 C").
+        double parsedTemperature = 0.0;
+        if (line.contains("TEMP", Qt::CaseInsensitive) &&
+            parseTemperatureFromArduinoLine(line, parsedTemperature)) {
+            ui->fishTemp->setText(QString::number(parsedTemperature, 'f', 2));
+            ui->tempSourceLabel->setText(
+                QString("Arduino: %1 C").arg(parsedTemperature, 0, 'f', 2));
+        }
+
         // Skip lines that don't contain "GPS:"
         if (!line.contains("GPS:")) continue;
 

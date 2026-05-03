@@ -109,8 +109,12 @@ MainWindow::MainWindow(QWidget *parent)
                     arduino->sendResponse("GRANTED");
 
                     QTimer::singleShot(300, this, [=]() {
-                        openAppWindow(userId, role);
-                    });
+
+                    arduino->close_arduino();   
+                    qDebug() << "Arduino closed from MainWindow";
+
+                    openAppWindow(userId, role);
+                });
 
                 } else {
 

@@ -434,7 +434,7 @@ QColor statusColor(const QString &status)
     }
 
     if (status.trimmed().compare("Available", Qt::CaseInsensitive) == 0) {
-        return QColor("#4ade80");
+        return QColor();
     }
 
     return QColor();
@@ -3834,7 +3834,7 @@ void appwindow::on_DockCalender_clicked()
     mainLayout->addWidget(titleLabel);
 
     QLabel *subtitleLabel = new QLabel(
-        "Red = Occupied reservation, Green = Available reservation",
+        "Red = Occupied reservation",
         &dialog);
     subtitleLabel->setAlignment(Qt::AlignCenter);
     subtitleLabel->setStyleSheet("color: #334155; font-size: 14px;");
@@ -3864,7 +3864,6 @@ void appwindow::on_DockCalender_clicked()
     };
 
     addLegendItem("Occupied", QColor("#f87171"));
-    addLegendItem("Available", QColor("#4ade80"));
     legendLayout->addStretch();
     mainLayout->addLayout(legendLayout);
 

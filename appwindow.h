@@ -10,6 +10,7 @@
 #include "company.h"
 #include "Docking.h"
 #include "manage.h"
+#include "chatbotdialog.h"
 #include <QSettings>
 #include <QDialog>
 #include <QByteArray>
@@ -276,6 +277,8 @@ private:
     void generateProductStatisticsByStatus(const QList<ProductRecord> &products);
     void generateProductQuantityByType(const QList<ProductRecord> &products);
 
+    //chatbot
+    ChatbotDialog *m_chatbot;
 
 
 

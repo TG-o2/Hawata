@@ -1,7 +1,9 @@
 #include "appwindow.h"
 #include "ui_appwindow.h"
+#include "chatbotdialog.h"
 #include "mainwindow.h"
 #include "smtpclient.h"
+
 
 #include <QPixmap>
 #include <QMessageBox>
@@ -137,18 +139,18 @@ bool convertDDMMtoDecimal(const QString &ddmm, double &decimal)
 {
     QString normalized = ddmm.trimmed();
     normalized.replace(',', '.');
-    
+
     bool ok = false;
     double value = normalized.toDouble(&ok);
     if (!ok || value < 0) {
         return false;
     }
-    
+
     // Determine if this is latitude (2-digit degrees) or longitude (3-digit degrees)
     // by finding the decimal point position
     int dotPos = normalized.indexOf('.');
     int minutesStart;
-    
+
     if (dotPos < 0) {
         // No decimal point; assume format is DDMM or DDDMM with trailing zeros
         if (normalized.length() >= 4) {
@@ -165,28 +167,28 @@ bool convertDDMMtoDecimal(const QString &ddmm, double &decimal)
             return false;
         }
     }
-    
+
     // Extract degree and minute parts
     QString degreePart = normalized.left(minutesStart);
     QString minutePart = normalized.mid(minutesStart);
-    
+
     bool degOk = false, minOk = false;
     int degrees = degreePart.toInt(&degOk);
     double minutes = minutePart.toDouble(&minOk);
-    
+
     if (!degOk || !minOk) {
         return false;
     }
-    
+
     // Validate ranges
     if (minutes < 0 || minutes >= 60) {
         return false;
     }
-    
+
     // For Tunisia: latitude ~30-37°N, longitude ~8-12°E
     bool isLatitude = degrees < 90;  // Latitude max is 89
     bool isLongitude = degrees < 180; // Longitude max is 179
-    
+
     if (isLatitude && degrees <= 89 && degrees >= 30) {
         // Likely latitude for Tunisia
         decimal = degrees + (minutes / 60.0);
@@ -200,7 +202,7 @@ bool convertDDMMtoDecimal(const QString &ddmm, double &decimal)
         decimal = degrees + (minutes / 60.0);
         return true;
     }
-    
+
     return false;
 }
 
@@ -217,11 +219,11 @@ bool parseLocationCoordinates(const QString &location, double &latitude, double 
     // Expected format: "DDMM.MMMM,DDDMM.MMMM" or "DDMM.MMMM DDDMM.MMMM"
     QRegularExpression gpsFormatPattern(R"((\d+\.?\d*)\s*[,\s]\s*(\d+\.?\d*))");
     QRegularExpressionMatch gpsMatch = gpsFormatPattern.match(normalized);
-    
+
     if (gpsMatch.hasMatch()) {
         QString latStr = gpsMatch.captured(1);
         QString lonStr = gpsMatch.captured(2);
-        
+
         double tempLat, tempLon;
         if (convertDDMMtoDecimal(latStr, tempLat) && convertDDMMtoDecimal(lonStr, tempLon)) {
             latitude = tempLat;
@@ -1221,8 +1223,26 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
 
     QTimer::singleShot(5000, this, &appwindow::onCheckMaintenanceReminders); // Check after 5 seconds
-}
 
+
+    // ── Harbor Assistant chatbot ──
+    ui->chatFAB->raise();  // always on top of all tabs
+
+    m_chatbot = new ChatbotDialog(this);
+
+    connect(ui->chatFAB, &QPushButton::clicked, this, [this]() {
+        if (m_chatbot->isVisible()) {
+            m_chatbot->hide();
+        } else {
+            // Center on this window
+            int x = geometry().x() + (width()  - m_chatbot->width())  / 2;
+            int y = geometry().y() + (height() - m_chatbot->height()) / 2;
+            m_chatbot->move(x, y);
+            m_chatbot->show();
+            m_chatbot->raise();
+        }
+    });
+}
 QString appwindow::dockingHistoryFilePath() const
 {
     QStringList startDirs;
@@ -3806,7 +3826,7 @@ void appwindow::generateDockingStatistics()
     QGraphicsProxyWidget *proxy = scene->addWidget(chartWidget);
     scene->setSceneRect(0, 0, viewWidth, viewHeight);
     proxy->setGeometry(QRectF(0, 0, viewWidth, viewHeight));
-    
+
     ui->graph_docking->setScene(scene);
     ui->graph_docking->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 }

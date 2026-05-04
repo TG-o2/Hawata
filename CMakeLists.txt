@@ -50,6 +50,9 @@ qt_add_executable(Sign_up
     smtpclient.cpp
     emailsender.h emailsender.cpp
     arduino.h arduino.cpp
+    chatbotdialog.h chatbotdialog.cpp chatbotdialog.ui
+
+
 
 )
 

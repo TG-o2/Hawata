@@ -528,8 +528,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->pushButton_10, &QPushButton::clicked, this, &appwindow::on_pushButton_10_clicked);
     updateBoatStatusProgressBar();
 
-    QPixmap logo("icons/homefish.png");
-    QPixmap smalllogo("icons/homefishsmall.png");
+    QPixmap logo("icons/fish3.png");
+    QPixmap smalllogo("icons/fish1.png");
     QPixmap Uicon("icons/add-user2.png");
     QPixmap Dock("icons/dock.png");
     QPixmap Boat("icons/boat.png");
@@ -537,7 +537,10 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     QPixmap Email("icons/Email.png");
     QPixmap Comp("icons/companies.png");
     QPixmap Stats("icons/stats.png");
-
+    QPixmap rt("icons/rt.png");
+    QPixmap ana("icons/ana.png");
+    QPixmap management("icons/management.png");
+    QPixmap time("icons/time.png");
     QPixmap user_icon("icons/add-user1.png");
     QPixmap user_display("icons/dashboard.png");
     QPixmap user_delete("icons/trash.png");
@@ -546,16 +549,22 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     //pictures for product--------
     QPixmap fish("icons/fishicon.png");
-    QPixmap pic_2("logoQT.png");
+    QPixmap pic_2("icons/logoQT2.png");
+    QPixmap smallshrimp("icons/shrimp.png");
     QPixmap homepage("icons/Ports1.jpg");
     QPixmap waves("icons/wave.jpg");
     //product picture set up
     ui->pic->setPixmap(fish);
     ui->pic->setScaledContents(true);
 
-
-
-
+    ui->image1->setPixmap(rt);
+    ui->image1->setScaledContents(true);
+    ui->image2->setPixmap(management);
+    ui->image2->setScaledContents(true);
+    ui->image3->setPixmap(ana);
+    ui->image3->setScaledContents(true);
+    ui->image4->setPixmap(time);
+    ui->image4->setScaledContents(true);
     //end of product picture code--------------
 
 
@@ -783,8 +792,14 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     ui->homeImage->setPixmap(logo);
     ui->homeImage->setScaledContents(true);
-    //ui->homeImage_2->setPixmap(smalllogo);
-    //ui->homeImage_2->setScaledContents(true);
+    if (smallshrimp.isNull()) {
+        qDebug() << "Image failed to load!";
+    } else {
+        qDebug() << "Image loaded successfully!";
+
+        ui->small->setPixmap(smallshrimp);
+        ui->small->setScaledContents(true);
+    }
 
     //ui->waveDecoration->setPixmap(waves);
     //ui->waveDecoration->setScaledContents(true);

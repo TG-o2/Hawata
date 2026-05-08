@@ -833,7 +833,34 @@ QFrame#infoFrame {
     border-radius: 6px;
 }
 
+QFrame#FeatureCard {
+    background-color: #EFF6FF;        /* Soft light blue */
+    border: 1px solid #BFDBFE;        /* Very subtle blue border */
+    border-radius: 16px;              /* Nice modern rounding */
+    padding: 20px 16px;
+}
 
+QFrame#FeatureCard:hover {
+    background-color: #DBEAFE;
+    border: 1px solid #60A5FA;
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15);   /* Soft glow on hover */
+}
+
+/* Optional: If you put a QLabel for the icon */
+QLabel#FeatureIcon {
+    color: #1E5A94;
+    font-size: 42px;                  /* Big icon size */
+    qproperty-alignment: AlignCenter;
+}
+
+/* Text label below icon */
+QLabel#FeatureTitle {
+    color: #0F4C81;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: "Poppins", "Segoe UI", sans-serif;
+    qproperty-alignment: AlignCenter;
+}
 /* =========================
    TOOL BOX
 ========================= */

@@ -18,7 +18,9 @@ int main(int argc, char *argv[])
 
     int fontId = QFontDatabase::addApplicationFont(":/fonts/Hey Comic.otf");
     int fontId3 = QFontDatabase::addApplicationFont(":/fonts/Bion-BoldCond.otf");
-
+    int fontId4 = QFontDatabase::addApplicationFont("C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/fonts/Poppins-SemiBold.ttf");
+    int fontId5 = QFontDatabase::addApplicationFont("C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/fonts/TANTWINKLE.ttf");
+    int fontId6 = QFontDatabase::addApplicationFont("C:/Users/SKYMIL_INFORMATIQUE/OneDrive - ESPRIT/Documents/Qt project/Sign_up/Hawata/fonts/Mileast.otf");
     int fontId2 = QFontDatabase::addApplicationFont(":/fonts/Behove.ttf");
     if (fontId == -1) {
         qDebug() << "Font failed to load";
@@ -38,7 +40,24 @@ int main(int argc, char *argv[])
         QString family = QFontDatabase::applicationFontFamilies(fontId3).at(0);
         qDebug() << "Loaded font:" << family;
     }
-
+    if (fontId4 == -1) {
+        qDebug() << "Font failed to load";
+    } else {
+        QString family = QFontDatabase::applicationFontFamilies(fontId4).at(0);
+        qDebug() << "Loaded font:" << family;
+    }
+    if (fontId5 == -1) {
+        qDebug() << "Font failed to load";
+    } else {
+        QString family = QFontDatabase::applicationFontFamilies(fontId5).at(0);
+        qDebug() << "Loaded font:" << family;
+    }
+    if (fontId6 == -1) {
+        qDebug() << "Font failed to load";
+    } else {
+        QString family = QFontDatabase::applicationFontFamilies(fontId6).at(0);
+        qDebug() << "Loaded font:" << family;
+    }
     //loadstylesheet
     QFile f(":/marine_theme.qss");
     if (f.open(QIODevice::ReadOnly)) {

@@ -1,6 +1,17 @@
 #include "chatbotdialog.h"
 #include "ui_chatbotdialog.h"
 
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonParseError>
+#include <QStringList>
+
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QSqlQuery>
@@ -90,6 +101,152 @@ bool ChatbotDialog::eventFilter(QObject *obj, QEvent *event)
 }
 
 // ─────────────────────────────────────────────
+//   Call Ollama ai
+// ─────────────────────────────────────────────
+void ChatbotDialog::callOllama(const QString &input)
+{
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+
+    // Put model in query string (common Ollama pattern) and send JSON body
+    QUrl url("http://localhost:11434/api/generate");
+    QUrlQuery q;
+    q.addQueryItem("model", "llama3");
+    url.setQuery(q);
+
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    // Provide clear system/context and the user message
+    json["prompt"] =
+        "You are a helpful harbor assistant for a fishing port system.\n"
+        "Answer concisely and use friendly emoji when helpful.\n"
+        "You have access to information about boats, docks, fish stock, users, and companies.\n\n"
+        "User: " + input + "\nAssistant:";
+    json["stream"] = false;
+    json["temperature"] = 0.2;
+    json["max_tokens"] = 512;
+
+    // Try a sequence of common Ollama/completion endpoints if one returns 404
+    QStringList endpoints = {
+        "http://localhost:11434/api/generate?model=llama3",
+        "http://localhost:11434/api/generate",
+        "http://localhost:11434/api/completions",
+        "http://localhost:11434/v1/completions"
+    };
+
+    std::function<void(int)> doRequest;
+    doRequest = [=](int idx) mutable {
+        if (idx >= endpoints.size()) {
+            addMessage("Error: All endpoints tried and returned errors.", false);
+            return;
+        }
+
+        QUrl u(endpoints[idx]);
+        QNetworkRequest r(u);
+        r.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+        // include model in body too for endpoints that expect it there
+        QJsonObject body = json;
+        body["model"] = "llama3";
+
+        QNetworkReply *rep = manager->post(r, QJsonDocument(body).toJson());
+
+        connect(rep, &QNetworkReply::errorOccurred, this, [=](QNetworkReply::NetworkError){
+            QString err = QString("Network error: %1").arg(rep->errorString());
+            addMessage(err, false);
+            rep->deleteLater();
+        });
+
+        connect(rep, &QNetworkReply::finished, this, [=]() mutable {
+            int status = rep->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+            QByteArray responseData = rep->readAll();
+
+            if (status >= 200 && status < 300) {
+                // parse success
+                QString aiResponse;
+
+                QJsonParseError parseError;
+                QJsonDocument doc = QJsonDocument::fromJson(responseData, &parseError);
+
+                if (parseError.error == QJsonParseError::NoError) {
+                    if (doc.isObject()) {
+                        QJsonObject obj = doc.object();
+
+                        if (obj.contains("response") && obj["response"].isString())
+                            aiResponse = obj["response"].toString();
+                        else if (obj.contains("text") && obj["text"].isString())
+                            aiResponse = obj["text"].toString();
+                        else if (obj.contains("output") && obj["output"].isString())
+                            aiResponse = obj["output"].toString();
+                        else if (obj.contains("choices") && obj["choices"].isArray()) {
+                            QJsonArray choices = obj["choices"].toArray();
+                            if (!choices.isEmpty() && choices[0].isObject()) {
+                                QJsonObject c0 = choices[0].toObject();
+                                if (c0.contains("text")) aiResponse = c0["text"].toString();
+                                else if (c0.contains("message") && c0["message"].isObject()) {
+                                    QJsonObject msg = c0["message"].toObject();
+                                    if (msg.contains("content")) aiResponse = msg["content"].toString();
+                                }
+                            }
+                        } else if (obj.contains("results") && obj["results"].isArray()) {
+                            QJsonArray res = obj["results"].toArray();
+                            QStringList parts;
+                            for (auto v : res) {
+                                if (v.isObject()) {
+                                    QJsonObject r = v.toObject();
+                                    if (r.contains("content") && r["content"].isArray()) {
+                                        QJsonArray cont = r["content"].toArray();
+                                        for (auto c : cont) if (c.isObject()) {
+                                            QJsonObject co = c.toObject();
+                                            if (co.contains("text")) parts << co["text"].toString();
+                                        }
+                                    }
+                                }
+                            }
+                            aiResponse = parts.join("\n");
+                        }
+                    } else if (doc.isArray()) {
+                        QJsonArray arr = doc.array();
+                        QStringList parts;
+                        for (auto v : arr) {
+                            if (v.isString()) parts << v.toString();
+                            else if (v.isObject()) {
+                                QJsonObject o = v.toObject();
+                                if (o.contains("text")) parts << o["text"].toString();
+                            }
+                        }
+                        aiResponse = parts.join("\n");
+                    }
+                }
+
+                if (aiResponse.trimmed().isEmpty()) {
+                    aiResponse = QString::fromUtf8(responseData).trimmed();
+                    if (aiResponse.isEmpty()) aiResponse = "(No response from Ollama)";
+                }
+
+                addMessage(aiResponse, false);
+                rep->deleteLater();
+            } else if (status == 404) {
+                // try next endpoint
+                rep->deleteLater();
+                doRequest(idx + 1);
+            } else {
+                // final error
+                QString body = QString::fromUtf8(responseData).trimmed();
+                QString msg = QString("HTTP %1: %2").arg(status).arg(body);
+                addMessage(msg, false);
+                rep->deleteLater();
+            }
+        });
+    };
+
+    doRequest(0);
+}
+
+
+
+// ─────────────────────────────────────────────
 //  Send / Chip handlers
 // ─────────────────────────────────────────────
 void ChatbotDialog::onSendClicked()
@@ -100,7 +257,13 @@ void ChatbotDialog::onSendClicked()
     addMessage(text, true);
 
     QString reply = processQuery(text.toLower());
-    addMessage(reply, false);
+
+    if (reply.contains("I'm not sure")) {
+        // fallback to AI
+        callOllama(text);
+    } else {
+        addMessage(reply, false);
+    }
 }
 
 void ChatbotDialog::onChip1Clicked() {

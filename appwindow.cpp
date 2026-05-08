@@ -528,8 +528,8 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
     connect(ui->pushButton_10, &QPushButton::clicked, this, &appwindow::on_pushButton_10_clicked);
     updateBoatStatusProgressBar();
 
-    QPixmap logo("icons/try1.png");
-
+    QPixmap logo("icons/homefish.png");
+    QPixmap smalllogo("icons/homefishsmall.png");
     QPixmap Uicon("icons/add-user2.png");
     QPixmap Dock("icons/dock.png");
     QPixmap Boat("icons/boat.png");
@@ -783,6 +783,9 @@ appwindow::appwindow(QWidget *parent, int currentUserId, const QString &currentU
 
     ui->homeImage->setPixmap(logo);
     ui->homeImage->setScaledContents(true);
+    //ui->homeImage_2->setPixmap(smalllogo);
+    //ui->homeImage_2->setScaledContents(true);
+
     //ui->waveDecoration->setPixmap(waves);
     //ui->waveDecoration->setScaledContents(true);
 
@@ -4244,7 +4247,61 @@ void appwindow::on_addBoatButton_clicked()
         QMessageBox::critical(this, "Error", "Failed to add boat: " + newBoat.getLastError());
     }
 }
+void appwindow::update_boat_location_arduino()
+{
+    QByteArray rawData = A.read_from_arduino();
+    if (rawData.isEmpty())
+        return;
 
+    static QByteArray buffer;
+    buffer.append(rawData);
+
+    int splitPos;
+    while ((splitPos = buffer.indexOf('\r')) != -1 || (splitPos = buffer.indexOf('\n')) != -1) {
+        QByteArray lineBytes = buffer.left(splitPos).trimmed();
+        buffer.remove(0, splitPos + 1);
+
+        QString line = QString::fromUtf8(lineBytes);
+        if (line.isEmpty()) continue;
+
+        // Only process lines containing "GPS:"
+        if (!line.contains("GPS:")) continue;
+
+        int colonIdx = line.indexOf(':');
+        if (colonIdx == -1) continue;
+        QString coordPart = line.mid(colonIdx + 1).trimmed();
+
+        // Remove trailing ">>" if present
+        coordPart.remove(QRegularExpression(">>$")).trimmed();
+
+        QStringList parts = coordPart.split(',', Qt::SkipEmptyParts);
+        if (parts.size() != 2) continue;
+
+        bool latOk, lonOk;
+        double latDeg = parts[0].trimmed().toDouble(&latOk);
+        double lonDeg = parts[1].trimmed().toDouble(&lonOk);
+        if (!latOk || !lonOk) continue;
+
+        // Store coordinates in decimal degrees format (e.g., "36.80650,10.18150")
+        QString decimalCoord = QString("%1,%2")
+                               .arg(latDeg, 0, 'f', 6)
+                               .arg(lonDeg, 0, 'f', 6);
+
+        QSqlDatabase db = QSqlDatabase::database();
+        if (!db.isOpen()) return;
+
+        QSqlQuery updateQuery(db);
+        updateQuery.prepare("UPDATE BOAT SET LOCATION = :coord WHERE BOATID = 1");
+        updateQuery.bindValue(":coord", decimalCoord);
+
+        if (updateQuery.exec()) {
+            qDebug() << "Boat 1 location updated to (decimal):" << decimalCoord;
+            displayBoats();   // refresh the boat table
+        } else {
+            qDebug() << "Failed to update boat location:" << updateQuery.lastError().text();
+        }
+    }
+}
 // ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
 //  "Save Changes" button on the form (Edit mode only)
 // ٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?٤?
@@ -7183,102 +7240,4 @@ appwindow::~appwindow()
 {
     A.close_arduino();   // cleanly close the serial port via Arduino class
     delete ui;
-}
-
-
-void appwindow::update_boat_location_arduino()
-{
-    qDebug() << "update_boat_location_arduino() triggered";
-
-    QByteArray rawData = A.read_from_arduino();
-    if (rawData.isEmpty()) {
-        qDebug() << "No data from Arduino";
-        return;
-    }
-
-    static QByteArray buffer;
-    buffer.append(rawData);
-
-    // Split on both \r and \n
-    int splitPos;
-    while ((splitPos = buffer.indexOf('\r')) != -1 || (splitPos = buffer.indexOf('\n')) != -1) {
-        QByteArray lineBytes = buffer.left(splitPos).trimmed();
-        buffer.remove(0, splitPos + 1);
-
-        QString line = QString::fromUtf8(lineBytes);
-        if (line.isEmpty()) continue;
-
-        qDebug() << "Line received:" << line;
-
-        // Handle DHT11 error lines from Arduino sketch.
-        if (line.startsWith("ERROR", Qt::CaseInsensitive)) {
-            ui->tempSourceLabel->setText("Arduino: DHT11 sensor error - check wiring");
-            continue;
-        }
-
-        // Parse and display temperature lines (e.g. "TEMPERATURE: 26.0 C").
-        double parsedTemperature = 0.0;
-        if (line.contains("TEMP", Qt::CaseInsensitive) &&
-            parseTemperatureFromArduinoLine(line, parsedTemperature)) {
-            ui->fishTemp->setText(QString::number(parsedTemperature, 'f', 2));
-            ui->tempSourceLabel->setText(
-                QString("Arduino: %1 C").arg(parsedTemperature, 0, 'f', 2));
-        }
-
-        // Skip lines that don't contain "GPS:"
-        if (!line.contains("GPS:")) continue;
-
-        // Extract everything after "GPS:"
-        int colonIdx = line.indexOf(':');
-        if (colonIdx == -1) continue;
-        QString coordPart = line.mid(colonIdx + 1).trimmed();
-
-        // Remove trailing ">>" or extra spaces (just in case)
-        coordPart.remove(QRegularExpression(">>$")).trimmed();
-
-        // Split latitude and longitude (they may be separated by comma + space)
-        QStringList parts = coordPart.split(',', Qt::SkipEmptyParts);
-        if (parts.size() != 2) continue;
-
-        bool latOk, lonOk;
-        double latDeg = parts[0].trimmed().toDouble(&latOk);
-        double lonDeg = parts[1].trimmed().toDouble(&lonOk);
-        if (!latOk || !lonOk) continue;
-
-        // Convert decimal degrees to ddmm.mmmm format
-        auto toDdmm = [](double deg, bool isLat) -> QString {
-            int degrees = static_cast<int>(deg);
-            double minutes = (deg - degrees) * 60.0;
-            if (isLat) {
-                // Latitude: 2 digits for degrees (0-90)
-                return QString("%1%2").arg(degrees, 2, 10, QChar('0'))
-                                      .arg(minutes, 7, 'f', 4, QChar('0'));
-            } else {
-                // Longitude: 3 digits for degrees (0-180)
-                return QString("%1%2").arg(degrees, 3, 10, QChar('0'))
-                                      .arg(minutes, 7, 'f', 4, QChar('0'));
-            }
-        };
-
-        QString formattedCoord = toDdmm(latDeg, true) + "," + toDdmm(lonDeg, false);
-        qDebug() << "Converted to ddmm.mmmm:" << formattedCoord;
-
-        // Update boat ID 1 in the database
-        QSqlDatabase db = QSqlDatabase::database();
-        if (!db.isOpen()) {
-            qDebug() << "Database not open – cannot update boat location";
-            return;
-        }
-
-        QSqlQuery updateQuery(db);
-        updateQuery.prepare("UPDATE BOAT SET LOCATION = :coord WHERE BOATID = 1");
-        updateQuery.bindValue(":coord", formattedCoord);
-
-        if (updateQuery.exec()) {
-            qDebug() << "✅ Boat 1 location updated to:" << formattedCoord;
-            displayBoats();  // refresh table
-        } else {
-            qDebug() << "❌ Failed to update boat location:" << updateQuery.lastError().text();
-        }
-    }
 }

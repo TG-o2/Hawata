@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-
+    /*
 
     //*************arduino with rfid***********
 
@@ -127,7 +127,7 @@ MainWindow::MainWindow(QWidget *parent)
 
                     rfidBusy = false; // allow retry
                 }
-            });
+            });*/
 
 
 }

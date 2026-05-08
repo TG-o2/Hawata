@@ -9,8 +9,16 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Qt modules
-find_package(Qt6 REQUIRED COMPONENTS Widgets Sql Charts PrintSupport Network SerialPort QuickWidgets WebView)
-
+find_package(Qt6 REQUIRED COMPONENTS
+    Widgets
+    Sql
+    Charts
+    PrintSupport
+    Network
+    SerialPort
+    QuickWidgets
+    WebView
+)
 # List of project sources
 set(PROJECT_SOURCES
     main.cpp
@@ -66,6 +74,9 @@ target_link_libraries(Sign_up PRIVATE
     Qt6::SerialPort
     Qt6::QuickWidgets
     Qt6::WebView
+    Qt6::Core
+    Qt6::Gui
+
 )
 
 # macOS bundle settings

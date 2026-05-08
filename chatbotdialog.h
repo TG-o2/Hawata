@@ -12,6 +12,11 @@
 #include <QSqlError>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
 
 namespace Ui {
 class chatbotdialog;
@@ -46,7 +51,7 @@ private:
 
     // Core query dispatcher
     QString processQuery(const QString &input);
-
+    void callOllama(const QString &input);
     // DB query helpers
     QString queryStock(const QString &input);
     QString queryDocks(const QString &input);

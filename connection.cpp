@@ -3,9 +3,8 @@
 #include <QStringList>
 #include <QtGlobal>
 
-Connection::Connection()
-{
-}
+
+Connection::Connection() = default;
 
 bool Connection::createconnect()
 {
@@ -13,12 +12,12 @@ bool Connection::createconnect()
 
     db.setHostName("localhost");
     db.setPort(1521);
-    db.setDatabaseName("projet_2A");
-    db.setUserName("SMARTFISH");
-    db.setPassword("root");
+    db.setDatabaseName("HWT");
+    db.setUserName("qtuser");
+    db.setPassword("mypassword123");
 
     if (db.open()) {
-        qDebug() << "Connected successfully!";
+        qDebug() << "Connected to MySQL!";
         return true;
     } else {
         m_lastError = db.lastError().text();

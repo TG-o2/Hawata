@@ -7171,15 +7171,12 @@ void appwindow::setupArduinoTemperatureReader()
         ui->tempSourceLabel->setText(
             QString("Arduino: connected on %1").arg(A.getarduino_port_name()));
 
-        // Wire readyRead → update_label  (slide: QObject::connect(A.getserial(), SIGNAL(readyRead()), …))
-        //QObject::connect(A.getserial(), SIGNAL(readyRead()),
-          //               this,          SLOT(update_label()));
-        // Disconnect any previous connection to be safe
+        // Wire readyRead → update_label (temperature reading)
         disconnect(A.getserial(), &QSerialPort::readyRead, this, nullptr);
-        // Connect to the new coordinate‑handling slot
         connect(A.getserial(), &QSerialPort::readyRead,
-            this, &appwindow::update_boat_location_arduino);
-            break;
+                this, &appwindow::update_label);
+        qDebug() << "Connected Arduino readyRead signal to update_label() slot for temperature parsing";
+        break;
 
     case 1:
         qDebug() << "arduino is available but not connected to :" << A.getarduino_port_name();
@@ -7209,7 +7206,14 @@ void appwindow::setupArduinoTemperatureReader()
  */
 void appwindow::update_label()
 {
-    arduinoSerialBuffer.append(A.read_from_arduino());
+    // Constant for fan control threshold
+    const double TEMP_THRESHOLD = 30.0;
+    
+    QByteArray newData = A.read_from_arduino();
+    if (!newData.isEmpty()) {
+        qDebug() << "[ARDUINO RX]" << newData;  // Debug: show raw data
+    }
+    arduinoSerialBuffer.append(newData);
 
     int newlineIndex = arduinoSerialBuffer.indexOf('\n');
     while (newlineIndex >= 0) {
@@ -7223,8 +7227,11 @@ void appwindow::update_label()
             continue;
         }
 
+        qDebug() << "[PARSED LINE]" << line;  // Debug: show each parsed line
+
         if (line.startsWith("ERROR")) {
             ui->tempSourceLabel->setText("Arduino: DHT11 sensor error — check wiring");
+            qDebug() << "[ERROR]" << line;
             newlineIndex = arduinoSerialBuffer.indexOf('\n');
             continue;
         }
@@ -7241,9 +7248,81 @@ void appwindow::update_label()
             bool ok = false;
             const double v = token.toDouble(&ok);
             if (ok) {
+                qDebug() << "[TEMPERATURE PARSED]" << v << "°C";
                 ui->fishTemp->setText(QString::number(v, 'f', 2));
+
+                // -- Insert temperature reading into database
+                QSqlDatabase db = QSqlDatabase::database();
+                if (!db.isOpen()) {
+                    qDebug() << "DB not open — attempting to open default connection...";
+                    if (!db.open()) {
+                        qDebug() << "Failed to open DB:" << db.lastError().text();
+                    }
+                }
+
+                if (db.isOpen()) {
+                    // Create table if it doesn't exist (best-effort; syntax targets Oracle/standard SQL)
+                    QStringList tables = db.tables();
+                    if (!tables.contains("TEMPERATURE_READINGS", Qt::CaseInsensitive)) {
+                        QSqlQuery createQ(db);
+                        bool okCreate = createQ.exec(
+                            "CREATE TABLE TEMPERATURE_READINGS ("
+                            "ID NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+                            "READING_TIME TIMESTAMP, "
+                            "TEMPERATURE FLOAT)"
+                        );
+                        if (!okCreate) {
+                            qDebug() << "Create table failed (may already exist or DB doesn't support identity):" << createQ.lastError().text();
+                        } else {
+                            qDebug() << "Created TEMPERATURE_READINGS table";
+                        }
+                    }
+
+                    QSqlQuery insertQ(db);
+                    insertQ.prepare("INSERT INTO TEMPERATURE_READINGS (READING_TIME, TEMPERATURE) VALUES (CURRENT_TIMESTAMP, :temp)");
+                    insertQ.bindValue(":temp", v);
+                    if (!insertQ.exec()) {
+                        qDebug() << "Failed to insert temperature reading:" << insertQ.lastError().text();
+                    } else {
+                        qDebug() << "Inserted temperature reading:" << v;
+                    }
+                }
+
+                // ──────────────────────────────────────────────────────
+                // Temperature control logic: Compare with threshold
+                // If temp > 30°C → Fan ON (send HIGH command to relay)
+                // If temp <= 30°C → Fan OFF (send LOW command to relay)
+                // ──────────────────────────────────────────────────────
+                
+                QString fanCommand;
+                QString fanStatus;
+                
+                if (v > TEMP_THRESHOLD) {
+                    // Temperature exceeds threshold - turn fan ON
+                    fanCommand = "FAN_ON\n";
+                    fanStatus = "ON";
+                    qDebug() << QString("Temperature %1°C > %2°C threshold - FAN ON").arg(v, 0, 'f', 2).arg(TEMP_THRESHOLD, 0, 'f', 1);
+                } else {
+                    // Temperature is safe - turn fan OFF
+                    fanCommand = "FAN_OFF\n";
+                    fanStatus = "OFF";
+                    qDebug() << QString("Temperature %1°C <= %2°C threshold - FAN OFF").arg(v, 0, 'f', 2).arg(TEMP_THRESHOLD, 0, 'f', 1);
+                }
+                
+                // Send fan control command to Arduino
+                if (A.getserial() && A.getserial()->isOpen()) {
+                    A.write_to_arduino(fanCommand.toUtf8());
+                    qDebug() << "Sent to Arduino:" << fanCommand.trimmed();
+                }
+                
+                // Update UI to show fan status
                 ui->tempSourceLabel->setText(
-                    QString("Arduino: %1 C").arg(v, 0, 'f', 2));
+                    QString("Arduino: %1 C | Fan: %2").arg(v, 0, 'f', 2).arg(fanStatus));
+            }
+        } else {
+            // Log lines that don't match temperature pattern (for debugging)
+            if (line.contains("SYSTEM") || line.contains("COMMAND") || line.contains("STATUS")) {
+                qDebug() << "[ARDUINO MSG]" << line;
             }
         }
 

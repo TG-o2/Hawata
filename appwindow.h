@@ -42,6 +42,9 @@ namespace Ui {
 class appwindow;
 }
 
+// Temperature threshold for fan control (max temp before fan turns on)
+constexpr double MAX_TEMP_THRESHOLD = 30.0;
+
 class appwindow : public QDialog
 {
     Q_OBJECT

@@ -35,32 +35,75 @@ int Arduino::connect_arduino()
         serial->close();
     }
 
+    // ── DEBUG: Log all available ports ────────────────────────────────
+    QList<QSerialPortInfo> availablePorts = QSerialPortInfo::availablePorts();
+    qDebug() << "──────────────────────────────────────────────────────";
+    qDebug() << "Available COM ports:" << availablePorts.size();
+    for (const QSerialPortInfo &port : availablePorts) {
+        qDebug() << "  Port:" << port.portName()
+                 << "| Description:" << port.description()
+                 << "| Manufacturer:" << port.manufacturer()
+                 << "| VendorID:" << port.vendorIdentifier()
+                 << "| ProductID:" << port.productIdentifier();
+    }
+    qDebug() << "──────────────────────────────────────────────────────";
+
     // ── 1. Try to identify the board by vendor / product ID ──────────
-    foreach (const QSerialPortInfo &serial_port_info, QSerialPortInfo::availablePorts()) {
+    foreach (const QSerialPortInfo &serial_port_info, availablePorts) {
         if (serial_port_info.hasVendorIdentifier() && serial_port_info.hasProductIdentifier()) {
             if (serial_port_info.vendorIdentifier()  == arduino_uno_vendor_id &&
                 serial_port_info.productIdentifier() == arduino_uno_product_id) {
                 arduino_is_available = true;
                 arduino_port_name    = serial_port_info.portName();
+                qDebug() << "✓ Found Arduino by Vendor/Product ID on port:" << arduino_port_name;
             }
         }
     }
 
-    // ── 2. Fallback: match by description keywords (CH340, Arduino, USB Serial) ──
+    // ── 2. Fallback: match by description keywords (extended list) ────
     if (!arduino_is_available) {
-        foreach (const QSerialPortInfo &serial_port_info, QSerialPortInfo::availablePorts()) {
-            const QString sig = (serial_port_info.description() + " " +
-                                 serial_port_info.manufacturer()).toLower();
-            if (sig.contains("arduino") || sig.contains("ch340") ||
-                sig.contains("usb serial")) {
+        foreach (const QSerialPortInfo &serial_port_info, availablePorts) {
+            const QString desc = serial_port_info.description().toLower();
+            const QString manuf = serial_port_info.manufacturer().toLower();
+            const QString combined = desc + " " + manuf;
+            
+            // Expanded keyword list: supports CH340, FT232, CP2102, WCH, etc.
+            if (combined.contains("arduino") || 
+                combined.contains("ch340") ||
+                combined.contains("ch341") ||
+                combined.contains("usb serial") ||
+                combined.contains("ft232") ||
+                combined.contains("cp2102") ||
+                combined.contains("cp210x") ||
+                combined.contains("wch") ||
+                combined.contains("silicon labs") ||
+                combined.contains("prolific") ||
+                combined.contains("pl2303")) {
                 arduino_is_available = true;
                 arduino_port_name    = serial_port_info.portName();
+                qDebug() << "✓ Found Arduino by description match on port:" << arduino_port_name;
+                qDebug() << "  Description:" << desc << "| Manufacturer:" << manuf;
                 break;
             }
         }
     }
 
-    qDebug() << "arduino_port_name is:" << arduino_port_name;
+    // ── 3. Last resort: if any COM port exists and previous methods failed ──
+    if (!arduino_is_available && !availablePorts.isEmpty()) {
+        // Take the first available COM port (useful for unknown USB chips)
+        arduino_port_name = availablePorts.first().portName();
+        arduino_is_available = true;
+        qDebug() << "⚠ Arduino not recognized by ID/keyword - using first available port:" << arduino_port_name;
+        qDebug() << "  Description:" << availablePorts.first().description();
+        qDebug() << "  Manufacturer:" << availablePorts.first().manufacturer();
+    }
+
+    if (!arduino_is_available) {
+        qDebug() << "✗ No COM ports found - Arduino not connected";
+        return -1;  // not found
+    }
+
+    qDebug() << "Attempting to open port:" << arduino_port_name;
 
     if (arduino_is_available) {
         // ── Configuration of the communication (flow, baud, bits …) ──
@@ -73,10 +116,15 @@ int Arduino::connect_arduino()
             serial->setStopBits(QSerialPort::OneStop);    // number of stop bits: 1
             serial->setFlowControl(QSerialPort::NoFlowControl);
 
+            qDebug() << "✓ Successfully opened serial port:" << arduino_port_name;
+
             QObject::disconnect(serial, nullptr, this, nullptr);
             QObject::connect(serial, &QSerialPort::readyRead,
                              this, &Arduino::handleReadyRead);
             return 0;  // connected successfully
+        } else {
+            qDebug() << "✗ Failed to open port:" << arduino_port_name;
+            qDebug() << "  Error:" << serial->errorString();
         }
         return 1;      // found but could not open
     }
